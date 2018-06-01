@@ -322,7 +322,7 @@ Data.Control = FALSE
 if(Data.Control)
 {
     data.version = '_total_v2'
-    load(file=paste('myRdata/my_genes_RNA_seq_analysis_sel', data.version, '.Rdata', sep=''))
+    load(file=paste('../myRdata/my_genes_RNA_seq_analysis_sel', data.version, '.Rdata', sep=''))
     
     source("f24_modified_1.0.r")
     source('model_RNA_seq_total/functions.R')
