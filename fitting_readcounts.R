@@ -307,177 +307,77 @@ if(RNA.Seq)
     save(ss, file='/Users/jiwang/Degradation_Liver/Main_Code_Degradation/model_RNA_seq_total/Libary_size_48_samples.Rdata')
     save(size.factors, file='/Users/jiwang/Degradation_Liver/Main_Code_Degradation/model_RNA_seq_total/size_factors_48_samples.Rdata')
     #load(file=paste('myRdata/my_genes_RNA_seq_analysis', data.version, '.Rdata', sep=''))
-    Prepare.NF.KO = FALSE
-    if(Prepare.NF.KO)
+    
+    
+    test.condition.dependent.alpha = TRUE
+    if(test.condition.dependent.alpha)
     {
-        prepare.NF.KO.tables();
-    }
-    
-}
-
-################### (TO DO)
-##### Data Control and Validation for the total RNA-seq data by comparing with qPCR (David Gatefield), ExonArray, nascent-RNA-seq
-###################
-Data.Control = FALSE
-if(Data.Control)
-{
-    data.version = '_total_v2'
-    load(file=paste('../myRdata/my_genes_RNA_seq_analysis_sel', data.version, '.Rdata', sep=''))
-    
-    source("f24_modified_1.0.r")
-    source('model_RNA_seq_total/functions.R')
-    
-    ###### Summary of data: expression of premRNAs and mRNAs, phases of rhythmic premRNAs and mRNAs
-    Tt = R;
-   
-    ii = grep('abs.mRNA', colnames(Tt))
-    jj = grep('abs.premRNA', colnames(Tt))
-    data1 = log2(as.matrix(Tt[,ii]))
-    data2 = log2(as.matrix(Tt[,jj]))
-    
-    stat1 = t(apply(data1,1, f24_R2_alt2, t=c(0:47)*2))
-    stat2 = t(apply(data2,1, f24_R2_alt2, t=c(0:47)*2))
-    stat1 = cbind(stat1, qvals(stat1[,6]))
-    stat2 = cbind(stat2, qvals(stat2[,6]))
-    
-    
-    sel = which(stat1[,2]>-1)
-    Tt = Tt[sel, ]
-    
-    data.version = '_total_v1'
-    save(R, Tt, file=paste('myRdata/my_genes_RNA_seq_analysis_sel', data.version, '.Rdata', sep=''))
-    
-    
-    pdf('myplots/premRNAs_expression_log2.pdf', width=2.2, height=2.2)
-    par(cex = 0.7, las = 1, mgp = c(1.6,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3)
-    
-    x = stat2[sel,2]
-    hist(x,breaks=25,xlab=NA,ylab=NA, main=NA,col='gray',cex.lab=1.0,xlim=c(-5, 15), axes=FALSE)
-    abline(v=median(x), lwd=1.5, col='navajowhite4')
-    axis(1,at=seq(-5,15,by=3),cex.axis =0.7)
-    axis(2,at = seq(0,1000, by=200),las=1,cex.axis = 0.7)
-    
-    dev.off()
-    
-    pdf('myplots/mRNAs_expression_log2.pdf', width=2.2, height=2.2)
-    par(cex = 0.7, las = 1, mgp = c(1.6,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3)
-    
-    x = stat1[sel,2]
-    hist(x,breaks=50,xlab=NA,ylab=NA, main=NA,col='gray',cex.lab=1.0,xlim=c(-5, 15), axes=FALSE)
-    abline(v=median(x), lwd=1.5, col='navajowhite4')
-    axis(1,at=seq(-5,15,by=3),cex.axis =0.7)
-    axis(2,at = seq(0,800, by=200),las=1,cex.axis = 0.7)
-    
-    dev.off()
-    
-    library(plotrix)
-    library("circular")
-    make_circ_coord = function(t,x,ttot=24)
-    {
-        dt=(t[2]-t[1])*.45
-        a=(rep(t,rep(4,length(t)))+rep(c(-dt,-dt,dt,dt),length(t)))*2*pi/ttot
-        h=rep(x,rep(4,length(x)))*rep(c(0,1,1,0),length(t))
-        list(angles=a,heights=h)
-    }
-    circular_phase24H_histogram = function(x,color_hist = rgb(0.6,0,0.2), cex.axis=0.5, cex.lab=0.5, lwd=0.5)
-    {
-        #color_DHS = rgb(0.6,0,0.2)
-        par(lwd=lwd,cex.axis=cex.axis, cex.main=0.1,cex.lab=cex.lab)
-        #par(mfrow=c(1,1),mar=c(4.5,4.5,1,.5)+.1,las=1)
-        br=0:24
-        h=hist(x, br=br,plot=FALSE)
-        co=make_circ_coord(br[-1],h$counts)
-        radial.plot(co$heights,co$angles,br[-1]-br[2], clockwise=TRUE,start=pi/2,main=NA, rp.type='p',poly.col=color_hist)
-    }
-    
-    kk = which(stat2[,7]<0.05)
-    phases = stat2[kk, 5]
-    
-    pdf('myplots/Phases_rhythmic_premRNAs.pdf', width=2.2, height=2.2)
-    par(cex = 0.7, las = 1, mgp = c(1.6,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3)
-    
-    circular_phase24H_histogram(phases, col=rgb(0.0,0.5,0.2), cex.axis=0.7, cex.lab=0.01, lwd=0.5)
-    
-    dev.off()
-    
-    kk = which(stat1[,7]<0.05)
-    phases = stat1[kk, 5]
-    
-    pdf('myplots/Phases_rhythmic_RNAs.pdf', width=2.2, height=2.2)
-    par(cex = 0.7, las = 1, mgp = c(1.6,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3)
-    
-    circular_phase24H_histogram(phases, col=rgb(0.7,0.,0.2), cex.axis=0.7, cex.lab=0.01, lwd=0.5)
-    
-    dev.off()
-    
-    ### compare with half-lives
-    half.life.comparison = FALSE
-    if(half.life.comparison)
-    {
-        shar = read.table('/Users/jiwang/Degradation_Liver/_x_MicroArray/complementary_data/half-lives/Sharova.txt', stringsAsFactors = FALSE, sep = '\t', header = TRUE)
-        fried = read.table('/Users/jiwang/Degradation_Liver/_x_MicroArray/complementary_data/half-lives/Friedel.txt', stringsAsFactors = FALSE, sep = '\t', header = TRUE)
-        schwa = read.csv('/Users/jiwang/Proteomics_anaylysis/Nuclear_proteins/Annotations/Schwarnhausser_2011.csv', header=TRUE)
-        ii = match(c("Gene.Names", "mRNA.half.life.replicate..h."), colnames(schwa))
-        schwa = schwa[,ii]
-        schwa = schwa[which(!is.na(schwa[,2])==TRUE), ]
-        gene = c()
+      Compute.alphas.each.condition = FALSE
+      if(Compute.alphas.each.condition){
+        ii = grep('.count.mRNA', colnames(T))
+        jj = grep('.count.premRNA', colnames(T))
+        exon = as.matrix(T[,ii])
+        intron = as.matrix(T[,jj])
+        countData =  rbind(exon, intron)
+        require('DESeq2')
+        load(file='/Users/jiwang/Degradation_Liver/Main_Code_Degradation/model_RNA_seq_total/size_factors_48_samples.Rdata')
         
-        for(n in 1:nrow(schwa))
+        ### estimate dispersion parameters with Deseq2 for each gene and each condition
+        alphas = matrix(NA, nrow=nrow(countData), ncol=12)
+        alphas.genes = matrix(NA, nrow=nrow(countData), ncol=12)
+        
+        for(n in 1:ncol(alphas))
         {
-            test = schwa[n, 1]
-            test = unlist(strsplit(as.character(test), ';'))
-            mm = match(test, Tt$gene)
-            if(length(which(!is.na(mm)==TRUE))>0) {gene = c(gene, as.character(test[which(!is.na(mm)==TRUE)][1]))
-            }else{
-                gene = c(gene, as.character(schwa[n, 1]))
-            }
+          cat('ZT ', (n-1)*2, '\n');
+          index = (c(0:3)*12+n);
+          countData2 = countData[, index];
+          condition <- factor(rep(c(1), 4))
+          dds <- DESeqDataSetFromMatrix(countData2, DataFrame(condition), ~1);
+          sizeFactors(dds) = size.factors[index]
+          dds <- estimateDispersions(dds, maxit = 500)
+          alphas[,n] = dispersions(dds);
+          alphas.genes[,n] = mcols(dds)$dispGeneEst
         }
-        schwa[, 1] = gene
         
-        colnames(shar) = c('gene', 'half.life')
-        colnames(fried) = c('gene', 'probeset.ID','hlmin','half.life')
-        shar = shar[which(shar[,2]>0),]
-        fried = fried[which(fried[,4]>0),]
-        fried = fried[, c(1,4)]
-        colnames(schwa) = c('gene', 'half.life')
-        #save(shar, fried, schwa, file='myRdata/mRNAs_half_lives_databases.Rdata')
+        xx = data.frame(alphas[c(1:nrow(T)),], alphas[-c(1:nrow(T)), ])
+        colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
+        alphas = xx;
         
-        overlap2 = intersect(Tt$gene, shar[,1])
-        overlap2 = intersect(overlap2, fried[,1])
-        overlap2 = intersect(overlap2, schwa[,1] )
+        T = data.frame(T[,c(1:3)], alphas, T[, -c(1:5)], stringsAsFactors = FALSE)
         
-        ii = match(overlap2, Tt$gene)
+        T$mRNA.outlier = '';
+        T$premRNA.outlier = '';
         
-        pdf('myplots/Compare_half-lives_polyA_Total_Exon_Array_Nascent.pdf', width=16.0, height=6.0)
-        par(cex = 0.7, las = 1, mgp = c(1.6,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3)
         
-        par(mfrow=c(1,3))
+        #save(alphas, alphas.genes, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/Deseq2_estimation_alpha_conditions', 
+        #                       data.version, '.Rdata', sep=''))
         
-        xx1 = as.numeric(Tt$mean.mRNA[ii]/Tt$mean.premRNA[ii])
-        mm = match(overlap2, fried[,1])
-        yy1 = as.numeric(fried[mm, 2])
+        load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/Deseq2_estimation_alpha_conditions', 
+                        data.version, '.Rdata', sep=''))
+        xx = data.frame(alphas[c(1:nrow(T)),], alphas[-c(1:nrow(T)), ])
+        colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
+        alphas = xx;
         
-        cex = 0.7
-        plot(xx1, yy1, cex=cex, xlab='total', ylab='fried', main=paste('R = ', signif(cor(xx1, yy1), d=2), sep=''), log='xy')
-        cor(xx1, yy1)
+        T$mRNA.outlier = '';
+        T$premRNA.outlier = '';
         
-        mm = match(overlap2, shar[,1])
-        yy1 = as.numeric(shar[mm, 2])
-        plot(xx1, yy1, cex=cex, xlab='total', ylab='shar', main=paste('R = ', signif(cor(xx1, yy1), d=2), sep=''), log='xy')
-        cor(xx1, yy1)
+        kk = grep('alpha', colnames(T))
+        T = data.frame(T[,c(1:3)], alphas, T[, -kk], stringsAsFactors = FALSE)
+        T = T[, -c(28:30)]
+        R = T;
+        data.version = '_total_counts_v2'
+        #save(R, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_RNA_seq_analysis_sel_alphas', data.version, '.Rdata', sep=''))
         
-        mm = match(overlap2, schwa[,1])
-        yy1 = as.numeric(schwa[mm, 2])
-        plot(xx1, yy1, cex=cex, xlab='total', ylab='schwa', main=paste('R = ', signif(cor(xx1, yy1), d=2), sep=''), log='xy')
-        cor(xx1, yy1)
-        
-        dev.off()
-    }
+      }
+    }  
+    
 }
 
-###########################
-######## FITS WITH REAL DATA (test part)
-###########################
+######################################
+######################################
+## Section: fitting the read count from RNA-seq data
+######################################
+######################################
 Real.Data.Fitting = FALSE
 if(Real.Data.Fitting)
 {
@@ -561,14 +461,6 @@ if(Real.Data.Fitting)
     name1 = paste('gamma.m', m, sep='');name2 = paste('gamma.stderr.m', m, sep='')
     eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))', sep='')));
     
-    #ptm <- proc.time()
-    #param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = j, debug = TRUE, zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE);
-    #proc.time() - ptm
-    #c(param.fits.results, my.BIC.this.gene(param.fits.results))
-    #test1 = c(param.fits.results, my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC'),
-    #  my.model.selection.one.gene.loglike(param.fits.results, method = 'AICc'), my.model.selection.one.gene.loglike(param.fits.results, method = 'AIC'))
-    #keep5 = rbind(keep5, test1)
-    
   }
   
   keep5 = data.frame(T[mm[c(1:14)], 1], keep5, stringsAsFactors = FALSE)
@@ -576,68 +468,6 @@ if(Real.Data.Fitting)
   #keep4 = keep4[c(1:4),]
   
   
-  test.condition.dependent.alpha = TRUE
-  if(test.condition.dependent.alpha)
-  {
-    Compute.alphas.each.condition = FALSE
-    if(Compute.alphas.each.condition)
-    {
-      ii = grep('.count.mRNA', colnames(T))
-      jj = grep('.count.premRNA', colnames(T))
-      exon = as.matrix(T[,ii])
-      intron = as.matrix(T[,jj])
-      countData =  rbind(exon, intron)
-      require('DESeq2')
-      load(file='/Users/jiwang/Degradation_Liver/Main_Code_Degradation/model_RNA_seq_total/size_factors_48_samples.Rdata')
-      
-      ### estimate dispersion parameters with Deseq2 for each gene and each condition
-      alphas = matrix(NA, nrow=nrow(countData), ncol=12)
-      alphas.genes = matrix(NA, nrow=nrow(countData), ncol=12)
-
-      for(n in 1:ncol(alphas))
-      {
-        cat('ZT ', (n-1)*2, '\n');
-        index = (c(0:3)*12+n);
-        countData2 = countData[, index];
-        condition <- factor(rep(c(1), 4))
-        dds <- DESeqDataSetFromMatrix(countData2, DataFrame(condition), ~1);
-        sizeFactors(dds) = size.factors[index]
-        dds <- estimateDispersions(dds, maxit = 500)
-        alphas[,n] = dispersions(dds);
-        alphas.genes[,n] = mcols(dds)$dispGeneEst
-      }
-      
-      xx = data.frame(alphas[c(1:nrow(T)),], alphas[-c(1:nrow(T)), ])
-      colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
-      alphas = xx;
-      
-      T = data.frame(T[,c(1:3)], alphas, T[, -c(1:5)], stringsAsFactors = FALSE)
-      
-      T$mRNA.outlier = '';
-      T$premRNA.outlier = '';
-      
-      
-      #save(alphas, alphas.genes, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/Deseq2_estimation_alpha_conditions', 
-      #                       data.version, '.Rdata', sep=''))
-      
-      load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/Deseq2_estimation_alpha_conditions', 
-                      data.version, '.Rdata', sep=''))
-      xx = data.frame(alphas[c(1:nrow(T)),], alphas[-c(1:nrow(T)), ])
-      colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
-      alphas = xx;
-      
-      T$mRNA.outlier = '';
-      T$premRNA.outlier = '';
-      
-      kk = grep('alpha', colnames(T))
-      T = data.frame(T[,c(1:3)], alphas, T[, -kk], stringsAsFactors = FALSE)
-      T = T[, -c(28:30)]
-      R = T;
-      data.version = '_total_counts_v2'
-      #save(R, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_RNA_seq_analysis_sel_alphas', data.version, '.Rdata', sep=''))
-    
-      }
-  }  
   
   
   #save(keep4, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_core_clock_fitting_results_alpha_conditions_MLE_outliers_v4', data.version, '.Rdata', sep=''))
