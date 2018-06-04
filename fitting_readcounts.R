@@ -10,22 +10,6 @@
 
 ######################################
 ######################################
-## Section: should be moved into the function scripts
-######################################
-######################################
-### install some packages
-ipak <- function(pkg){
-  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-  if (length(new.pkg)) 
-    install.packages(new.pkg, dependencies = TRUE)
-  sapply(pkg, require, character.only = TRUE)
-}
-# usage
-packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
-ipak(packages)
-
-######################################
-######################################
 ## Section: prepare the read count table for fitting
 ## 1) Import read counts of total RNA-seq data
 ## 2) filter non-expressed mRNAs
@@ -628,31 +612,4 @@ if(Real.Data.Fitting)
 	  abline(h=1, col='red', lwd=2.0)
   }
    
-   
-    #### check functions for mRNA premRNA profiles
-    Check.functions = FALSE
-    if(Check.functions)
-    {
-      source('functions.R')
-      zt = seq(0, 94, by=2)
-      Min = 5
-      Amp = 1.0
-      beta = 5.0
-      phase = 6;
-      s1 = compute.s.beta(zt, Min, Amp, phase, beta);
-      fold.change = Amp/Min+1;
-      #mean = Min*(1+(fold.change-1)/4^beta*gamma(1+2*beta)/gamma(1+beta)^2)
-      s2 = compute.s.beta.v1(zt, mean, fold.change, phase, beta)
-    
-      gamma = log(2)/5;
-      eps.gamma = 0.2;
-      phase.gamma = 15;
-      splicing.k = log(2)/(5/60);
-      m1 = compute.m.beta(zt, gamma, eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta, simulation.only=FALSE)
-      mm1 = compute.m.beta(zt, gamma, eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta, simulation.only=TRUE)
-    
-      source('functions_RPKM_v1.R')
-      m2 = compute.m.beta(zt, gamma*(1-eps.gamma), 2*gamma*eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta)
-    }
-    
 }

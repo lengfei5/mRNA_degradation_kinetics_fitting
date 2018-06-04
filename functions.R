@@ -1,6 +1,19 @@
-#####################
-#### We work only on the absolute value of RNA-seq and cosine.beta parametrization
-#####################
+######################################
+######################################
+## Section: should be moved into the function scripts
+######################################
+######################################
+### install some packages
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+# usage
+packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
+ipak(packages)
+
 library(emdbook)
 library(deSolve)
 library(fdrtool)
@@ -14,6 +27,11 @@ library('Matrix')
 #library('matrixcalc')
 #source("https://bioconductor.org/biocLite.R")
 #biocLite("biomaRt")
+
+#####################
+#### We work only on the absolute value of RNA-seq and cosine.beta parametrization
+#####################
+
 ###### splicing demonstration and intron selection
 selection = function(vect, cutoff=-4)
 {
@@ -1476,13 +1494,11 @@ f24_R2_alt2=function(x, t=2*(0:(length(x)-1)), period=24, offset=0)
   }
 }
 
-
 #################################################################################################################
 #################################################################################################################
 ###########  Main Function for model selection and fitting
 #################################################################################################################
 #################################################################################################################
-
 ### Model Selection for one gene
 my.model.selection.one.gene.loglike = function(param.fits.results, nb.data=96, method = 'BIC', absolute.signal=TRUE)
 {
@@ -2897,11 +2913,11 @@ compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, pha
 	return(m)
 }
 
+
 ##################################################################################################################
+## ---------- finishing line of optimization --------------------------------
 ##################################################################################################################
-################################################################################################################## finishing line of optimization
-##################################################################################################################
-##################################################################################################################
+
 
 ######################
 # Functions for model selecion
