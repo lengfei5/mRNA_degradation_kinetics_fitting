@@ -53,24 +53,11 @@ unpacking.plots = function(vect)
 
 
 ######## FUNCTIONS FOR SIMULATED DATA and for the optimization and model selection
-
 mean.substract = function(vect)
 {
 	return(vect-mean(vect[which(!is.na(vect))]))
 }
 
-index.outliers = function(data.xx)
-{
-	c = 1.5
-	#data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
-	Q1 = quantile(data.xx, 0.25,type=5)
-	Q3 = quantile(data.xx, 0.75, type=5)
-	IQD = Q3 - Q1
-	lower = Q1 - c*IQD
-	upper = Q3 + c*IQD
-	index = which(data.xx<lower|data.xx>upper)
-	#boxplot(data.xx);abline(h=Q1);abline(h=Q3);
-}
 
 variance.mean.counts = function(x, normalization=TRUE)
 {
@@ -973,8 +960,6 @@ f24_R2_alt2=function(x, t=2*(0:(length(x)-1)), period=24, offset=0)
 ##################################################################################################################
 ## ---------- finishing line of optimization --------------------------------
 ##################################################################################################################
-
-
 
 ################
 ######## Output 

@@ -72,7 +72,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
       
-      res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, L.m, L.s,  
+      res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, a.m, a.s, L.m, L.s,  
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
                                                                   nb.additonal.m = nb.additonal.m, 
                                                                   nb.additonal.s = nb.additonal.s);
@@ -111,6 +111,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       #### FAST analysis
       #ptm <- proc.time()
     }
+    
     for(model in c(2:4))
     {
       cat('Model ', model, '\n');
@@ -149,7 +150,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     }
     if(PLOT.Ident.analysis)  dev.off()
     #proc.time() - ptm;
-    
   }
   
   ####################

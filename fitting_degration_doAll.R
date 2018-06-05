@@ -25,12 +25,12 @@ ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
-outliers.removal = FALSE;
+outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
 
-Identifiablity.Analysis.by.Profile.Likelihood.gamma = FALSE
+Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE
 PLOT.Ident.analysis = FALSE
 
 gg = 'Rorc'
@@ -47,10 +47,10 @@ proc.time() - ptm
 ###########################
 ## compare with origine function
 ###########################
-source('functions_origin.R')
+source('origin/functions_origin.R')
 ptm <- proc.time()
-param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = TRUE,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
+param.fits.results.v0 = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = TRUE,
+                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
 proc.time() - ptm
 
 index = match(c('outlier.m', 'outlier.s'), names(param.fits.results))

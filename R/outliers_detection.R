@@ -10,7 +10,9 @@
 ### chekc if there are outliers
 detect.ouliters.loglike = function(param.fits.results,
                                    R.m,
-                                   R.s, 
+                                   R.s,
+                                   a.m, 
+                                   a.s,
                                    L.m,
                                    L.s,
                                    outlier.m = c(), 
@@ -112,6 +114,19 @@ index.outliers.loglike = function(data.xx, c=1.5)
   index = which(data.xx>upper)
   #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
   return(index)
+}
+
+index.outliers = function(data.xx)
+{
+  c = 1.5
+  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
+  Q1 = quantile(data.xx, 0.25,type=5)
+  Q3 = quantile(data.xx, 0.75, type=5)
+  IQD = Q3 - Q1
+  lower = Q1 - c*IQD
+  upper = Q3 + c*IQD
+  index = which(data.xx<lower|data.xx>upper)
+  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
 }
 
 ## testing the scope of variables in R
