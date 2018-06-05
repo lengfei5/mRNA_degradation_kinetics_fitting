@@ -1,7 +1,7 @@
 ##########################################################################
 ##########################################################################
 ## Project: fitting temporal profiles of pre-mRNA and mRNA with a kinetic model to infer the rhythmic transcriptional and post-transcriptional regulation
-## Script purpose:
+## Script purpose: this script is the function of the highest order for R package
 ## Usage example: 
 ## Author: Jingkui Wang (jingkui.wang@imp.ac.at)
 ## Date of creation: Fri Jun  1 12:01:00 2018
@@ -32,11 +32,13 @@ j = which(T$gene==gg)
 #source('functions.R')
 
 ptm <- proc.time()
-param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = TRUE,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
+param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = debug,
+                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers);
 proc.time() - ptm
 
+###########################
 ## compare with origine function
+###########################
 source('functions_origine.R')
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = TRUE,
