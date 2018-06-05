@@ -20,16 +20,23 @@ data.version = "data_example_readCount"
 dataDir = "data/"
 load(file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
 
+### parameter to specify 
 ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
+
 outliers = FALSE;
 debug = TRUE;
+absolute.signal = TRUE
+parametrization = 'cosine.beta'
+Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE
+PLOT.Ident.analysis = FALSE
+
 gg = 'Rorc'
 j = which(T$gene==gg)
 
-
-source('R/fitting_degradation_do_stepbystep.R')
+source("R/fitting_degradation_do_stepbystep.R")
+#source("R/fitting_degradation_do_stepbystep.R")
 
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = debug,
@@ -91,7 +98,8 @@ if(Test.circadian.gene.examples){
     print(test1);
     m = test1[which(names(test1)=='BIC.best.model')]
     name1 = paste('gamma.m', m, sep='');name2 = paste('gamma.stderr.m', m, sep='')
-    eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))', sep='')));
+    eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))',
+                          sep='')));
     
   }
   

@@ -3,30 +3,6 @@
 ## Section: should be moved into the function scripts
 ######################################
 ######################################
-### install some packages
-ipak <- function(pkg){
-  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-  if (length(new.pkg))
-    install.packages(new.pkg, dependencies = TRUE)
-  sapply(pkg, require, character.only = TRUE)
-}
-# usage
-packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
-ipak(packages)
-
-library(emdbook)
-library(deSolve)
-library(fdrtool)
-library(circular)
-library(preprocessCore)
-library(gtools)
-library(biomaRt)
-#library(plotrix)
-library(numDeriv)
-library('Matrix')
-#library('matrixcalc')
-#source("https://bioconductor.org/biocLite.R")
-#biocLite("biomaRt")
 
 #####################
 #### We work only on the absolute value of RNA-seq and cosine.beta parametrization
@@ -77,23 +53,6 @@ unpacking.plots = function(vect)
 
 
 ######## FUNCTIONS FOR SIMULATED DATA and for the optimization and model selection
-set.scaling.factors = function()
-{
-  #ptm = proc.time()
-  #load(file='Scaling_factors_48_samples.Rdata')
-  #proc.time() - ptm;
-  #xx = scaling.factors;
-  #scaling.factors <<- xx;
-  #proc.time() - ptm;
-  
-  #ptm = proc.time()
-  scaling.factors <<- c(39920608, 42250245, 38121270, 45609244, 41511752, 45781196, 43722568, 39638552, 30496638, 30573333, 54950572, 47158379,
-                        31722765, 39931646, 36317783, 35382708, 47293167, 42408985, 39842283, 40230336, 43691685, 39237518, 51051196, 44778546,
-                        43858841, 42791401, 42357301, 49782402, 44628140, 44561463, 43485553, 47853067, 43318817, 45055723, 30180984, 46825671,
-                        43270558, 37496344, 40971385, 45828360, 37065376, 35776330, 45025514, 43026714, 43116633, 35173387, 28538212, 36707156);
-  #proc.time() - ptm;
-  
-}
 
 mean.substract = function(vect)
 {

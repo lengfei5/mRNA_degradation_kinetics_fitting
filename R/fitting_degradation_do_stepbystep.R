@@ -7,10 +7,23 @@
 ## Date of creation: Tue Jun  5 11:03:16 2018
 ##########################################################################
 ##########################################################################
-make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, gene.index = 1, debug = FALSE, zt = seq(0,94,by = 2), i.ex = ZT.ex, i.int = ZT.int, 
-                                                                  outliers = FALSE, Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE, PLOT.Ident.analysis = FALSE, 
-                                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE)
+source("R/configure.R")
+source("R/preparation_before_modelfitting.R")
+make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, 
+                                                                  gene.index = 1, 
+                                                                  zt = seq(0,94,by = 2), 
+                                                                  i.ex = ZT.ex, 
+                                                                  i.int = ZT.int, 
+                                                                  debug = FALSE,
+                                                                  outliers = FALSE, 
+                                                                  Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE, 
+                                                                  PLOT.Ident.analysis = FALSE, 
+                                                                  parametrization = c('cosine.beta'), 
+                                                                  absolute.signal = TRUE)
 {
+  ####################
+  ## check the parameters
+  ####################
   #gg = 'Per2'; gene.index = which(T$gene==gg); source('functions.R');zt = seq(0,94,by = 2); debug=TRUE; outliers = TRUE;
   gene.name = T$gene[gene.index];
   R.m = T[gene.index, ZT.ex]
@@ -20,15 +33,22 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, gene.in
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
   
-  #######
-  #### fitting and outlier removal
-  #######
+  
+  ####################
+  ## fitting the data for each model
+  ####################
+  source("R/optimization_params.R")
   if(!outliers)
   {
     param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                 i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE); 
     outlier.m = NA; outlier.s = NA;
+    
   }else{
+    ####################
+    ## outlier detection and loop over the mode fitting if there are outliers 
+    ####################
+    ## source()
     outlier.m = c(); outlier.s = c();
     nb.additonal.m = 1; nb.additonal.s = 1;
     T$mRNA.outlier[gene.index] = '';  T$premRNA.outlier[gene.index] = '';
@@ -43,6 +63,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, gene.in
         #        my.model.selection.one.gene.loglike(param.fits.results, nb.data = (96-missing.data), method = 'AIC')));
         #print(param.fits.results);
       }
+      
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
       ### chekc if there are outliers
@@ -121,10 +142,14 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, gene.in
     if(length(outlier.s)==0) outlier.s = NA;
   }
   
-  ##### Analyze non-identifiability using Profile Likelihood approache
+  ####################
+  ## Analyze non-identifiability using Profile Likelihood approache
+  ####################
   if(Identifiablity.Analysis.by.Profile.Likelihood.gamma)
   {
+    source("R/identifiability_analysis.R")
     if(debug){cat('\t\t starting non-identifiability analysis for gamma \n')}
+    
     M = norm.RPKM(R.m, L.m)
     S = norm.RPKM(R.s, L.s)
     a = mean(M)/mean(S) # ratio between splicing rate and degratation rate
@@ -179,5 +204,18 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, gene.in
     
   }
   
+  ####################
+  ## model selection  
+  ####################
+  
+  ####################
+  ## parameter transformation 
+  ####################
+  
+  ####################
+  ## output  
+  ####################
+  
   return(c(param.fits.results, outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')));
+  
 }

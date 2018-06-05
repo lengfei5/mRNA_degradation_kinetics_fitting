@@ -15,6 +15,10 @@
 #########
 #### fitting all models for one genes and remove outliers with iterations
 #########
+source("R/error_functions.R")
+source("R/kinetic_model.R")
+source("R/set_bounds_initialize_values.R")
+
 make.fits.with.all.models.for.one.gene.remove.outliers.4specific.model = function(T = T, gene.index = j, model=3, debug = TRUE,
                                                                                   zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE)
 {
@@ -97,6 +101,7 @@ norm.RPKM = function(nb.reads, length)
   set.scaling.factors();
   return(nb.reads/length/scaling.factors*10^9);
 }
+
 convert.nb.reads = function(rpkm, length)
 {
   set.scaling.factors();
