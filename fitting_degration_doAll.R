@@ -39,7 +39,7 @@ proc.time() - ptm
 ###########################
 ## compare with origine function
 ###########################
-source('functions_origine.R')
+source('functions_origin.R')
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = TRUE,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
