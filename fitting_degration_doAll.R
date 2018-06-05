@@ -24,12 +24,12 @@ ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 outliers = FALSE;
-
 debug = TRUE;
-
 gg = 'Rorc'
 j = which(T$gene==gg)
-#source('functions.R')
+
+
+source('R/fitting_degradation_do_stepbystep.R')
 
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = debug,
