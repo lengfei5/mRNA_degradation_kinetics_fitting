@@ -125,20 +125,6 @@ variance.estimate.replicates = function(x, nb.replicates=4, log=TRUE)
   return(sd)
 }
 
-index.outliers.loglike = function(data.xx, c=1.5)
-{
-  #c = 3
-  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
-  #data.xx = data.xx[which(!is.na(data.xx)==TRUE)]
-  Q1 = quantile(data.xx, 0.25,type=5)
-  Q3 = quantile(data.xx, 0.75, type=5)
-  IQD = Q3 - Q1
-  lower = Q1 - c*IQD
-  upper = Q3 + c*IQD
-  index = which(data.xx>upper)
-  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
-  return(index)
-}
 
 
 plot.dispersion.examples = function(T, index)

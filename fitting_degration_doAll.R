@@ -29,17 +29,18 @@ outliers = FALSE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
-Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE
+
+Identifiablity.Analysis.by.Profile.Likelihood.gamma = FALSE
 PLOT.Ident.analysis = FALSE
 
 gg = 'Rorc'
-j = which(T$gene==gg)
+gene.index = which(T$gene==gg)
 
 source("R/fitting_degradation_do_stepbystep.R")
 #source("R/fitting_degradation_do_stepbystep.R")
 
 ptm <- proc.time()
-param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = j, debug = debug,
+param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers);
 proc.time() - ptm
 
