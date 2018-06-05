@@ -7,8 +7,8 @@
 ## Date of creation: Tue Jun  5 11:03:16 2018
 ##########################################################################
 ##########################################################################
+## install package dependency
 source("R/configure.R")
-source("R/preparation_before_modelfitting.R")
 
 make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, 
                                                                   gene.index = 1, 
@@ -22,6 +22,11 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   parametrization = c('cosine.beta'), 
                                                                   absolute.signal = TRUE)
 {
+  ####################
+  ## prepare the table, geneNames, geneLengths, sizeFactors, dispersion estiamtion and variance estimation 
+  ####################
+  source("R/preparation_before_modelfitting.R")
+  
   ####################
   ## check the parameters
   ####################
@@ -38,15 +43,17 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ## fitting the data for each model
   ####################
   source("R/optimization_params.R")
+  
   if(!outliers.removal){
     ## without outlier detection and removal
     param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
-                                                                i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE); 
-    outlier.m = NA; 
+                                                                i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal); 
+    outlier.m = NA;
     outlier.s = NA;
     
   }else{
-    ## wit outlier detection and removal
+    
+    ## outlier detection and removal
     source("R/outliers_detection.R")
     outlier.m = c(); 
     outlier.s = c();
@@ -63,14 +70,13 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       }
       
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
-                                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
-      #######
-      ## to improve (no need T as argument ! ?)
-      ######
-      res.outliers.detection = detect.ouliters.loglike(T, param.fits.results,  
+                                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
+      
+      res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, L.m, L.s,  
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
                                                                   nb.additonal.m = nb.additonal.m, 
-                                                                  nb.additonal.s = nb.additonal.s); 
+                                                                  nb.additonal.s = nb.additonal.s);
+      
       nb.additonal.m = res.outliers.detection$nb.additonal.m
       nb.additonal.s = res.outliers.detection$nb.additonal.s;
       outlier.m = res.outliers.detection$outlier.m;

@@ -8,8 +8,11 @@
 ##########################################################################
 ##########################################################################
 ### chekc if there are outliers
-detect.ouliters.loglike = function(T,
-                                   param.fits.results,
+detect.ouliters.loglike = function(param.fits.results,
+                                   R.m,
+                                   R.s, 
+                                   L.m,
+                                   L.s,
                                    outlier.m = c(), 
                                    outlier.s = c(),
                                    nb.additonal.m = 1,
@@ -109,6 +112,17 @@ index.outliers.loglike = function(data.xx, c=1.5)
   index = which(data.xx>upper)
   #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
   return(index)
+}
+
+## testing the scope of variables in R
+test.funciton = function()
+{
+  cat("test ----------\n")
+  L.m = 10;
+  cat("L.m -- ", L.m /2, "\n")
+  cat("L.s -- ", L.s /2, "\n")
+  #g <- function(y) { Lm <- 100; f(y); }
+  
 }
 
 
