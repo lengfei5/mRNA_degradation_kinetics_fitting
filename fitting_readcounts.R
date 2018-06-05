@@ -369,12 +369,21 @@ if(Real.Data.Fitting)
   data.version = '_total_counts_v2'
   load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_RNA_seq_analysis_sel_alphas', data.version, '.Rdata', sep=''))
   
-  source("/Users/jiwang/Degradation_Liver/Main_Code_Degradation/f24_modified_1.0.r")
+  #source("/Users/jiwang/Degradation_Liver/Main_Code_Degradation/f24_modified_1.0.r")
   T = R;
   
-  Save.table = FALSE
-  if(Save.table)
-  {
+  Save.data.example.for.Rpackage = FALSE
+  if(Save.data.example.for.Rpackage){
+    
+    data.version = "data_example_readCount"
+    dataDir = "data/"
+    save(T, file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
+    write.table(T, file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".txt"), col.names = TRUE, row.names = TRUE, quote = FALSE,
+                sep = "\t")
+  }
+  
+  Save.table.for.Manuscript = FALSE
+  if(Save.table.for.Manuscript){
     ZT.int = grep('.count.premRNA', colnames(T))
     ZT.ex = grep('.count.mRNA', colnames(T))
     exon = as.matrix(T[, ZT.ex])
