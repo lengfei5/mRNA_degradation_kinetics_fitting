@@ -38,122 +38,6 @@ selection = function(vect, cutoff=-4)
     length(which(vect>cutoff))>=6
 }
 
-Introns.signal.correction = function(vect, ss)
-{
-    #if((n%%(1000))==0){cat(round(100*n/nrow(Introns), digits = 1),'%\n')} ### indicating the progress
-    test = vect
-    test = unlist(strsplit(as.character(unlist(test)),","))
-    nb.introns = length(test)/24
-    rpkm.introns = matrix(0, nb.introns, 24)
-    test = unlist(strsplit(as.character((test)),"/"))
-    ii = c(1:nb.introns)
-    jj = c(1:24)
-    for(m in jj) rpkm.introns[,m] = as.numeric(test[c(ii*2+(m-1)*2*nb.introns)])
-    
-    test = test[ii*2-1]
-    test = unlist(strsplit(as.character(unlist(test)),":"))
-    test = test[ii*2]
-    test = unlist(strsplit(as.character(unlist(test)),"-"))
-    length.introns = as.numeric(test[ii*2]) - as.numeric(test[ii*2-1])
-    kk = which(length.introns>200)
-    if(length(kk)>0)
-    {
-        length.introns = length.introns[kk] ## select the introns with length>200bp
-        rpkm.introns = rpkm.introns[kk,] ## select the introns with length>200bp
-        
-        norm.introns = rpkm.introns
-        if(length(kk)>1)
-        {
-            for(m in 1:ncol(rpkm.introns))
-            {
-                norm.introns[,m] = rpkm.introns[,m]*10^9/ss[m]/length.introns
-            }
-            norm.introns = log2(norm.introns+10^-10)
-            sel = apply(norm.introns, 1, selection) ## select introns with log2(rpkm)>-6
-            length.sel = length.introns[sel]
-            rpkm.sel = rpkm.introns[sel,]
-            
-        }else{
-            norm.introns = log2(rpkm.introns*10^9/ss[m]/length.introns + 10^-10)
-            #norm.introns = log2(norm.introns+10^-10)
-            sel = selection(norm.introns)
-            length.sel = length.introns[sel]
-            rpkm.sel = rpkm.introns[sel]
-        }
-        
-        if(sum(sel)>1) {
-            nb.reads = apply(rpkm.sel, 2, sum)
-            return(log2(nb.reads*10^9/sum(length.sel)/ss+10^-10));
-        }else if(sum(sel)==1){
-            return(log2(rpkm.sel*10^9/sum(length.sel)/ss+10^-10));
-        }else{
-            return(rep(NA, 24));
-        }
-        
-    }else{
-        return(rep(NA, 24));
-    }
-    #print(c(mean(keep[n,]), mean(unlist(compare[n,]))))
-}
-
-Introns.signal.correction.v2 = function(vect, ss)
-{
-    #if((n%%(1000))==0){cat(round(100*n/nrow(Introns), digits = 1),'%\n')} ### indicating the progress
-    test = vect[c(1:24)]
-    strand = as.numeric(vect[25])
-    test = unlist(strsplit(as.character(unlist(test)),","))
-    nb.introns = length(test)/24
-    
-    nb.reads = matrix(0, nb.introns, 24)
-    test = unlist(strsplit(as.character((test)),"/"))
-    ii = c(1:nb.introns)
-    jj = c(1:24)
-    for(m in jj) nb.reads[,m] = as.numeric(test[c(ii*2+(m-1)*2*nb.introns)])
-    
-    test = test[ii*2-1]
-    test = unlist(strsplit(as.character(unlist(test)),":"))
-    test = test[ii*2]
-    test = unlist(strsplit(as.character(unlist(test)),"-"))
-    length.introns = as.numeric(test[ii*2]) - as.numeric(test[ii*2-1])
-    introns.start = as.numeric(test[ii*2-1])
-    
-    kk = which(length.introns>0)
-    
-    if(length(kk)>=3)
-    {
-        length.introns = length.introns[kk]
-        introns.start = introns.start[kk]
-        nb.reads = nb.reads[kk,]
-        
-        if(strand>0)
-        {
-            o1 = order(introns.start)
-        }else{
-            o1 = order(-introns.start)
-        }
-        nb.reads = nb.reads[o1,]
-        length.introns = length.introns[o1]
-    
-    
-        jj = c((length(kk)-2), (length(kk)-1), length(kk))
-        length.introns = length.introns[jj] ## select the last three introns with length>200bp
-        nb.reads= nb.reads[jj,]
-        
-        norm.introns = log2((apply(nb.reads, 2, sum))/sum(length.introns)/ss*10^9)
-        
-        if(length(which(norm.introns>(-4.8)))<18)
-        {
-            return(rep(NA, 24));
-        }else{
-            return(norm.introns)
-        }
-        
-    }else{
-        return(rep(NA, 24));
-    }
-    
-}
-
 packing = function(vect)
 {
     return(paste(vect, sep='', collapse=','))
@@ -191,164 +75,6 @@ unpacking.plots = function(vect)
     #return(as.numeric(unlist(strsplit(as.character(vect), ','))))
 }
 
-Introns.splicing = function(vect, ss)
-{
-    #if((n%%(1000))==0){cat(round(100*n/nrow(Introns), digits = 1),'%\n')} ### indicating the progress
-    test = vect[c(1:24)]
-    strand = as.numeric(vect[25])
-    test = unlist(strsplit(as.character(unlist(test)),","))
-    nb.introns = length(test)/24
-    rpkm.introns = matrix(0, nb.introns, 24)
-    test = unlist(strsplit(as.character((test)),"/"))
-    ii = c(1:nb.introns)
-    jj = c(1:24)
-    for(m in jj) rpkm.introns[,m] = as.numeric(test[c(ii*2+(m-1)*2*nb.introns)])
-    
-    test = test[ii*2-1]
-    test = unlist(strsplit(as.character(unlist(test)),":"))
-    test = test[ii*2]
-    test = unlist(strsplit(as.character(unlist(test)),"-"))
-    length.introns = as.numeric(test[ii*2]) - as.numeric(test[ii*2-1])
-    introns.start = as.numeric(test[ii*2-1])
-    if(nb.introns>1)
-    {
-        if(strand>0)
-        {
-            o1 = order(introns.start)
-        }
-        else{
-            o1 = order(-introns.start)
-        }
-        rpkm.introns = rpkm.introns[o1,]
-        length.introns = length.introns[o1]
-    }
-    
-    kk = which(length.introns>200)
-    
-    if(length(kk)>0)
-    {
-        length.introns = length.introns[kk] ## select the introns with length>200bp
-        rpkm.introns = rpkm.introns[kk,] ## select the introns with length>200bp
-        
-        norm.introns = rpkm.introns
-        if(length(kk)>1)
-        {
-            for(m in 1:ncol(rpkm.introns))
-            {
-                norm.introns[,m] = rpkm.introns[,m]*10^9/ss[m]/length.introns
-            }
-            norm.introns = log2(norm.introns+10^-10)
-            return(c(length(kk), packing(length.introns), t(apply(norm.introns, 2, packing))))
-            
-        }else{
-            norm.introns = log2(rpkm.introns*10^9/ss[m]/length.introns + 10^-10)
-            #norm.introns = log2(norm.introns+10^-10)
-            return(c(length(kk), length.introns, norm.introns))
-        }
-        
-    }else{
-        return(c(0, rep(NA, 25)));
-    }
-    
-}
-######## prepare tables of WT-NF and KO-NF;
-prepare.NF.KO.tables = function()
-{
-  source('/Users/jiwang/Proteomics_anaylysis/Nuclear_proteins/f24_modified_1.0.r')
-  
-  R = read.table('/Users/jiwang/RNA_seq_Data/Total_RNA_Seq_AL_RF_KO_Tables/WT_AL_Intron_Exon_RFP.txt',sep='\t', header=TRUE)
-  R = R[, -1]
-  kk = grep('RFP', colnames(R))
-  R = R[, -kk]
-  
-  ii = grep('WT_AL_Exon', colnames(R))
-  jj = grep('WT_AL_Intron', colnames(R))
-  ## change mRNA and premRNA data into linear scale and statistics in linear scale
-  data1 = 2^R[,ii]
-  data2 = 2^R[,jj]
-  
-  tt = c(0:47)*2
-  stat1 = t(apply(data1,1, f24_R2_alt2, t=tt))
-  stat2 = t(apply(data2,1, f24_R2_alt2, t=tt))
-  
-  stat1 = cbind(stat1, qvals(stat1[,6]))
-  stat2 = cbind(stat2, qvals(stat2[,6]))
-  
-  R = data.frame(R[,1], data1, data2, stat1, stat2, stringsAsFactors=FALSE)
-  colnames(R)[1] = 'gene'
-  colnames(R)[2:49] = paste('ZT', tt, '.abs.mRNA', sep='')
-  colnames(R)[50:97] = paste('ZT', tt, '.abs.premRNA', sep='')
-  #stat = colnames(R)[50:56]
-  #stat = unlist(strsplit(as.character(stat), '.'))
-  colnames(R)[98:104] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.mRNA', sep='')
-  colnames(R)[105:111] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.premRNA', sep='')
-  #kk = which(R$mean.mRNA>R$mean.premRNA)
-  #R = R[kk,]
-  R.WT.AD = R
-  
-  R = read.table('/Users/jiwang/RNA_seq_Data/Total_RNA_Seq_AL_RF_KO_Tables/WT_RF_Intron_Exon_RFP.txt',sep='\t', header=TRUE)
-  R = R[, -1]
-  kk = grep('RFP', colnames(R))
-  R = R[, -kk]
-  
-  ii = grep('WT_RF_Exon', colnames(R))
-  jj = grep('WT_RF_Intron', colnames(R))
-  ## change mRNA and premRNA data into linear scale and statistics in linear scale
-  data1 = 2^R[,ii]
-  data2 = 2^R[,jj]
-  
-  tt = c(0:23)*4+2
-  stat1 = t(apply(data1,1, f24_R2_alt2, t=tt))
-  stat2 = t(apply(data2,1, f24_R2_alt2, t=tt))
-  
-  stat1 = cbind(stat1, qvals(stat1[,6]))
-  stat2 = cbind(stat2, qvals(stat2[,6]))
-  
-  R = data.frame(R[,1], data1, data2, stat1, stat2, stringsAsFactors=FALSE)
-  colnames(R)[1] = 'gene'
-  colnames(R)[2:25] = paste('ZT', tt, '.abs.mRNA', sep='')
-  colnames(R)[26:49] = paste('ZT', tt, '.abs.premRNA', sep='')
-  #stat = colnames(R)[50:56]
-  #stat = unlist(strsplit(as.character(stat), '.'))
-  colnames(R)[50:56] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.mRNA', sep='')
-  colnames(R)[57:63] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.premRNA', sep='')
-  #kk = which(R$mean.mRNA>R$mean.premRNA)
-  #R = R[kk,]
-  R.WT.RF = R
-  
-  R = read.table('/Users/jiwang/RNA_seq_Data/Total_RNA_Seq_AL_RF_KO_Tables/KO_RF_Intron_Exon_RFP.txt',sep='\t', header=TRUE)
-  R = R[, -1]
-  kk = grep('RFP', colnames(R))
-  R = R[, -kk]
-  
-  ii = grep('KO_RF_Exon', colnames(R))
-  jj = grep('KO_RF_Intron', colnames(R))
-  ## change mRNA and premRNA data into linear scale and statistics in linear scale
-  data1 = 2^R[,ii]
-  data2 = 2^R[,jj]
-  
-  tt = c(0:11)*4+2
-  stat1 = t(apply(data1,1, f24_R2_alt2, t=tt))
-  stat2 = t(apply(data2,1, f24_R2_alt2, t=tt))
-  
-  stat1 = cbind(stat1, qvals(stat1[,6]))
-  stat2 = cbind(stat2, qvals(stat2[,6]))
-  
-  R = data.frame(R[,1], data1, data2, stat1, stat2, stringsAsFactors=FALSE)
-  colnames(R)[1] = 'gene'
-  colnames(R)[2:13] = paste('ZT', tt, '.abs.mRNA', sep='')
-  colnames(R)[14:25] = paste('ZT', tt, '.abs.premRNA', sep='')
-  #stat = colnames(R)[50:56]
-  #stat = unlist(strsplit(as.character(stat), '.'))
-  colnames(R)[26:32] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.mRNA', sep='')
-  colnames(R)[33:39] = paste(c('nb.timepoints', 'mean', 'amp', 'rel.amp', 'phase','pval', 'qv'), '.premRNA', sep='')
-  #kk = which(R$mean.mRNA>R$mean.premRNA)
-  #R = R[kk,]
-  R.KO.RF = R
-  
-  save(R.WT.AD, R.WT.RF, R.KO.RF, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/Cry_Bmal_WT_AD_NRF_Bmal_KO_RF.Rdata', sep=''))
-   
-}
 
 ######## FUNCTIONS FOR SIMULATED DATA and for the optimization and model selection
 set.scaling.factors = function()
@@ -424,6 +150,37 @@ variance.mean.rpkm.gene = function(x)
   #sd = mean(apply(xx, 2, sd))
   return(var.mean)
 }
+
+variance.estimate.replicates = function(x, nb.replicates=4, log=TRUE)
+{
+  if(!log)
+  {
+    x = log(x)
+  }
+  x = as.numeric(x)
+  #xx = matrix(x, ncol=4)
+  if(nb.replicates==4) xx = rbind(x[c(1:12)], x[c(13:24)], x[25:36], x[37:48]);
+  if(nb.replicates==2) xx = rbind(x[c(1:12)], x[c(13:24)]);
+  sd = mean(apply(xx, 2, sd))
+  
+  return(sd)
+}
+
+index.outliers.loglike = function(data.xx, c=1.5)
+{
+  #c = 3
+  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
+  #data.xx = data.xx[which(!is.na(data.xx)==TRUE)]
+  Q1 = quantile(data.xx, 0.25,type=5)
+  Q3 = quantile(data.xx, 0.75, type=5)
+  IQD = Q3 - Q1
+  lower = Q1 - c*IQD
+  upper = Q3 + c*IQD
+  index = which(data.xx>upper)
+  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
+  return(index)
+}
+
 
 plot.dispersion.examples = function(T, index)
 {
@@ -947,35 +704,7 @@ test.NB.distribution.read.counts = function(T = T)
   
 }
 
-variance.estimate.replicates = function(x, nb.replicates=4, log=TRUE)
-{
-  if(!log)
-  {
-    x = log(x)
-  }
-  x = as.numeric(x)
-  #xx = matrix(x, ncol=4)
-  if(nb.replicates==4) xx = rbind(x[c(1:12)], x[c(13:24)], x[25:36], x[37:48]);
-  if(nb.replicates==2) xx = rbind(x[c(1:12)], x[c(13:24)]);
-  sd = mean(apply(xx, 2, sd))
-  
-  return(sd)
-}
 
-index.outliers.loglike = function(data.xx, c=1.5)
-{
-  #c = 3
-  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
-  #data.xx = data.xx[which(!is.na(data.xx)==TRUE)]
-  Q1 = quantile(data.xx, 0.25,type=5)
-  Q3 = quantile(data.xx, 0.75, type=5)
-  IQD = Q3 - Q1
-  lower = Q1 - c*IQD
-  upper = Q3 + c*IQD
-  index = which(data.xx>upper)
-  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
-  return(index)
-}
 
 estimate.dispersion.parameter.identify.outliers = function(T = T, gene.index = 1, zt = seq(0,94,by = 2), ZT.index = ZT.ex)
 {

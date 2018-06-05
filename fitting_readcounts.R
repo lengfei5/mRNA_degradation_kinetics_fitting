@@ -368,6 +368,7 @@ if(Real.Data.Fitting)
   cat('TEST THE FIT on THE REAL DATA\n')
   data.version = '_total_counts_v2'
   load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_RNA_seq_analysis_sel_alphas', data.version, '.Rdata', sep=''))
+  
   source("/Users/jiwang/Degradation_Liver/Main_Code_Degradation/f24_modified_1.0.r")
   T = R;
   
