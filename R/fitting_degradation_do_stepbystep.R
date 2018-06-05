@@ -61,10 +61,11 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
         cat('\t\t starting utlier of mRNA : ', T$mRNA.outlier[gene.index],  '\n');  
         cat('Outlier of premRNA : ', T$premRNA.outlier[gene.index],  '\n');
       }
+      
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
       #######
-      ## to test !!!!
+      ## to improve (no need T as argument ! ?)
       ######
       res.outliers.detection = detect.ouliters.loglike(T, param.fits.results,  
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
