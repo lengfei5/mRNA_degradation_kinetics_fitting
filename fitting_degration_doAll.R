@@ -25,12 +25,12 @@ ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
-outliers.removal = TRUE;
+outliers.removal = FALSE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
 
-Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE
+Identifiablity.Analysis = FALSE
 PLOT.Ident.analysis = FALSE
 
 gg = 'Rorc'
@@ -41,7 +41,8 @@ source("R/fitting_degradation_do_stepbystep.R")
 
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers.removal = outliers.removal);
+                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers.removal = outliers.removal,
+                                                                            Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
 
 ###########################

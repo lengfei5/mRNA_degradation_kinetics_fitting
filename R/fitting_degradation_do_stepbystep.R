@@ -18,7 +18,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   debug = FALSE,
                                                                   outliers.removal = FALSE, 
                                                                   Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE, 
-                                                                  PLOT.Ident.analysis = FALSE, 
                                                                   parametrization = c('cosine.beta'), 
                                                                   absolute.signal = TRUE)
 {
@@ -102,16 +101,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     S = norm.RPKM(R.s, L.s)
     a = mean(M)/mean(S) # ratio between splicing rate and degratation rate
     
-    if(PLOT.Ident.analysis){
-      pdf.name = paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myplots/Total/Total_counts/identifiability_test_Real_Data/gamma_nonidentif_',
-                       gene.name, '_all_models.pdf', sep=''); 
-      pdf(pdf.name, width = 10 , height = 3);
-      par(cex = 0.7, las = 1, mgp = c(2.0,0.5,0), mar = c(3,3,2,0.8)+0.1, tcl = -0.3);
-      par(mfrow=c(1,3),cex=1.0)
-      #### FAST analysis
-      #ptm <- proc.time()
-    }
-    
     for(model in c(2:4))
     {
       cat('Model ', model, '\n');
@@ -148,7 +137,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       param.fits.results = c(param.fits.results, res.nonident.analysis.gamma);
       #names(param.fits.results)[length(param.fits.results)] = paste('non.identifiability.gamma.m', model, sep = '') 
     }
-    if(PLOT.Ident.analysis)  dev.off()
+    
     #proc.time() - ptm;
   }
   
