@@ -42,7 +42,7 @@ absolute.signal = TRUE
 parametrization = 'cosine.beta'
 Identifiablity.Analysis = FALSE
 
-gg = 'Rorc'
+gg = 'Per3'
 gene.index = which(T$gene==gg)
 
 ####################
@@ -60,6 +60,8 @@ param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = 
                                                                             outliers.removal = outliers.removal,
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
+
+
 
 ###########################
 ## compare with origine function
@@ -82,26 +84,28 @@ names(res.fit) = names(param.fits.results)[-index]
 ####################
 Test.circadian.gene.examples = FALSE
 if(Test.circadian.gene.examples){
-  examples = c('Per2', 'Cry1', 'Per3','Per1', 'Npas2', 'Arntl', 'Clock', 'Cry2', 'Nr1d1', 'Nr1d2', 'Dbp', 'Hlf', 'Tef', 'Rorc','Rora',    
+  examples = c("Rorc", "Cp",  "Fus", "Per3", "Cbs", "Per1", "Per3", "Nr1d1", "Tef", "Dbp", "Hlf", "Bhlhe40", "Nfil3", "Per2", "Clock", "Wee1")
+  circ.examples = c('Per2', 'Cry1', 'Per3','Per1', 'Npas2', 'Arntl', 'Clock', 'Cry2', 'Nr1d1', 'Nr1d2', 'Dbp', 'Hlf', 'Tef', 'Rorc','Rora',    
                'Nfil3', 'Bhlhe40', 'Bhlhe41', 'Nampt', 'Parp1', 'Gsk3a','Csnk1d', 
                'Por', 'Tymp', 'Ppara', 'Hnrnpc', 'Elmo3', 'Camta1', 'Abcb11', 'Tfrc', 'Loxl4', 'Rcan1', 'Cdkn1a', 'Tubb2a', 'Mfsd2', 'Ppard',
                'Nedd4l', 'Cbs', 'Gsta3', 'Eps8l2', 'Insig2', 'Rbm3')
+  
   mm = match(unique(examples), T[,1])
   mm = mm[which(!is.na(mm)==TRUE)]
   T[mm, c(1:3)]
   
+  #source('functions.R')
+  source('origin/functions_origin.R')
   
-  source('functions.R')
-  
-  keep5 = c()
+  keep2compare = c()
   #for(j in match(controls, T[,1]))
   for(j in mm)
   {
     cat(T[j, 1], '\n');
     
-    gg = 'Per2'
-    j = which(T$gene==gg)
-    source('functions.R')
+    # gg = 'Per2'
+    #j = which(T$gene==gg)
+    #source('functions.R')
     #T$mRNA.outlier[j] = paste(outlier.m, sep='', collapse = ';')
     #T$premRNA.outlier[j] = paste(outlier.s, sep='', collapse = ';')
     ptm <- proc.time()
@@ -117,14 +121,19 @@ if(Test.circadian.gene.examples){
     test1 = c(res.fit, my.model.selection.one.gene.loglike(res.fit, nb.data = (96-missing.data), method = 'BIC'))
     print(test1);
     m = test1[which(names(test1)=='BIC.best.model')]
-    name1 = paste('gamma.m', m, sep='');name2 = paste('gamma.stderr.m', m, sep='')
+    name1 = paste('gamma.m', m, sep='');
+    name2 = paste('gamma.stderr.m', m, sep='')
     eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))',
                           sep='')));
-    
+   
+    keep2compare = rbind(keep2compare, test1) 
   }
   
-  keep5 = data.frame(T[mm[c(1:14)], 1], keep5, stringsAsFactors = FALSE)
-  keep5[, c(1, grep('best.model', colnames(keep5)))]
+  keep2compare = data.frame(T[mm[1:7], 1],  keep2compare, stringsAsFactors = FALSE)
+  colnames(keep2compare)[1] = 'gene'
+  
+  save(keep2compare, file = paste0(dataDir, "fitting_results_for_examples_2compare_with_new_functions.Rdata"))
+  
 }
 
 

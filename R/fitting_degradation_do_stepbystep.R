@@ -36,7 +36,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   
   if(!outliers.removal){
     ## without outlier detection and removal
-    if(debug){cat('starting optimization without outliers ----------\n ')}
+    if(debug){cat('starting optimization without outliers \n ')}
     
     param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                 i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal); 
@@ -51,20 +51,15 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     
     outlier.m = c(); 
     outlier.s = c();
-    nb.additonal.m = 1; 
-    nb.additonal.s = 1;
-    #T$mRNA.outlier[gene.index] = '';  
-    #T$premRNA.outlier[gene.index] = '';
-    
-    while((nb.additonal.m>0 | nb.additonal.s>0) & sum(c(outlier.m, outlier.s))<=12)
+    nb.newOutliers.m = 1; 
+    nb.newOutliers.s = 1;
+        
+    while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
-      if(debug){
-        cat('starting optimization with outlier detection ----------\n ')
-        cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
-        cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n');
+      if(debug){cat('starting optimization with outlier detection ----------\n ');
+        cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n');
       }
       
-      #test.funciton();
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
       
@@ -73,10 +68,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   nb.additonal.m = nb.additonal.m, 
                                                                   nb.additonal.s = nb.additonal.s);
       
-      #res.outliers.detection = detect.ouliters.loglike();
-      
-      nb.additonal.m = res.outliers.detection$nb.additonal.m
-      nb.additonal.s = res.outliers.detection$nb.additonal.s;
+      nb.newOutliers.m = res.outliers.detection$nb.newOutliers.m
+      nb.newOutliers.s = res.outliers.detection$nb.newOutliers.s
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
       
@@ -137,7 +130,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       #names(param.fits.results)[length(param.fits.results)] = paste('non.identifiability.gamma.m', model, sep = '') 
     }
     
-    #proc.time() - ptm;
   }
   
   ####################

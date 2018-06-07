@@ -109,37 +109,33 @@ detect.ouliters.loglike = function(param.fits.results,
     #cat(index.outliers.loglike(loglike), '\n')
     loglike.s[(model-1), ] = loglike
   }
+  
   #additional.m = intersect(index.outliers.loglike(loglike.m[3,]), intersect(index.outliers.loglike(loglike.m[1,]), index.outliers.loglike(loglike.m[2,])))
   #additional.s = intersect(index.outliers.loglike(loglike.s[3,]), intersect(index.outliers.loglike(loglike.s[1,]), index.outliers.loglike(loglike.s[2,])))
-  additional.m = index.outliers.loglike(loglike.m[3,]); 
-  additional.s = index.outliers.loglike(loglike.s[3,]);
-  #apply(cbind(loglike.s, loglike.m), 1, sum)
-  #apply(cbind(loglike.s[, setdiff(c(1:48), outlier.s)], loglike.m[, setdiff(c(1:48), outlier.m)]), 1, sum)
   
-  if(length(outlier.m)==0)
-  {
-    outlier.m = additional.m;
+  ## identified outlier index
+  index.outliers.m = index.outliers.loglike(loglike.m[3,]); 
+  index.outliers.s = index.outliers.loglike(loglike.s[3,]);
+    
+  if(length(outlier.m)==0){
+    outlier.m = index.outliers.m;
   }else{
-    additional.m = setdiff(additional.m, outlier.m);
-    outlier.m = c(outlier.m, additional.m);
-  }
-  nb.additonal.m = length(additional.m);
-  
-  if(length(outlier.s)==0)
-  {
-    outlier.s = additional.s;
-  }else{
-    additional.s = setdiff(additional.s, outlier.s);
-    outlier.s = c(outlier.s, additional.s);
+    index.outliers.m = setdiff(index.outliers.m, outlier.m);
+    outlier.m = c(outlier.m, new.outliers.m);
   }
   
-  nb.additonal.s = length(additional.s);
+  if(length(outlier.s)==0){
+    outlier.s = index.outliers.s;
+  }else{
+    index.outliers.s = setdiff(index.outliers.s, outlier.s);
+    outlier.s = c(outlier.s, new.outliers.s);
+  }
   
   outlier.m = outlier.m[order(outlier.m)];
   outlier.s = outlier.s[order(outlier.s)];
   
-  res.outliers.detection = list(nb.additonal.m = nb.additonal.m, 
-                                nb.additonal.s = nb.additonal.s, 
+  res.outliers.detection = list(nb.newOutliers.m = length(index.outliers.m), 
+                                nb.newOutliers.s = length(index.outliers.s), 
                                 outlier.m = outlier.m,
                                 outlier.s = outlier.s);
   

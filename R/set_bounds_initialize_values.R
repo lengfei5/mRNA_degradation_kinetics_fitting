@@ -7,6 +7,36 @@
 ## Date of creation: Mon Jun  4 12:23:08 2018
 ##########################################################################
 ##########################################################################
+Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, w=2*pi/24)
+{
+  # min.half.life=0.5; max.half.life=6; w=2*pi/24
+  eps.gamma.init = as.numeric(eps.gamma.init);
+  gamma.init = rep(log(2)/(10/60), length(eps.gamma.init))
+  lss = lseq(log(2)/max.half.life, log(2)/min.half.life, length=100)
+  for(n in 1:length(gamma.init))
+  {
+    kk = which(lss>=sqrt(w^2/(1/eps.gamma.init[n]^2-1)));
+    if(length(kk)>0) gamma.init[n] = sample(lss[kk], 1);
+  }
+  return(gamma.init)
+  #gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit.M), Nfit.M%/%Nfit.M), rep(log(2)/5,Nfit.M%%Nfit.M))
+}
+
+sigmoid.bound.contraint = function(eps.gamma)
+{
+  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
+  
+  smooth.bound.constraint.function = FALSE
+  if(smooth.bound.constraint.function)
+  {
+    xx = lseq(0.001, 1.2, length.out = 1000)
+    x0 = 1.0;y0=10^4
+    yy = y0/(1+exp(-100*(xx-x0)))
+    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
+    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
+  }
+}
+
 set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.signal = TRUE)
 {
   ### minimum and maximum of gamma

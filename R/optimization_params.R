@@ -33,41 +33,12 @@ norm.RPKM.libary.size = function(nb.reads, length)
   load(file='Libary_size_48_samples.Rdata')
   return(nb.reads/length/ss*10^9);
 }
+
 convert.nb.reads.libary.size = function(rpkm, length)
 {
   load(file='Libary_size_48_samples.Rdata')
   return(rpkm*length*ss/10^9);
 }
-
-Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, w=2*pi/24)
-{
-  # min.half.life=0.5; max.half.life=6; w=2*pi/24
-  eps.gamma.init = as.numeric(eps.gamma.init);
-  gamma.init = rep(log(2)/(10/60), length(eps.gamma.init))
-  lss = lseq(log(2)/max.half.life, log(2)/min.half.life, length=100)
-  for(n in 1:length(gamma.init))
-  {
-    kk = which(lss>=sqrt(w^2/(1/eps.gamma.init[n]^2-1)));
-    if(length(kk)>0) gamma.init[n] = sample(lss[kk], 1);
-  }
-  return(gamma.init)
-  #gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit.M), Nfit.M%/%Nfit.M), rep(log(2)/5,Nfit.M%%Nfit.M))
-}
-sigmoid.bound.contraint = function(eps.gamma)
-{
-  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
-  
-  smooth.bound.constraint.function = FALSE
-  if(smooth.bound.constraint.function)
-  {
-    xx = lseq(0.001, 1.2, length.out = 1000)
-    x0 = 1.0;y0=10^4
-    yy = y0/(1+exp(-100*(xx-x0)))
-    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
-    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
-  }
-}
-
 
 #########
 #### fitting all models for one genes and remove outliers with iterations
@@ -76,12 +47,7 @@ make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug =
                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
-  #cat("test--------------\n")
-  #cat("gene name -- ", gene.name, "\n")
-  #cat("a.m -- ", a.m, "\n" )
-  #cat("L.m -- ", L.m, "\n" )
-  #stop("testing the variable scope---")
-  
+    
   for(model in 1:4)
   {
     if(debug){cat('\t starting model ',model,'\n');}
@@ -103,50 +69,72 @@ make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug =
 make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, zt = seq(0,46,by = 2), 
                                i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
-  param.fit = NA
-  ## Model 1 premrna and mran are both flat
-  if(model == 1)
-  {
-    ## gene.index = j; model=1; i.ex = ZT.ex; i.int=ZT.int;
-    R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-    R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-    L.m = T$length.mRNA[gene.index];
-    L.s = T$length.premRNA[gene.index];
-    M = norm.RPKM(R.m, L.m)
-    S = norm.RPKM(R.s, L.s)
-    alpha.m = rep(as.numeric(T[gene.index, grep('alpha.mRNA.ZT', colnames(T))]), 4);
-    alpha.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
-    
-    if(outliers)
-    {
-      outlier.m = as.numeric(unlist(strsplit(as.character(T$mRNA.outlier[gene.index]), ';')))
-      outlier.s = as.numeric(unlist(strsplit(as.character(T$premRNA.outlier[gene.index]), ';'))) 
-    }else{
-      outlier.m = c();
-      outlier.s = c();
-    }
-    
-    mu.m = convert.nb.reads(rep(mean(M), length(R.m)), L.m);
-    mu.s = convert.nb.reads(rep(mean(S), length(R.s)), L.s);
-    
-    err = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, 
-                   mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
-    param.fit = err;
-    names(param.fit) = 'error.m1';
-    
+  param.fit = NA;
+  
+  ## error for model 1
+  if(model == 1){
+    param.fit = calculate.error.for.flat.model(T = T, 
+                                               gene.index = gene.index, 
+                                               debug = debug,  
+                                               zt = zt, i.ex = i.ex, i.int = i.int, 
+                                               outliers = outliers, 
+                                               parametrization = parametrization, 
+                                               absolute.signal = absolute.signal)
   }
   
   ## parameter estimations for model 2,3,4
-  if(model > 1)
-  {
-    param.fit = make.optimization(T = T, i = gene.index, model = model, Nfit = NA, debug = debug, zt = zt, i.ex = i.ex, i.int = i.int, outliers = outliers)
+  if(model > 1){
+    param.fit = make.optimization(T = T, i = gene.index, model = model, Nfit = NA, debug = debug, zt = zt, i.ex = i.ex, i.int = i.int, 
+                                  outliers = outliers)
   }
+  
   return(param.fit)
 }
 
+###########
+## error for model 1
+###########
+calculate.error.for.flat.model = function(T = T, 
+                                          gene.index = 1, 
+                                          debug = FALSE, 
+                                          zt = seq(0,46,by = 2), 
+                                          i.ex = ZT.ex, 
+                                          i.int = ZT.int, 
+                                          outliers = FALSE, 
+                                          parametrization = c('cosine.beta'), 
+                                          absolute.signal = TRUE)
+{
+  R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = T$length.mRNA[gene.index];
+  L.s = T$length.premRNA[gene.index];
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
+  alpha.m = rep(as.numeric(T[gene.index, grep('alpha.mRNA.ZT', colnames(T))]), 4);
+  alpha.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
+  
+  if(outliers)
+  {
+    outlier.m = as.numeric(unlist(strsplit(as.character(T$mRNA.outlier[gene.index]), ';')))
+    outlier.s = as.numeric(unlist(strsplit(as.character(T$premRNA.outlier[gene.index]), ';'))) 
+  }else{
+    outlier.m = c();
+    outlier.s = c();
+  }
+  
+  mu.m = convert.nb.reads(rep(mean(M), length(R.m)), L.m);
+  mu.s = convert.nb.reads(rep(mean(S), length(R.s)), L.s);
+  
+  err = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, 
+                 mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
+  names(err) = 'error.m1';
+  
+  return(err)
+  
+}
 
 ####################
-## main optimization function
+## main optimization function for Model 2, 3 and 4
 ####################
 make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, zt =  seq(0,46,by = 2), 
                              i.ex = ZT.ex, i.int = ZT.int, 
