@@ -121,14 +121,14 @@ detect.ouliters.loglike = function(param.fits.results,
     outlier.m = index.outliers.m;
   }else{
     index.outliers.m = setdiff(index.outliers.m, outlier.m);
-    outlier.m = c(outlier.m, new.outliers.m);
+    outlier.m = c(outlier.m, index.outliers.m);
   }
   
   if(length(outlier.s)==0){
     outlier.s = index.outliers.s;
   }else{
     index.outliers.s = setdiff(index.outliers.s, outlier.s);
-    outlier.s = c(outlier.s, new.outliers.s);
+    outlier.s = c(outlier.s, index.outliers.s);
   }
   
   outlier.m = outlier.m[order(outlier.m)];

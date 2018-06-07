@@ -53,7 +53,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     outlier.s = c();
     nb.newOutliers.m = 1; 
     nb.newOutliers.s = 1;
-        
+    T$mRNA.outlier[gene.index] = '';  T$premRNA.outlier[gene.index] = '';
+    
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
       if(debug){cat('starting optimization with outlier detection ----------\n ');
@@ -73,8 +74,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
       
-      #T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
-      #T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
+      T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
+      T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 

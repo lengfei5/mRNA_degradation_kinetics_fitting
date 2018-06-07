@@ -66,6 +66,9 @@ proc.time() - ptm
 ###########################
 ## compare with origine function
 ###########################
+load(file = paste0(dataDir, "fitting_results_for_examples_2compare_with_new_functions.Rdata"))
+keep2compare[which(keep2compare$gene == gg), ]
+
 rm(list = lsf.str())
 source('origin/functions_origin.R')
 ptm <- proc.time()
