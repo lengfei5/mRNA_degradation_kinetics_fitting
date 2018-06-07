@@ -133,8 +133,9 @@ index.outliers = function(data.xx)
 test.funciton = function()
 {
   cat("test ----------\n")
+  cat("intially defined L.m -- ", L.m , "\n")
   L.m = 10;
-  cat("L.m -- ", L.m /2, "\n")
+  cat("newly defefined L.m -- ", L.m, "\n")
   cat("L.s -- ", L.s /2, "\n")
   #g <- function(y) { Lm <- 100; f(y); }
   

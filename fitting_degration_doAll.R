@@ -40,9 +40,7 @@ outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
-
 Identifiablity.Analysis = FALSE
-PLOT.Ident.analysis = FALSE
 
 gg = 'Rorc'
 gene.index = which(T$gene==gg)
@@ -50,7 +48,7 @@ gene.index = which(T$gene==gg)
 ####################
 ## test the current functions 
 ####################
-rm(list = lsf.str())
+#rm(list = lsf.str())
 ## install package dependency
 
 

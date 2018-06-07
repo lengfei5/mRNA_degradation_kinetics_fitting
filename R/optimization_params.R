@@ -15,9 +15,9 @@
 #########
 #### fitting all models for one genes and remove outliers with iterations
 #########
-source("R/error_functions.R")
-source("R/kinetic_model.R")
-source("R/set_bounds_initialize_values.R")
+source("R/error_functions.R", local = TRUE)
+source("R/kinetic_model.R", local = TRUE)
+source("R/set_bounds_initialize_values.R", local = TRUE)
 
 make.fits.with.all.models.for.one.gene.remove.outliers.4specific.model = function(T = T, gene.index = j, model=3, debug = TRUE,
                                                                                   zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE)
@@ -33,6 +33,12 @@ make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug =
                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
+  #cat("test--------------\n")
+  #cat("gene name -- ", gene.name, "\n")
+  #cat("a.m -- ", a.m, "\n" )
+  #cat("L.m -- ", L.m, "\n" )
+  #stop("testing the variable scope---")
+  
   for(model in 1:4)
   {
     if(debug){cat('\t starting model ',model,'\n');}

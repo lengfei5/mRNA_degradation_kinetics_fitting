@@ -21,7 +21,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## check the parameters
   ####################
-  #gg = 'Per2'; gene.index = which(T$gene==gg); source('functions.R');zt = seq(0,94,by = 2); debug=TRUE; outliers = TRUE;
   gene.name = T$gene[gene.index];
   R.m = T[gene.index, ZT.ex]
   R.s = T[gene.index, ZT.int]
@@ -33,19 +32,21 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## fitting the data for each model
   ####################
-  source("R/optimization_params.R")
+  source("R/optimization_params.R", local = TRUE)
   
   if(!outliers.removal){
     ## without outlier detection and removal
     param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                 i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal); 
+    #param.fits.results = make.fits.with.all.models.for.one.gene();
     outlier.m = NA;
     outlier.s = NA;
     
   }else{
     
     ## outlier detection and removal
-    source("R/outliers_detection.R")
+    source("R/outliers_detection.R", local = TRUE)
+    
     outlier.m = c(); 
     outlier.s = c();
     nb.additonal.m = 1; 
@@ -60,6 +61,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
         cat('Outlier of premRNA : ', T$premRNA.outlier[gene.index],  '\n');
       }
       
+      #test.funciton();
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
       
@@ -67,6 +69,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
                                                                   nb.additonal.m = nb.additonal.m, 
                                                                   nb.additonal.s = nb.additonal.s);
+      
+      #res.outliers.detection = detect.ouliters.loglike();
       
       nb.additonal.m = res.outliers.detection$nb.additonal.m
       nb.additonal.s = res.outliers.detection$nb.additonal.s;
@@ -86,7 +90,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(Identifiablity.Analysis.by.Profile.Likelihood.gamma)
   {
-    source("R/identifiability_analysis.R")
+    source("R/identifiability_analysis.R", local = TRUE)
     if(debug){cat('\t\t starting non-identifiability analysis for gamma \n')}
     
     M = norm.RPKM(R.m, L.m)
