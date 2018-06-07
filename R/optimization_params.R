@@ -149,7 +149,9 @@ sigmoid.bound.contraint = function(eps.gamma)
 }
 
 make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, zt =  seq(0,46,by = 2), 
-                             i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE,parametrization =c('cosine.beta'), norm.params = TRUE, absolute.signal = TRUE)
+                             i.ex = ZT.ex, i.int = ZT.int, 
+                             outliers = FALSE,
+                             parametrization =c('cosine.beta'), norm.params = TRUE, absolute.signal = TRUE)
 {
   # i = j; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
   #norm.params = TRUE;
@@ -269,10 +271,17 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   ######
   if(is.na(Nfit))
   {
-    if(model==2) Nfit = fitting.factor*10;
-    if(model==3) Nfit = fitting.factor*12;
-    if(model==4) Nfit = fitting.factor*12;
+    if(debug){
+      if(model==2) Nfit = fitting.factor*4;
+      if(model==3) Nfit = fitting.factor*6;
+      if(model==4) Nfit = fitting.factor*8;
+    }else{
+      if(model==2) Nfit = fitting.factor*10;
+      if(model==3) Nfit = fitting.factor*12;
+      if(model==4) Nfit = fitting.factor*12;
+    }
   }
+    
   
   ### Define the initial values for degradation and splicing parameters
   a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate

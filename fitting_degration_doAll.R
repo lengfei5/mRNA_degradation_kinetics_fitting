@@ -15,17 +15,28 @@
 ######################################
 rm(list=ls())
 
-## import data example
+####################
+## install dependencies 
+####################
+source("R/configure.R")
+
+####################
+## import data example and create an object
+## prepare the table, geneNames, geneLengths, sizeFactors, dispersion estiamtion and variance estimation 
+####################
+source("R/preparation_before_modelfitting.R")
 data.version = "data_example_readCount"
 dataDir = "data/"
 load(file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
 
-### parameter to specify 
 ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
-outliers.removal = FALSE;
+####################
+## parameter to specify 
+####################
+outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
@@ -36,22 +47,31 @@ PLOT.Ident.analysis = FALSE
 gg = 'Rorc'
 gene.index = which(T$gene==gg)
 
+####################
+## test the current functions 
+####################
+rm(list = lsf.str())
+## install package dependency
+
+
 source("R/fitting_degradation_do_stepbystep.R")
 #source("R/fitting_degradation_do_stepbystep.R")
-
 ptm <- proc.time()
 param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers.removal = outliers.removal,
+                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, 
+                                                                            outliers.removal = outliers.removal,
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
 
 ###########################
 ## compare with origine function
 ###########################
+rm(list = lsf.str())
 source('origin/functions_origin.R')
 ptm <- proc.time()
 param.fits.results.v0 = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = TRUE,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
+                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal,
+                                                                            Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
 
 index = match(c('outlier.m', 'outlier.s'), names(param.fits.results))

@@ -7,9 +7,6 @@
 ## Date of creation: Tue Jun  5 11:03:16 2018
 ##########################################################################
 ##########################################################################
-## install package dependency
-source("R/configure.R")
-
 make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, 
                                                                   gene.index = 1, 
                                                                   zt = seq(0,94,by = 2), 
@@ -17,15 +14,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   i.int = ZT.int, 
                                                                   debug = FALSE,
                                                                   outliers.removal = FALSE, 
-                                                                  Identifiablity.Analysis.by.Profile.Likelihood.gamma = TRUE, 
+                                                                  Identifiablity.Analysis.by.Profile.Likelihood.gamma = FALSE, 
                                                                   parametrization = c('cosine.beta'), 
                                                                   absolute.signal = TRUE)
 {
-  ####################
-  ## prepare the table, geneNames, geneLengths, sizeFactors, dispersion estiamtion and variance estimation 
-  ####################
-  source("R/preparation_before_modelfitting.R")
-  
   ####################
   ## check the parameters
   ####################

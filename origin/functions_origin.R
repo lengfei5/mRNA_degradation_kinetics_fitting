@@ -1954,9 +1954,15 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
 	######
 	if(is.na(Nfit))
 	{
-	  if(model==2) Nfit = fitting.factor*10;
-	  if(model==3) Nfit = fitting.factor*12;
-	  if(model==4) Nfit = fitting.factor*12;
+	  if(debug){
+	    if(model==2) Nfit = fitting.factor*4;
+	    if(model==3) Nfit = fitting.factor*6;
+	    if(model==4) Nfit = fitting.factor*8;
+	  }else{
+	    if(model==2) Nfit = fitting.factor*10;
+	    if(model==3) Nfit = fitting.factor*12;
+	    if(model==4) Nfit = fitting.factor*12;
+	  }
 	}
 	
 	### Define the initial values for degradation and splicing parameters

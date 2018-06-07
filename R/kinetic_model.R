@@ -77,7 +77,7 @@ compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, pha
 #### Integration
 integrate.m = function(t=seq(0, 46, by=2), gamma=log(2)/5, eps.gamma=0.2, phase.gamma=12, splicing.k=log(2)/(5/60), Min = 0.5, Amp=2.0, phase=12, beta=1)
 {
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   m = rep(0, length(t))
   
   Tstable = 24*(ceiling(log(2000)/gamma/24) +1)

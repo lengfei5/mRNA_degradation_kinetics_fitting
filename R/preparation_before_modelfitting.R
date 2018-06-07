@@ -4,7 +4,9 @@
 ## Script purpose: 
 ## 1) processing the expresson table 
 ## 2) calculate the size factor and dispersion parameters using DESeq2
-## 3) calculate variances using voom  
+## 3) calculate variances using voom
+## 4) Important Note !!!!!! 
+##   
 ## Usage example: 
 ## Author: Jingkui Wang (jingkui.wang@imp.ac.at)
 ## Date of creation: Tue Jun  5 11:31:45 2018
