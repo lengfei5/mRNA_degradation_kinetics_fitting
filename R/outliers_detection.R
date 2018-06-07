@@ -7,7 +7,53 @@
 ## Date of creation: Tue Jun  5 12:04:24 2018
 ##########################################################################
 ##########################################################################
-### chekc if there are outliers
+
+####################
+## utility functions for outlier detection 
+####################
+index.outliers.loglike = function(data.xx, c=1.5)
+{
+  #c = 3
+  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
+  #data.xx = data.xx[which(!is.na(data.xx)==TRUE)]
+  Q1 = quantile(data.xx, 0.25,type=5)
+  Q3 = quantile(data.xx, 0.75, type=5)
+  IQD = Q3 - Q1
+  lower = Q1 - c*IQD
+  upper = Q3 + c*IQD
+  index = which(data.xx>upper)
+  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
+  return(index)
+}
+
+index.outliers = function(data.xx)
+{
+  c = 1.5
+  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
+  Q1 = quantile(data.xx, 0.25,type=5)
+  Q3 = quantile(data.xx, 0.75, type=5)
+  IQD = Q3 - Q1
+  lower = Q1 - c*IQD
+  upper = Q3 + c*IQD
+  index = which(data.xx<lower|data.xx>upper)
+  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
+}
+
+## testing the scope of variables in R
+test.funciton = function()
+{
+  cat("test ----------\n")
+  cat("intially defined L.m -- ", L.m , "\n")
+  L.m = 10;
+  cat("newly defefined L.m -- ", L.m, "\n")
+  cat("L.s -- ", L.s /2, "\n")
+  #g <- function(y) { Lm <- 100; f(y); }
+  
+}
+
+####################
+## main function for outlier detection 
+####################
 detect.ouliters.loglike = function(param.fits.results,
                                    R.m,
                                    R.s,
@@ -100,46 +146,3 @@ detect.ouliters.loglike = function(param.fits.results,
   return(res.outliers.detection)
   
 }
-
-index.outliers.loglike = function(data.xx, c=1.5)
-{
-  #c = 3
-  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
-  #data.xx = data.xx[which(!is.na(data.xx)==TRUE)]
-  Q1 = quantile(data.xx, 0.25,type=5)
-  Q3 = quantile(data.xx, 0.75, type=5)
-  IQD = Q3 - Q1
-  lower = Q1 - c*IQD
-  upper = Q3 + c*IQD
-  index = which(data.xx>upper)
-  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
-  return(index)
-}
-
-index.outliers = function(data.xx)
-{
-  c = 1.5
-  #data.xx = c(2, 3, 6, 9, 13, 18, 21, 106)
-  Q1 = quantile(data.xx, 0.25,type=5)
-  Q3 = quantile(data.xx, 0.75, type=5)
-  IQD = Q3 - Q1
-  lower = Q1 - c*IQD
-  upper = Q3 + c*IQD
-  index = which(data.xx<lower|data.xx>upper)
-  #boxplot(data.xx);abline(h=Q1);abline(h=Q3);
-}
-
-## testing the scope of variables in R
-test.funciton = function()
-{
-  cat("test ----------\n")
-  cat("intially defined L.m -- ", L.m , "\n")
-  L.m = 10;
-  cat("newly defefined L.m -- ", L.m, "\n")
-  cat("L.s -- ", L.s /2, "\n")
-  #g <- function(y) { Lm <- 100; f(y); }
-  
-}
-
-
-

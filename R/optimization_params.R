@@ -1,18 +1,13 @@
 ##########################################################################
 ##########################################################################
 ## Project:
-## Script purpose:
+## Script purpose: Main Function for model fitting
 ## Usage example: 
 ## Author: Jingkui Wang (jingkui.wang@imp.ac.at)
 ## Date of creation: Mon Jun  4 13:49:17 2018
 ##########################################################################
 ##########################################################################
 
-#################################################################################################################
-#################################################################################################################
-## Main Function for model fitting
-#################################################################################################################
-#################################################################################################################
 ## import function dependencies
 source("R/error_functions.R", local = TRUE)
 source("R/kinetic_model.R", local = TRUE)
@@ -138,7 +133,9 @@ make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, 
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
     param.fit = err;
     names(param.fit) = 'error.m1';
+    
   }
+  
   ## parameter estimations for model 2,3,4
   if(model > 1)
   {
@@ -157,7 +154,6 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
                              parametrization =c('cosine.beta'), norm.params = TRUE, absolute.signal = TRUE)
 {
   # i = j; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
-  #norm.params = TRUE;
   w = 2*pi/24;
   gene2opt = T$gene[i];
   param.fit = NA
@@ -269,9 +265,10 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     #cat('-2loglike = ', errors.fit.m[imin.m], errors.fit.s[imin.s], '\n sum of -2loglike = ', sum(errors.fit.m[imin.m], errors.fit.s[imin.s]), '\n')
   }
   #proc.time() - ptm
-  ######
-  ### Now fit mRNA and premRNA all together for model2, model3 and model4
-  ######
+  
+  #################################
+  #### Fit both S (pre-mRNA) and M (mRNA) together for Model 2, 3, 4 
+  #################################
   if(is.na(Nfit))
   {
     if(debug){
@@ -285,7 +282,6 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     }
   }
     
-  
   ### Define the initial values for degradation and splicing parameters
   a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
   a.init = lseq(max(0.1, a/5), min(10^5, a*2), length=Nfit)
@@ -312,7 +308,6 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   if(model==3)
   {	
     ### initialize decay parameters for model 3
-    #gamma.init = c(rep(log(2)/lseq(6, 0.5, length = Nfit), Nfit%/%Nfit), rep(log(2)/5,Nfit%%Nfit))
     eps.m = min((max(M) - min(M))/mean(M)/2, 1); # close to mRNA amplitude
     eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), Nfit/2, replace = TRUE), rep(eps.m, length=Nfit/2));
     if(length(which(eps.gamma.init>0.8))>=1) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
@@ -331,8 +326,6 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   if(model==4)
   {
     ### initialize decay parameters for model 4
-    #gamma.init = c(seq(max(log(2)/max.half.life, res.fit.m[1]/2), min(log(2)/min.half.life, res.fit.m[1]*2), length=(Nfit-Nfit%/%3)),
-    #               log(2)/lseq(10, 1, length = Nfit%/%3));
     eps.gamma.init = seq(res.fit.m[2]/4, min(res.fit.m[2]*4, 1), length=Nfit);
     if(length(which(eps.gamma.init>0.8))>=1) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
     gamma.init = Gamma.Initiation(eps.gamma.init, 0.5, 8);
@@ -354,54 +347,36 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     upper[6] = (max(S)-min(S))*5;
   }
   
-  #################################
-  #### Fit the S and M all together 
-  #################################
-  #ptm = proc.time();
   errors.fit = rep(NA, Nfit)
-  #rank.hess = rep(NA, Nfit)
-  #aic.fit = rep(NA, Nfit)
-  # fit.number = 1; 
-  #lower[1] = log(2)/24;upper[1]=log(2)/(10/60);
-  #while(fit.number<(Nfit+1))
-  #ptm <- proc.time()
+  
   for(fit.number in 1:Nfit)
   {
     ## cat(fit.number, '\n'); alpha.m = 0.002; alpha.s = 0.2;
     par.init = PAR.INIT[fit.number,]
     if(debug){cat('\t \t optimization # ',fit.number,' started : \t',par.init,'\n')}
     
-    #ptm <- proc.time()
     opt = optim(par.init, f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
                 outlier.m = outlier.m, outlier.s = outlier.s, model = model, debug = debug, zt = zt, norm.params=norm.params,
                 method = 'L-BFGS-B', lower = lower, upper = upper, control = list(maxit=500,trace=0), hessian = FALSE)
-    #cat(proc.time() - ptm);
+    
     ## extract the parameter of optimization results and errors
     errors.fit[fit.number] = opt$value;
     eval(parse(text = paste('res.fit.', fit.number, ' = opt$par', sep = '')))
-    #ttry = try(sqrt(diag(solve(0.5*opt$hessian))), silent = TRUE); 
-    #if(!inherits(ttry, "try-error")) { opt$stderr = sqrt(diag(solve(0.5*opt$hessian)));}else{ opt$stderr = rep(NA, length(opt$par));}
-    #eval(parse(text = paste('res.fit.stderr.', fit.number, ' = opt$stderr', sep = '')))
-    #res.fit.stderr = opt$stderr
-    #aic.fit[fit.number] = errors.fit[fit.number] + rank.hess[fit.number]*2
+        
     if(debug){cat('\t\t optimization # ',fit.number,' finished : \t', opt$par, '\t',opt$value, '\n')}
   }
-  #proc.time() - ptm;
-  
+    
   #### First choose the best estimated parameters
   imin = which.min(errors.fit); 
-  #imin.test = which.min(aic.fit)
   eval(parse(text = paste('res.fit = res.fit.', imin, sep = '')))
-  #eval(parse(text = paste('res.fit.stderr = res.fit.stderr.', imin, sep = '')))
-  #if(debug){cat('\t\t select optimal fitting ', res.fit, '\n')};
-  
+    
   ### compute the Standard Error of estimates using hessian function
   hess = hessian(func=f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
                  outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, x=res.fit);
-  #if(debug){cat('\t\t calculate hessian matrix..... \n')};
   ttry = try(sqrt(diag(solve(0.5*hess))), silent = FALSE);
+  
   if(!inherits(ttry, "try-error")){res.fit.stderr = sqrt(diag(solve(0.5*hess)));}else{res.fit.stderr = rep(NA, length(res.fit))}
-  #if(debug){cat('\t\t calculate standard error of estimates..... \n')};
+  
   param.fit = c(errors.fit[imin], res.fit, res.fit.stderr);
   names(param.fit) = paste(c('error', colnames(PAR.INIT), paste(colnames(PAR.INIT), '.stderr', sep='')),'.m',model,sep = ''); 
   
