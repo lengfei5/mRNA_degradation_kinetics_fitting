@@ -36,6 +36,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   
   if(!outliers.removal){
     ## without outlier detection and removal
+    if(debug){cat('starting optimization without outliers ----------\n ')}
+    
     param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
                                                                 i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal); 
     #param.fits.results = make.fits.with.all.models.for.one.gene();
@@ -51,14 +53,15 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     outlier.s = c();
     nb.additonal.m = 1; 
     nb.additonal.s = 1;
-    T$mRNA.outlier[gene.index] = '';  
-    T$premRNA.outlier[gene.index] = '';
+    #T$mRNA.outlier[gene.index] = '';  
+    #T$premRNA.outlier[gene.index] = '';
     
     while((nb.additonal.m>0 | nb.additonal.s>0) & sum(c(outlier.m, outlier.s))<=12)
     {
       if(debug){
-        cat('\t\t starting utlier of mRNA : ', T$mRNA.outlier[gene.index],  '\n');  
-        cat('Outlier of premRNA : ', T$premRNA.outlier[gene.index],  '\n');
+        cat('starting optimization with outlier detection ----------\n ')
+        cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
+        cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n');
       }
       
       #test.funciton();
@@ -77,8 +80,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
       
-      T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
-      T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
+      #T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
+      #T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 
@@ -91,7 +94,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   if(Identifiablity.Analysis.by.Profile.Likelihood.gamma)
   {
     source("R/identifiability_analysis.R", local = TRUE)
-    if(debug){cat('\t\t starting non-identifiability analysis for gamma \n')}
+    if(debug){cat('starting non-identifiability analysis for gamma \n')}
     
     M = norm.RPKM(R.m, L.m)
     S = norm.RPKM(R.s, L.s)
@@ -140,14 +143,19 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## model selection  
   ####################
+  if(debug){cat('starting model selection \n')}
+  
   
   ####################
   ## parameter transformation 
   ####################
+  if(debug){cat('starting parameter transformation \n')}
+  
   
   ####################
   ## output  
   ####################
+  if(debug){cat('final result is \n')}
   
   return(c(param.fits.results, outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')));
   

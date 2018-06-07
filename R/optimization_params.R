@@ -7,28 +7,76 @@
 ## Date of creation: Mon Jun  4 13:49:17 2018
 ##########################################################################
 ##########################################################################
+
 #################################################################################################################
 #################################################################################################################
-###########  Main Function for model selection and fitting
+## Main Function for model fitting
 #################################################################################################################
 #################################################################################################################
-#########
-#### fitting all models for one genes and remove outliers with iterations
-#########
+## import function dependencies
 source("R/error_functions.R", local = TRUE)
 source("R/kinetic_model.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
-make.fits.with.all.models.for.one.gene.remove.outliers.4specific.model = function(T = T, gene.index = j, model=3, debug = TRUE,
-                                                                                  zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE)
+###############
+#### utility functions for model fitting
+###############
+norm.RPKM = function(nb.reads, length)
 {
-  #make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, zt = seq(0,46,by = 2), 
-  #                               i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE)
-  param.fits.results = make.fit.spec.model(T = T, gene.index = gene.index, model = model,debug = debug, zt = zt, 
-                                           i.ex = ZT.ex, i.int = ZT.int, outliers = outliers); 
-  return(param.fits.results);
+  set.scaling.factors();
+  return(nb.reads/length/scaling.factors*10^9);
 }
 
+convert.nb.reads = function(rpkm, length)
+{
+  set.scaling.factors();
+  return(rpkm*length*scaling.factors/10^9);
+}
+
+norm.RPKM.libary.size = function(nb.reads, length)
+{
+  load(file='Libary_size_48_samples.Rdata')
+  return(nb.reads/length/ss*10^9);
+}
+convert.nb.reads.libary.size = function(rpkm, length)
+{
+  load(file='Libary_size_48_samples.Rdata')
+  return(rpkm*length*ss/10^9);
+}
+
+Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, w=2*pi/24)
+{
+  # min.half.life=0.5; max.half.life=6; w=2*pi/24
+  eps.gamma.init = as.numeric(eps.gamma.init);
+  gamma.init = rep(log(2)/(10/60), length(eps.gamma.init))
+  lss = lseq(log(2)/max.half.life, log(2)/min.half.life, length=100)
+  for(n in 1:length(gamma.init))
+  {
+    kk = which(lss>=sqrt(w^2/(1/eps.gamma.init[n]^2-1)));
+    if(length(kk)>0) gamma.init[n] = sample(lss[kk], 1);
+  }
+  return(gamma.init)
+  #gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit.M), Nfit.M%/%Nfit.M), rep(log(2)/5,Nfit.M%%Nfit.M))
+}
+sigmoid.bound.contraint = function(eps.gamma)
+{
+  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
+  
+  smooth.bound.constraint.function = FALSE
+  if(smooth.bound.constraint.function)
+  {
+    xx = lseq(0.001, 1.2, length.out = 1000)
+    x0 = 1.0;y0=10^4
+    yy = y0/(1+exp(-100*(xx-x0)))
+    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
+    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
+  }
+}
+
+
+#########
+#### fitting all models for one genes and remove outliers with iterations
+#########
 make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug = FALSE, zt = seq(0,46,by = 2),
                                                   i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
@@ -99,61 +147,10 @@ make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, 
   return(param.fit)
 }
 
-###############
-#### Function to estimat parameters for model 2, 3, 4
-###############
-norm.RPKM = function(nb.reads, length)
-{
-  set.scaling.factors();
-  return(nb.reads/length/scaling.factors*10^9);
-}
 
-convert.nb.reads = function(rpkm, length)
-{
-  set.scaling.factors();
-  return(rpkm*length*scaling.factors/10^9);
-}
-
-norm.RPKM.libary.size = function(nb.reads, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  return(nb.reads/length/ss*10^9);
-}
-convert.nb.reads.libary.size = function(rpkm, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  return(rpkm*length*ss/10^9);
-}
-
-Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, w=2*pi/24)
-{
-  # min.half.life=0.5; max.half.life=6; w=2*pi/24
-  eps.gamma.init = as.numeric(eps.gamma.init);
-  gamma.init = rep(log(2)/(10/60), length(eps.gamma.init))
-  lss = lseq(log(2)/max.half.life, log(2)/min.half.life, length=100)
-  for(n in 1:length(gamma.init))
-  {
-    kk = which(lss>=sqrt(w^2/(1/eps.gamma.init[n]^2-1)));
-    if(length(kk)>0) gamma.init[n] = sample(lss[kk], 1);
-  }
-  return(gamma.init)
-  #gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit.M), Nfit.M%/%Nfit.M), rep(log(2)/5,Nfit.M%%Nfit.M))
-}
-sigmoid.bound.contraint = function(eps.gamma)
-{
-  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
-  
-  smooth.bound.constraint.function = FALSE
-  if(smooth.bound.constraint.function)
-  {
-    xx = lseq(0.001, 1.2, length.out = 1000)
-    x0 = 1.0;y0=10^4
-    yy = y0/(1+exp(-100*(xx-x0)))
-    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
-    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
-  }
-}
-
+####################
+## main optimization function
+####################
 make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, zt =  seq(0,46,by = 2), 
                              i.ex = ZT.ex, i.int = ZT.int, 
                              outliers = FALSE,
@@ -267,7 +264,7 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     imin.m = which.min(errors.fit.m); 
     eval(parse(text = paste('res.fit.m = res.fit.m.', imin.m, sep = '')))
     
-    if(debug){cat('prefix parameter for M4', res.fit.m, res.fit.s, '\n')};
+    if(debug){cat('\t -- prefix parameter for M4', res.fit.m, res.fit.s, '\n')};
     #cat('true parameters for M4', unlist(T[j, c(142, 146, 147, 141, 140, 143, 144, 145)]), '\n')
     #cat('-2loglike = ', errors.fit.m[imin.m], errors.fit.s[imin.s], '\n sum of -2loglike = ', sum(errors.fit.m[imin.m], errors.fit.s[imin.s]), '\n')
   }
@@ -367,7 +364,7 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   # fit.number = 1; 
   #lower[1] = log(2)/24;upper[1]=log(2)/(10/60);
   #while(fit.number<(Nfit+1))
-  ptm <- proc.time()
+  #ptm <- proc.time()
   for(fit.number in 1:Nfit)
   {
     ## cat(fit.number, '\n'); alpha.m = 0.002; alpha.s = 0.2;
@@ -389,7 +386,8 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     #aic.fit[fit.number] = errors.fit[fit.number] + rank.hess[fit.number]*2
     if(debug){cat('\t\t optimization # ',fit.number,' finished : \t', opt$par, '\t',opt$value, '\n')}
   }
-  proc.time() - ptm;
+  #proc.time() - ptm;
+  
   #### First choose the best estimated parameters
   imin = which.min(errors.fit); 
   #imin.test = which.min(aic.fit)
@@ -407,34 +405,5 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   param.fit = c(errors.fit[imin], res.fit, res.fit.stderr);
   names(param.fit) = paste(c('error', colnames(PAR.INIT), paste(colnames(PAR.INIT), '.stderr', sep='')),'.m',model,sep = ''); 
   
-  #####
-  ##### identifiability analysis (for M2, M3 AND M4) using rank of hessian matrix or profile likelihood
-  #Identifiablity.Analysis.by.Profile.Likelihood = FALSE
-  #if(Identifiablity.Analysis.by.Profile.Likelihood)
-  #{
-  #  if(debug){cat('\t\t start non-identifiability analysis for gamma \n')}
-  #### FAST analysis 
-  #  ptm <- proc.time()
-  #  res.nonident.analysis.gamma = Identifiablity.analysis.gamma.each.model(error.opt=errors.fit[imin], params.opt =res.fit, 
-  #                                                                         lower = lower, upper = upper, 
-  #                                     R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
-  #                                   outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, PLOT.PL = TRUE, gene2plot=gene2opt); 
-  
-  # proc.time() - ptm;
-  #param.fit = c(param.fit, res.nonident.analysis.gamma);
-  #names(param.fit)[length(param.fit)] = paste('non.identifiability.gamma.m', model, sep = '')
-  
-  #### Detail analysis with individual examples
-  #Detail.analysis = FALSE
-  #if(Detail.analysis){
-  #ptm <- proc.time()
-  #Identifiablity.analysis.M3.M4.Example(error.opt = errors.fit[imin], params = res.fit, lower = lower, upper = upper, 
-  #                                     R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
-  #                                     outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt); 
-  #proc.time() - ptm
-  #}
-  #}
-  #if(debug){cat('\t\t\t optimization finished\n')};
-  #if(debug){cat('\t\t fitting result ', param.fit, '\n')};
   return(param.fit);
 }
