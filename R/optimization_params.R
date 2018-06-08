@@ -155,7 +155,7 @@ make.optimization = function(T = T,
                              norm.params = TRUE, 
                              absolute.signal = TRUE)
 {
-  # i = gene.index; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
+  # i = gene.index; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 4;outliers = TRUE; 
   
   ####################
   ## prepare parameters for the optimization 
@@ -198,39 +198,23 @@ make.optimization = function(T = T,
     if(model==4) Nfit = fitting.factor*8;
   }
   
-  ## parameter boundary
-  bounds = set.bounds(model = model);
-  upper = bounds$upper; 
-  lower = bounds$lower;
-  
-  ######################################
-  ######################################
-  ## Section: start to fit the absolute signals
-  # Here we want first to fit the pre-mRNA profile to identify parameters mean.int, fold.change.int, phase.int, beta.int
-  # Prefit premRNA for model2 and model4 in order to have the good initial values for premRNA parameters
-  ######################################
-  ######################################
+  ####################
+  ## fit premRNA individually for M2 and M4 with the aim of having good initial values for its parameters 
+  ####################
   #ptm = proc.time();
   if((model==2|model==4) & prefit.S) 
   {
-    ### Choose different initial values of parameters for S fitting
-    Min.init = rep(min(S), Nfit.S)
-    Amp.init = rep((max(S)-min(S)), Nfit.S)
-    phase.init = zt[which.max(S)]
-    phase.init = (rep(phase.init, Nfit.S)+rnorm(Nfit.S,sd = 3))%%24
-    beta.min = 1;
-    beta.max = 5;
-    beta.init = lseq(beta.min, beta.max, length = Nfit.S)
-    PAR.INIT.S = cbind(Min.init, Amp.init, phase.init, beta.init)
-    
+    ## set initial values of parameters for S fitting
+    PAR.INIT.S = Sampling.Initial.Values.for.fitting.S(S , Nfit.S, zt)
+    bounds.g.s = set.bounds.gene.s(S, range_scalingFactor=5)
+
     errors.fit.s = rep(NA, Nfit.S)
     
-    limit.factor = 5
     for(fit.nb.s in 1:Nfit.S)
     {
       par.init.s = PAR.INIT.S[fit.nb.s,]
       opt.s = optim(par.init.s, f2min.int, R.s=R.s, L.s=L.s, alpha.s=alpha.s, outlier.s=outlier.s, zt = zt, method = 'L-BFGS-B', 
-                    lower = c(min(S)/limit.factor, (max(S)-min(S))/limit.factor, 0, 1), upper = c(max(S), (max(S)-min(S))*limit.factor, 24, 5))
+                    lower = bounds.g.s$lower, upper = bounds.g.s$upper)
       
       res.fit.s = opt.s$par
       errors.fit.s[fit.nb.s] = opt.s$value
@@ -244,30 +228,22 @@ make.optimization = function(T = T,
   }
   #proc.time() - ptm
   
+  ####################
+  ## fit mRNA individually for M4 with the aim of having good initial values for its parameters     
+  ####################
   #ptm = proc.time();
   if(model==4 & prefit.M)
   {
-    ### Choose different initial values of parameters for M fitting
-    eps.m = min((max(M) - min(M))/mean(M)/2, 1);
-    eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), Nfit.M/2, replace = TRUE), rep(eps.m/1.25, length=Nfit.M/2));
-    #if(debug){cat('eps.gamma inital values ... ', eps.gamma.init, '\n')};
-    if(length(which(eps.gamma.init>0.8))>=1) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
-    phase.m = zt[which.max(M)]
-    phase.gamma.init =  (rep((phase.m+12), Nfit.M)+rnorm(Nfit.M, sd = 3))%%24
-    #if(debug){cat('eps.gamma inital values ', eps.gamma.init, '\n')};
-    gamma.init = Gamma.Initiation(eps.gamma.init, 0.5, 6);
-    #if(debug){cat('gamma inital values ', gamma.init, '\n')};
-    a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
-    a.init = rep(a, Nfit.M)
-    PAR.INIT.M = cbind(gamma.init, eps.gamma.init, phase.gamma.init, a.init)
+    ### sampling initial values of parameters for M fitting
+    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit.M, zt)
+    bounds.g.m = set.bounds.gene.m(M, S, range_scalingFactor=5)
     
     errors.fit.m = rep(NA, Nfit.M)
     for(fit.nb.m in 1:Nfit.M)
     {
-      # fit.nb.m = 1;
       par.init.m = PAR.INIT.M[fit.nb.m,]
       opt.m = optim(par.init.m, f2min.mrna, res.fit.s=res.fit.s, R.m=R.m, L.m=L.m, alpha.m=alpha.m, outlier.m=outlier.m, zt = zt, 
-                    norm.params=norm.params, method = 'L-BFGS-B', lower = c(lower[c(1:3)], a/10), upper = c(upper[c(1:3)], a*5))
+                    norm.params=norm.params, method = 'L-BFGS-B', lower = bounds.g.m$lower, upper = bounds.g.m$upper)
       res.fit.m = opt.m$par
       errors.fit.m[fit.nb.m] = opt.m$value
       eval(parse(text = paste('res.fit.m.', fit.nb.m, ' = res.fit.m', sep = '')))
@@ -285,6 +261,10 @@ make.optimization = function(T = T,
   #################################
   #### Fit both S (pre-mRNA) and M (mRNA) together for Model 2, 3, 4 
   #################################
+  bounds.general = set.bounds.general(model = model);
+  upper = bounds.general$upper;
+  lower = bounds.general$lower;
+  
   ### Define the initial values for degradation and splicing parameters
   a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
   a.init = lseq(max(0.1, a/5), min(10^5, a*2), length=Nfit)

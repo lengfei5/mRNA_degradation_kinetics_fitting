@@ -45,7 +45,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
     outlier.s = NA;
     
   }else{
-    
     ## outlier detection and removal
     source("R/outliers_detection.R", local = TRUE)
     

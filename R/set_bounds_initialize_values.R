@@ -38,9 +38,37 @@ sigmoid.bound.contraint = function(eps.gamma)
 }
 
 ####################
-## main function for parameter boundaries 
+## function for general parameter boundaries 
 ####################
-set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.signal = TRUE)
+set.general.bounds.int = function(lower.user = NULL, 
+                                  upper.user = NULL,
+                                  parametrization =c('cosine.beta'), 
+                                  absolute.signal = TRUE)
+{
+  Min.int.max = 2^20; ## intron signal mean 2^9;
+  Min.int.min = 2^(-20);
+  
+  Amp.int.min = 0;
+  Amp.int.max = 200;
+  
+  phase.int.min = 0;
+  phase.int.max = 24; 
+  
+  beta.int.min = 1;
+  beta.int.max = 5;
+  
+  param.synthesis.upper = c(Min.int.max, Amp.int.max, phase.int.max, beta.int.max)
+  param.synthesis.lower = c(Min.int.min, Amp.int.min, phase.int.min, beta.int.min)
+  names(param.synthesis.upper) = c("Min.int", "Amp.int", "phase.int", "beta.int")
+  names(param.synthesis.lower) = names(param.synthesis.upper);
+
+  return(list(lower = param.synthesis.lower, upper = param.synthesis.upper))
+}
+
+set.general.bounds.degr.splicing = function(lower.user = NULL, 
+                                  upper.user = NULL,
+                                  parametrization =c('cosine.beta'), 
+                                  absolute.signal = TRUE)
 {
   ### minimum and maximum of gamma
   gamma.min = log(2)/24
@@ -58,27 +86,29 @@ set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.sig
   splicing.k.max = 10^5 ## 1s of splicing time;
   splicing.k.min = 10^(-1) ## 30 min of splicing time;
   
-  Min.int.max = 2^20; ## intron signal mean 2^9;
-  Min.int.min = 2^(-20);
+  degr.splicing.upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max)
+  degr.splicing.lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min)
   
-  Amp.int.min = 0;
-  Amp.int.max = 200;
+  names(degr.splicing.upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k")
+  names(degr.splicing.lower) =  names(degr.splicing.upper)
   
-  phase.int.min = 0;
-  phase.int.max = 24; 
+  return(list(lower = degr.splicing.lower, upper = degr.splicing.upper))
   
-  beta.int.min = 1;
-  beta.int.max = 5;
+}
+
+set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
+                              parametrization =c('cosine.beta'), absolute.signal = TRUE)
+{
+  bounds.int = set.general.bounds.int();
+  bounds.degr.splicing = set.general.bounds.degr.splicing();
   
-  param.synthesis.upper = c(Min.int.max, Amp.int.max, phase.int.max, beta.int.max)
-  param.synthesis.lower = c(Min.int.min, Amp.int.min, phase.int.min, beta.int.min)
-    
-  upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max,  param.synthesis.upper)
-  lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min,  param.synthesis.lower)
-  
-  names(upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k", 
-                           "Min.int", "Amp.int", "phase.int", "beta.int")
-  names(lower) =  names(upper)
+  upper = c(bounds.degr.splicing$upper, bounds.int$upper);
+  lower = c(bounds.degr.splicing$lower, bounds.int$lower);
+  #upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max,  param.synthesis.upper)
+  #lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min,  param.synthesis.lower)
+  #names(upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k", 
+  #                         "Min.int", "Amp.int", "phase.int", "beta.int")
+  #names(lower) =  names(upper)
   
   if(absolute.signal){
     if(model==1){ upper = upper[c(1, 4, 5)];  lower = lower[c(1, 4, 5)]; }
@@ -87,6 +117,109 @@ set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.sig
   }
   
   return(list(lower = lower, upper = upper))
+}
+
+####################
+## Set gene-specific parameter boundaries and inital values for fitting pre-mRNAs
+## Initial values were smapled 
+####################
+Sampling.Initial.Values.for.fitting.S = function(S, Nfit.S = 4, zt = seq(0,94,by = 2)) 
+{
+  set.seed(8675309);
+  
+  bounds.general = set.bounds.general(model = 2);
+  upper.general = bounds.general$upper; 
+  lower.general = bounds.general$lower;
+  
+  Min.init = rep(min(S), Nfit.S)
+  
+  Amp.init = rep((max(S)-min(S)), Nfit.S)
+  
+  phase.init = zt[which.max(S)]
+  phase.init = (rep(phase.init, Nfit.S)+rnorm(Nfit.S,sd = 3))%%24
+  
+  beta.min = lower.general[which(names(lower.general)=="beta.int")]; 
+  beta.max = upper.general[which(names(upper.general)=="beta.int")];
+  beta.init = lseq(beta.min, beta.max, length = Nfit.S)
+  
+  PAR.INIT.S = cbind(Min.init, Amp.init, phase.init, beta.init)
+  colnames(PAR.INIT.S) = c('Min.int', 'Amp.int', "phase.int", "beta.int")
+  
+  return(PAR.INIT.S)
+  
+}
+
+set.bounds.gene.s = function(S, range_scalingFactor=5)
+{
+  bounds.int = set.general.bounds.int();
+  
+  lower.g.s = c(min(S)/range_scalingFactor, (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
+  upper.g.s = c(max(S), (max(S)-min(S))*range_scalingFactor, bounds.int$upper[c(3:4)])
+  
+  return(list(upper = upper.g.s, lower = lower.g.s))
+  
+}
+
+####################
+## Set gene-specific parameter boundaries and inital values for fitting mRNAs
+## Initial values were smapled 
+####################
+Sampling.Initial.Values.for.fitting.M = function(M, S, Nfit.M = 6, zt = seq(0,94,by = 2)) 
+{
+  set.seed(8675309);
+  eps.m = min((max(M) - min(M))/mean(M)/2, 1);
+  if(Nfit.M%%2==0){
+    eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), Nfit.M/2, replace = TRUE), rep(eps.m/1.25, length=Nfit.M/2));
+  }else{
+    eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), (Nfit.M-1)/2, replace = TRUE), rep(eps.m/1.25, length=(Nfit.M+1)/2));
+  }
+  if(any(eps.gamma.init>0.8)) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
+    
+  phase.m = zt[which.max(M)]
+  phase.gamma.init =  (rep((phase.m+12), Nfit.M)+rnorm(Nfit.M, sd = 3))%%24
+    
+  gamma.init = Gamma.Initiation(eps.gamma.init, 0.5, 6);
+  #if(debug){cat('gamma inital values ', gamma.init, '\n')};
+  
+  # define the ratio between splicing rate and degratation rate
+  a.init = rep(mean(M)/mean(S), Nfit.M)
+  
+  PAR.INIT.M = cbind(gamma.init, eps.gamma.init, phase.gamma.init, a.init)
+  colnames(PAR.INIT.M) = c('gamma', 'eps.gamma', "phase.gamma", "splicing.k")
+  
+  return(PAR.INIT.M)
+  
+}
+
+set.bounds.gene.m = function(M, S, range_scalingFactor=5)
+{
+  bounds.gamma.k = set.general.bounds.degr.splicing();
+  a = mean(M)/mean(S);
+  
+  lower.gamma.k = c(bounds.gamma.k$lower[c(1:3)], a/range_scalingFactor)
+  upper.gamma.k = c(bounds.gamma.k$upper[c(1:3)], a*range_scalingFactor)
+  
+  return(list(upper = upper.gamma.k, lower = lower.gamma.k))
+  
+}
+
+####################
+## Set gene-specific parameter boundaries and inital values for fitting mRNA and pre-mRNA together
+## Initial values were smapled 
+####################
+Sampling.Initial.Values.for.fitting.M.S = function(M, S, Nfit = 6, zt = seq(0,94,by = 2)) 
+{
+  set.seed(8675309);
+  
+  
+}
+
+set.bounds.gene.m.s = function(M, S, range_scalingFactor=5)
+{
+ 
+  
+  return(list(upper = upper.gamma.k, lower = lower.gamma.k))
+  
 }
 
 

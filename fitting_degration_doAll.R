@@ -51,7 +51,6 @@ gene.index = which(T$gene==gg)
 #rm(list = lsf.str())
 ## install package dependency
 
-
 source("R/fitting_degradation_do_stepbystep.R")
 #source("R/fitting_degradation_do_stepbystep.R")
 ptm <- proc.time()
@@ -60,7 +59,6 @@ param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = 
                                                                             outliers.removal = outliers.removal,
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
-
 
 ###########################
 ## compare with origine function
