@@ -74,8 +74,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
       
+      # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
       T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
       T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
+    
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 

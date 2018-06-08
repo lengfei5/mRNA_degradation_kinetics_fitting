@@ -14,7 +14,9 @@ source("R/kinetic_model.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
 ###############
-#### utility functions for model fitting
+## utility functions for model fitting
+## these functions are also mainly for the read count table
+## they are not used in gaussian model
 ###############
 norm.RPKM = function(nb.reads, length)
 {
@@ -89,6 +91,7 @@ make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, 
   }
   
   return(param.fit)
+  
 }
 
 ###########
@@ -142,6 +145,8 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
                              parametrization =c('cosine.beta'), norm.params = TRUE, absolute.signal = TRUE)
 {
   # i = j; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
+  
+  # prepare parameters for the optimization 
   w = 2*pi/24;
   gene2opt = T$gene[i];
   param.fit = NA
@@ -153,11 +158,10 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
   S = norm.RPKM(R.s, L.s)
   #alpha.m = T$alpha.mRNA[i];
   #alpha.s = T$alpha.premRNA[i];
-  alpha.m = rep(as.numeric(T[i, grep('alpha.mRNA.ZT', colnames(T))]), 4);
-  alpha.s = rep(as.numeric(T[i, grep('alpha.premRNA.ZT', colnames(T))]), 4);
+  alpha.m = rep(as.numeric(T[i, grep('alpha.mRNA.ZT', colnames(T))]), 4);  # dispersion parameter alpha for each time points
+  alpha.s = rep(as.numeric(T[i, grep('alpha.premRNA.ZT', colnames(T))]), 4); 
   
-  if(outliers)
-  {
+  if(outliers){
     outlier.m = as.numeric(unlist(strsplit(as.character(T$mRNA.outlier[i]), ';')))
     outlier.s = as.numeric(unlist(strsplit(as.character(T$premRNA.outlier[i]), ';'))) 
   }else{
@@ -165,7 +169,9 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     outlier.s = c();
   }
   
-  fitting.factor = 1; ### define the nb of initial values in optimization
+  # define the nb of initial values in optimization
+  fitting.factor = 1; 
+  
   bounds = set.bounds(model = model);
   upper = bounds$upper; 
   lower = bounds$lower;

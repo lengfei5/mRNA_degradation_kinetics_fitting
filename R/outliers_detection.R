@@ -110,10 +110,10 @@ detect.ouliters.loglike = function(param.fits.results,
     loglike.s[(model-1), ] = loglike
   }
   
+  ## identified outlier index
   #additional.m = intersect(index.outliers.loglike(loglike.m[3,]), intersect(index.outliers.loglike(loglike.m[1,]), index.outliers.loglike(loglike.m[2,])))
   #additional.s = intersect(index.outliers.loglike(loglike.s[3,]), intersect(index.outliers.loglike(loglike.s[1,]), index.outliers.loglike(loglike.s[2,])))
-  
-  ## identified outlier index
+   
   index.outliers.m = index.outliers.loglike(loglike.m[3,]); 
   index.outliers.s = index.outliers.loglike(loglike.s[3,]);
     
