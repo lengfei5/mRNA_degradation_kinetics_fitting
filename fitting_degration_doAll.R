@@ -62,7 +62,6 @@ param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = 
 proc.time() - ptm
 
 
-
 ###########################
 ## compare with origine function
 ###########################

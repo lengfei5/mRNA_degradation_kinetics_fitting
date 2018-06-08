@@ -30,15 +30,18 @@ convert.nb.reads = function(rpkm, length)
   return(rpkm*length*scaling.factors/10^9);
 }
 
+## those two function need to be modified and NOT USED 
 norm.RPKM.libary.size = function(nb.reads, length)
 {
   load(file='Libary_size_48_samples.Rdata')
+  
   return(nb.reads/length/ss*10^9);
 }
 
 convert.nb.reads.libary.size = function(rpkm, length)
 {
   load(file='Libary_size_48_samples.Rdata')
+  
   return(rpkm*length*ss/10^9);
 }
 
@@ -139,14 +142,24 @@ calculate.error.for.flat.model = function(T = T,
 ####################
 ## main optimization function for Model 2, 3 and 4
 ####################
-make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, zt =  seq(0,46,by = 2), 
-                             i.ex = ZT.ex, i.int = ZT.int, 
+make.optimization = function(T = T, 
+                             i = 1, 
+                             model = 4, 
+                             Nfit = NA,
+                             zt =  seq(0,94,by = 2), 
+                             i.ex = ZT.ex, 
+                             i.int = ZT.int, 
                              outliers = FALSE,
-                             parametrization =c('cosine.beta'), norm.params = TRUE, absolute.signal = TRUE)
+                             parametrization =c('cosine.beta'), 
+                             debug = FALSE,
+                             norm.params = TRUE, 
+                             absolute.signal = TRUE)
 {
-  # i = j; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
+  # i = gene.index; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 3;outliers = TRUE; 
   
-  # prepare parameters for the optimization 
+  ####################
+  ## prepare parameters for the optimization 
+  ####################
   w = 2*pi/24;
   gene2opt = T$gene[i];
   param.fit = NA
@@ -169,25 +182,37 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     outlier.s = c();
   }
   
-  # define the nb of initial values in optimization
-  fitting.factor = 1; 
+  ####################
+  ## Prefix parameters in optimization process
+  ####################
+  prefit.S = TRUE # optimization warm-up by fitting pre-mRNA individually to have good initial values
+  prefit.M = TRUE # optimization warm-up by fitting mRNA individually 
   
+  fitting.factor = 1;  
+  Nfit.S = 4*fitting.factor; # nb of inital values for pre-mRNA
+  Nfit.M = 6*fitting.factor; # nb of initial values for mRNA
+  if(is.na(Nfit)) # nb of intial valeus for pre-mRNA and mRNA together
+  {
+    if(model==2) Nfit = fitting.factor*4;
+    if(model==3) Nfit = fitting.factor*6;
+    if(model==4) Nfit = fitting.factor*8;
+  }
+  
+  ## parameter boundary
   bounds = set.bounds(model = model);
   upper = bounds$upper; 
   lower = bounds$lower;
   
-  #######
-  ####### FITTING the absolute signal
-  #######
-  ### Here we want first to fit the pre-mRNA profile to identify parameters mean.int, fold.change.int, phase.int, beta.int
-  ## Prefit premRNA for model2 and model4 in order to have the good initial values for premRNA parameters
+  ######################################
+  ######################################
+  ## Section: start to fit the absolute signals
+  # Here we want first to fit the pre-mRNA profile to identify parameters mean.int, fold.change.int, phase.int, beta.int
+  # Prefit premRNA for model2 and model4 in order to have the good initial values for premRNA parameters
+  ######################################
+  ######################################
   #ptm = proc.time();
-  prefit.S = TRUE 
   if((model==2|model==4) & prefit.S) 
   {
-    Nfit.S = 4*fitting.factor;
-    #index = i
-    
     ### Choose different initial values of parameters for S fitting
     Min.init = rep(min(S), Nfit.S)
     Amp.init = rep((max(S)-min(S)), Nfit.S)
@@ -203,27 +228,25 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     limit.factor = 5
     for(fit.nb.s in 1:Nfit.S)
     {
-      # fit.nb.s = 1;
       par.init.s = PAR.INIT.S[fit.nb.s,]
       opt.s = optim(par.init.s, f2min.int, R.s=R.s, L.s=L.s, alpha.s=alpha.s, outlier.s=outlier.s, zt = zt, method = 'L-BFGS-B', 
                     lower = c(min(S)/limit.factor, (max(S)-min(S))/limit.factor, 0, 1), upper = c(max(S), (max(S)-min(S))*limit.factor, 24, 5))
-      #print(opt.s$convergence)
+      
       res.fit.s = opt.s$par
       errors.fit.s[fit.nb.s] = opt.s$value
       eval(parse(text = paste('res.fit.s.', fit.nb.s, ' = res.fit.s', sep = '')))
     }
+    
     ## choose the best-fitting parameters for S
     imin.s = which.min(errors.fit.s); 
-    eval(parse(text = paste('res.fit.s = res.fit.s.', imin.s, sep = '')))			
+    eval(parse(text = paste('res.fit.s = res.fit.s.', imin.s, sep = '')))
+    
   }
   #proc.time() - ptm
   
   #ptm = proc.time();
-  prefit.M = TRUE
   if(model==4 & prefit.M)
   {
-    Nfit.M = 6*fitting.factor;
-    
     ### Choose different initial values of parameters for M fitting
     eps.m = min((max(M) - min(M))/mean(M)/2, 1);
     eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), Nfit.M/2, replace = TRUE), rep(eps.m/1.25, length=Nfit.M/2));
@@ -255,27 +278,13 @@ make.optimization = function(T = T, i = 1, model = 4, Nfit = NA, debug = FALSE, 
     eval(parse(text = paste('res.fit.m = res.fit.m.', imin.m, sep = '')))
     
     if(debug){cat('\t -- prefix parameter for M4', res.fit.m, res.fit.s, '\n')};
-    #cat('true parameters for M4', unlist(T[j, c(142, 146, 147, 141, 140, 143, 144, 145)]), '\n')
-    #cat('-2loglike = ', errors.fit.m[imin.m], errors.fit.s[imin.s], '\n sum of -2loglike = ', sum(errors.fit.m[imin.m], errors.fit.s[imin.s]), '\n')
+    
   }
   #proc.time() - ptm
   
   #################################
   #### Fit both S (pre-mRNA) and M (mRNA) together for Model 2, 3, 4 
   #################################
-  if(is.na(Nfit))
-  {
-    if(debug){
-      if(model==2) Nfit = fitting.factor*4;
-      if(model==3) Nfit = fitting.factor*6;
-      if(model==4) Nfit = fitting.factor*8;
-    }else{
-      if(model==2) Nfit = fitting.factor*10;
-      if(model==3) Nfit = fitting.factor*12;
-      if(model==4) Nfit = fitting.factor*12;
-    }
-  }
-    
   ### Define the initial values for degradation and splicing parameters
   a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
   a.init = lseq(max(0.1, a/5), min(10^5, a*2), length=Nfit)

@@ -37,6 +37,9 @@ sigmoid.bound.contraint = function(eps.gamma)
   }
 }
 
+####################
+## main function for parameter boundaries 
+####################
 set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.signal = TRUE)
 {
   ### minimum and maximum of gamma
@@ -69,30 +72,20 @@ set.bounds = function(model = 4, parametrization =c('cosine.beta'), absolute.sig
   
   param.synthesis.upper = c(Min.int.max, Amp.int.max, phase.int.max, beta.int.max)
   param.synthesis.lower = c(Min.int.min, Amp.int.min, phase.int.min, beta.int.min)
+    
+  upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max,  param.synthesis.upper)
+  lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min,  param.synthesis.lower)
   
-  if(absolute.signal)
-  {
-    if(model==1)
-    {
-      upper = c(gamma.max, splicing.k.max, mean.int.max)
-      lower = c(gamma.min, splicing.k.min, mean.int.min)
-    }
-    if(model==2)
-    {
-      upper = c(gamma.max, splicing.k.max, param.synthesis.upper)
-      lower = c(gamma.min, splicing.k.min, param.synthesis.lower)
-    }
-    if(model==3)
-    {
-      upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max, Min.int.max)
-      lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min, Min.int.min)
-    }
-    if(model==4)
-    {
-      upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max,  param.synthesis.upper)
-      lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min,  param.synthesis.lower)
-    }
+  names(upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k", 
+                           "Min.int", "Amp.int", "phase.int", "beta.int")
+  names(lower) =  names(upper)
+  
+  if(absolute.signal){
+    if(model==1){ upper = upper[c(1, 4, 5)];  lower = lower[c(1, 4, 5)]; }
+    if(model==2){ upper = upper[c(1, 4, 5:8)];  lower = lower[c(1, 4, 5:8)];}
+    if(model==3){ upper = upper[c(1:5)]; lower = lower[c(1:5)]; }
   }
+  
   return(list(lower = lower, upper = upper))
 }
 
