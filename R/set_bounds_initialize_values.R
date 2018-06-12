@@ -207,10 +207,73 @@ set.bounds.gene.m = function(M, S, range_scalingFactor=5)
 ## Set gene-specific parameter boundaries and inital values for fitting mRNA and pre-mRNA together
 ## Initial values were smapled 
 ####################
-Sampling.Initial.Values.for.fitting.M.S = function(M, S, Nfit = 6, zt = seq(0,94,by = 2)) 
+Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt = seq(0,94,by = 2)) 
 {
   set.seed(8675309);
-  
+  ### Define the initial values for degradation and splicing parameters
+  a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
+  a.init = lseq(max(0.1, a/5), min(10^5, a*2), length=Nfit)
+  max.half.life = 12;
+  min.half.life = 30/60;
+  if(model==2)
+  {
+    Min.init = rep(res.fit.s[1], Nfit)
+    Amp.init = seq(res.fit.s[2]/2, res.fit.s[2]*2, length=Nfit)
+    phase.init = (rep(res.fit.s[3],Nfit)+rnorm(Nfit,sd = 2))%%24
+    beta.init = lseq(max(1, (res.fit.s[4]-2)), min((res.fit.s[4]+2), 10), length=Nfit)
+    
+    gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit), Nfit%/%Nfit), rep(log(2)/5,Nfit%%Nfit))
+    
+    PAR.INIT = cbind(gamma.init, a.init, Min.init, Amp.init, phase.init, beta.init); 
+    colnames(PAR.INIT) = c('gamma','splicing.k','Min.int','Amp.int','phase.int','beta.int');
+    upper[2] = a*5 
+    lower[2] = a/5;
+    lower[3] = min(S)/5;
+    upper[3] = max(S)*5;
+    lower[4] = (max(S)-min(S))/5;
+    upper[4] = (max(S)-min(S))*5;
+  }
+  if(model==3)
+  {	
+    ### initialize decay parameters for model 3
+    eps.m = min((max(M) - min(M))/mean(M)/2, 1); # close to mRNA amplitude
+    eps.gamma.init = c(sample(seq(0.1, 0.6, length = 10), Nfit/2, replace = TRUE), rep(eps.m, length=Nfit/2));
+    if(length(which(eps.gamma.init>0.8))>=1) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
+    phase.m = zt[which.max(M)]
+    phase.gamma.init =  (rep((phase.m+12), Nfit)+rnorm(Nfit, sd = 2))%%24 ## antiphasic to mRNA
+    gamma.init = Gamma.Initiation(eps.gamma.init, 0.5, 6);
+    
+    Min.init = rep(mean(S), Nfit)
+    PAR.INIT = cbind(gamma.init, eps.gamma.init, phase.gamma.init, a.init, Min.init)
+    colnames(PAR.INIT) = c('gamma','eps.gamma','phase.gamma','splicing.k', 'Min.int');
+    upper[4] = a*5;
+    lower[4] = a/5;
+    lower[5] = min(S)/5;
+    upper[5] = max(S)*5;
+  }
+  if(model==4)
+  {
+    ### initialize decay parameters for model 4
+    eps.gamma.init = seq(res.fit.m[2]/4, min(res.fit.m[2]*4, 1), length=Nfit);
+    if(length(which(eps.gamma.init>0.8))>=1) eps.gamma.init[which(eps.gamma.init>0.8)] = 0.8;
+    gamma.init = Gamma.Initiation(eps.gamma.init, 0.5, 8);
+    phase.gamma.init = (rep(res.fit.m[3],Nfit)+rnorm(Nfit,sd = 1.5))%%24;
+    a.init = seq(max(0.1, res.fit.m[4]/1.5), min(10^5, res.fit.m[4]*1.5), length=Nfit)
+    
+    Min.init = rep(res.fit.s[1], Nfit)
+    Amp.init = seq(res.fit.s[2]/2, res.fit.s[2]*2, length=Nfit)
+    phase.init = (rep(res.fit.s[3],Nfit)+rnorm(Nfit,sd = 2))%%24
+    beta.init = lseq(max(1, (res.fit.s[4]-2)), min((res.fit.s[4]+2), 10), length=Nfit)
+    
+    PAR.INIT = cbind(gamma.init, eps.gamma.init, phase.gamma.init, a.init, Min.init, Amp.init, phase.init, beta.init);
+    colnames(PAR.INIT) = c('gamma','eps.gamma','phase.gamma','splicing.k', 'Min.int','Amp.int','phase.int','beta.int')
+    upper[4] = a*5;
+    lower[4] = a/5;
+    lower[5] = min(S)/5;
+    upper[5] = max(S)*5;
+    lower[6] = (max(S)-min(S))/5;
+    upper[6] = (max(S)-min(S))*5;
+  }
   
 }
 
