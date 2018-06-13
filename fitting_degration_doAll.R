@@ -16,7 +16,7 @@
 rm(list=ls())
 
 ####################
-## install dependencies 
+## install dependencies step 
 ####################
 source("R/configure.R")
 

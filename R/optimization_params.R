@@ -224,7 +224,6 @@ make.optimization = function(T = T,
     ## choose the best-fitting parameters for S
     imin.s = which.min(errors.fit.s); 
     eval(parse(text = paste('res.fit.s = res.fit.s.', imin.s, sep = '')))
-    
   }
   #proc.time() - ptm
   
@@ -235,7 +234,7 @@ make.optimization = function(T = T,
   if(model==4 & prefit.M)
   {
     ### sampling initial values of parameters for M fitting
-    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit, model = model, zt = zt)
+    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit, zt = zt)
     bounds.g.m = set.bounds.gene.m(M, S, range_scalingFactor=5)
     
     errors.fit.m = rep(NA, Nfit.M)
@@ -253,8 +252,8 @@ make.optimization = function(T = T,
     imin.m = which.min(errors.fit.m); 
     eval(parse(text = paste('res.fit.m = res.fit.m.', imin.m, sep = '')))
     
-    if(debug){cat('\t -- prefix parameter for M4', res.fit.m, res.fit.s, '\n')};
-    
+    if(debug){cat('\t fitting warm-up for M4 ', res.fit.m, res.fit.s, '\n')};
+ 
   }
   #proc.time() - ptm
   
@@ -262,7 +261,10 @@ make.optimization = function(T = T,
   #### Fit both S (pre-mRNA) and M (mRNA) together for Model 2, 3, 4 
   #################################
   ### sampling initial values for parameters and set boundaries
-  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(M, S, model = model, Nfit, zt)
+  if(model == 2) {res.fit.m = NULL;}
+  if(model == 3) {res.fit.s = NULL; res.fit.m = NULL}
+  
+  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(M, S, model, Nfit, zt, res.fit.s, res.fit.m)
   bounds.g = set.bounds.gene(M, S, model = model)
   
   errors.fit = rep(NA, Nfit)

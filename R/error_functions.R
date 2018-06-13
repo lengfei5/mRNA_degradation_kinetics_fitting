@@ -7,6 +7,20 @@
 ## Date of creation: Mon Jun  4 12:27:15 2018
 ##########################################################################
 ##########################################################################
+sigmoid.bound.contraint = function(eps.gamma)
+{
+  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
+  
+  smooth.bound.constraint.function = FALSE
+  if(smooth.bound.constraint.function)
+  {
+    xx = lseq(0.001, 1.2, length.out = 1000)
+    x0 = 1.0;y0=10^4
+    yy = y0/(1+exp(-100*(xx-x0)))
+    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
+    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
+  }
+}
 
 ########
 ### ERROR function for premRNA profile
@@ -121,9 +135,6 @@ f2min = function(par, R.m, R.s, L.m, L.s, alpha.m, alpha.s, outlier.m = c(), out
 NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), alpha.s=rep(0.03, 48), 
                     mu.m=rep(1000, 48), mu.s=rep(100, 48), outlier.m = c(), outlier.s=c(), specie = 'both', intense.debug=FALSE)
 {
-  ## specie = c('both', 'mRNA', 'premRNA')
-  #q = 0.05;
-  ### -2*loglikelihood for the mRNA
   if(specie=='both'|specie=='mRNA')
   {
     R.m = as.numeric(unlist(R.m));
@@ -167,6 +178,7 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
       #cat(error.S, error.S2, '\n')
     } 
   }
+  
   ## -2loglike
   if(specie == 'mRNA') 
   {
@@ -185,4 +197,5 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
   #if(intense.debug){cat('-------- error.M = ',error.M)}
   #if(intense.debug){cat('-------- error.M = ',error,'\n')}
   return(error)
+  
 }

@@ -19,22 +19,7 @@ Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, 
     if(length(kk)>0) gamma.init[n] = sample(lss[kk], 1);
   }
   return(gamma.init)
-  #gamma.init = c(rep(log(2)/lseq(max.half.life, min.half.life, length = Nfit.M), Nfit.M%/%Nfit.M), rep(log(2)/5,Nfit.M%%Nfit.M))
-}
-
-sigmoid.bound.contraint = function(eps.gamma)
-{
-  return(10^4/(1+exp(-100*(eps.gamma-1.0))));
   
-  smooth.bound.constraint.function = FALSE
-  if(smooth.bound.constraint.function)
-  {
-    xx = lseq(0.001, 1.2, length.out = 1000)
-    x0 = 1.0;y0=10^4
-    yy = y0/(1+exp(-100*(xx-x0)))
-    plot(xx, yy, type='l', col='blue', log='', ylim=c(0, y0));abline(h=1, col='red');abline(h=0, col='red');
-    abline(v=x0, col='black');abline(v=(x0-0.05), col='black');abline(v=1, col='black');
-  }
 }
 
 ####################
@@ -207,13 +192,15 @@ set.bounds.gene.m = function(M, S, range_scalingFactor=5)
 ## Set gene-specific parameter boundaries and inital values for fitting mRNA and pre-mRNA together
 ## Initial values were smapled 
 ####################
-Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt = seq(0,94,by = 2)) 
+Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt = seq(0,94,by = 2), 
+                                                   res.fit.s = NULL, res.fit.m = NULL) 
 {
   set.seed(8675309);
   
   ### Define the initial values for degradation and splicing parameters
-  a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
-  a.init = lseq(max(0.1, a/5), min(10^5, a*2), length=Nfit)
+  a = mean(M)/mean(S) 
+  a.init = lseq(max(0.1, a/5), min(10^5, a*5), length=Nfit)
+  
   max.half.life = 12;
   min.half.life = 30/60;
   
@@ -227,7 +214,6 @@ Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt
     
     PAR.INIT = cbind(gamma.init, a.init, Min.init, Amp.init, phase.init, beta.init); 
     colnames(PAR.INIT) = c('gamma','splicing.k','Min.int','Amp.int','phase.int','beta.int');
-    
   }
   if(model==3){	
     ### initialize decay parameters for model 3
@@ -241,7 +227,6 @@ Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt
     Min.init = rep(mean(S), Nfit)
     PAR.INIT = cbind(gamma.init, eps.gamma.init, phase.gamma.init, a.init, Min.init)
     colnames(PAR.INIT) = c('gamma','eps.gamma','phase.gamma','splicing.k', 'Min.int');
-   
   }
   if(model==4){
     ### initialize decay parameters for model 4
@@ -260,10 +245,15 @@ Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt
     colnames(PAR.INIT) = c('gamma','eps.gamma','phase.gamma','splicing.k', 'Min.int','Amp.int','phase.int','beta.int')
   }
   
+  return(PAR.INIT)
 }
 
 set.bounds.gene = function(M, S, model = 4, range_scalingFactor=5)
 {
+  bounds.general = set.bounds.general(model = model)
+  upper = bounds.general$upper;
+  lower = bounds.general$lower;
+  
   a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
   
   if(model==2){
