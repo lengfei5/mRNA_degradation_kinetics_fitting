@@ -235,7 +235,7 @@ make.optimization = function(T = T,
   if(model==4 & prefit.M)
   {
     ### sampling initial values of parameters for M fitting
-    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit.M, zt)
+    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit, model = model, zt = zt)
     bounds.g.m = set.bounds.gene.m(M, S, range_scalingFactor=5)
     
     errors.fit.m = rep(NA, Nfit.M)
@@ -262,12 +262,9 @@ make.optimization = function(T = T,
   #### Fit both S (pre-mRNA) and M (mRNA) together for Model 2, 3, 4 
   #################################
   ### sampling initial values for parameters and set boundaries
-  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(M, S, Nfit.M, zt)
-  bounds.g = set.bounds.gene.m.s(M, S, range_scalingFactor=5)
+  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(M, S, model = model, Nfit, zt)
+  bounds.g = set.bounds.gene(M, S, model = model)
   
-  #bounds.general = set.bounds.general(model = model);
-  #upper = bounds.general$upper;
-  #lower = bounds.general$lower;
   errors.fit = rep(NA, Nfit)
   
   for(fit.number in 1:Nfit)

@@ -14,14 +14,14 @@
 ######################################
 compute.s.beta = function(t = zt, Min = 1, Amp = 2, phase = 12, beta = 1)
 {
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   s = Min+Amp*((1+cos(w*(t-phase)))/2)^beta
   return(s)
 }
 
 compute.s.beta.v1 = function(t = zt, mean = 1, fold.change = 2, phase = 12, beta = 1)
 {
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   #s = 1/(1+(fold.change-1)/4^beta*gamma(1+2*beta)/gamma(1+beta)^2)*(1+(fold.change-1)*((1+cos(w*(t-phase)))/2)^beta)
   s = mean/(1+(fold.change-1)/4^beta*gamma(1+2*beta)/gamma(1+beta)^2)*(1+(fold.change-1)*((1+cos(w*(t-phase)))/2)^beta)
   return(s)
@@ -32,7 +32,7 @@ compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, pha
 {
   #gamma=log(2)/5; eps.gamma=0.25; phase.gamma=12; splicing.k=log(2)/(5/60); mean = 10; fold.change=10; phase=6; beta=1;t = seq(0,46, by=2);simulation.only=FALSE
   #gamma=4.159; eps.gamma=0.3; phase.gamma=24; splicing.k=43.135; Min = 0.01418; Amp=0.215; phase=6.3; beta=5;t = seq(0,94, by=2);simulation.only=FALSE
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   zt = t;
   
   #### because m is periodic, so just compute the first period and then repeat it.
@@ -102,7 +102,7 @@ f2integrate = function(t, par)
 #### This is the integral of degradation function
 Gamma = function(t = 0, gamma = log(2)/3, eps.gamma = 0.2, phase.gamma = 0)
 {
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   Gamma = gamma*(t + eps.gamma/w * sin(w*(t-phase.gamma)))
   #Gamma = gamma*(t+ eps.gamma/w * sin(w*(t-phase.gamma)))
   #Gamma = gamma*(t+ eps.gamma/w * sin(w*(t-phase.gamma)))
@@ -123,7 +123,7 @@ dmdt = function(t, y, par)
   param.synthesis.3 = par[7]; 
   param.synthesis.4 = par[8];
   
-  w <<- 2*pi/24;
+  w = 2*pi/24;
   
   s.t = compute.s.beta(t=t, Min = param.synthesis.1, Amp = param.synthesis.2, phase = param.synthesis.3, beta =  param.synthesis.4)
   
