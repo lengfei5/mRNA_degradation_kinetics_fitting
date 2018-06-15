@@ -23,7 +23,7 @@ Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, 
 }
 
 ####################
-## function for general parameter boundaries 
+## function for set general parameter boundaries 
 ####################
 set.general.bounds.int = function(lower.user = NULL, 
                                   upper.user = NULL,
@@ -81,6 +81,7 @@ set.general.bounds.degr.splicing = function(lower.user = NULL,
   
 }
 
+
 set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
                               parametrization =c('cosine.beta'), absolute.signal = TRUE)
 {
@@ -105,7 +106,60 @@ set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
 }
 
 ####################
-## Set gene-specific parameter boundaries and inital values for fitting pre-mRNAs
+## function for set gene-specific parameter boundaries 
+####################
+set.bounds.gene.m = function(M, S, range_scalingFactor=5)
+{
+  bounds.gamma.k = set.general.bounds.degr.splicing();
+  a = mean(M)/mean(S);
+  
+  lower.gamma.k = c(bounds.gamma.k$lower[c(1:3)], a/range_scalingFactor)
+  upper.gamma.k = c(bounds.gamma.k$upper[c(1:3)], a*range_scalingFactor)
+  
+  return(list(upper = upper.gamma.k, lower = lower.gamma.k))
+  
+}
+
+set.bounds.gene.s = function(S, range_scalingFactor=5)
+{
+  bounds.int = set.general.bounds.int();
+  
+  lower.g.s = c(min(S)/range_scalingFactor, (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
+  upper.g.s = c(max(S), (max(S)-min(S))*range_scalingFactor, bounds.int$upper[c(3:4)])
+  
+  return(list(upper = upper.g.s, lower = lower.g.s))
+  
+}
+
+set.bounds.gene = function(M, S, model = 4, range_scalingFactor=5)
+{
+  bounds.general = set.bounds.general(model = model)
+  upper = bounds.general$upper;
+  lower = bounds.general$lower;
+  
+  a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
+  
+  if(model==2){
+    upper[2] = a*range_scalingFactor;   lower[2] = a/range_scalingFactor;
+    lower[3] = min(S)/range_scalingFactor;     upper[3] = max(S)*range_scalingFactor;
+    lower[4] = (max(S)-min(S))/range_scalingFactor;     upper[4] = (max(S)-min(S))*range_scalingFactor;
+  }
+  if(model==3){	
+    upper[4] = a*range_scalingFactor;     lower[4] = a/range_scalingFactor;
+    lower[5] = min(S)/range_scalingFactor;     upper[5] = max(S)*range_scalingFactor;
+  }
+  if(model==4){
+    upper[4] = a*range_scalingFactor; lower[4] = a/range_scalingFactor;
+    lower[5] = min(S)/range_scalingFactor;  upper[5] = max(S)*range_scalingFactor;
+    lower[6] = (max(S)-min(S))/range_scalingFactor; upper[6] = (max(S)-min(S))*range_scalingFactor;
+  }
+  
+  return(list(upper = upper, lower = lower))
+  
+}
+
+####################
+##  set inital values for fitting pre-mRNAs
 ## Initial values were smapled 
 ####################
 Sampling.Initial.Values.for.fitting.S = function(S, Nfit.S = 4, zt = seq(0,94,by = 2)) 
@@ -131,17 +185,6 @@ Sampling.Initial.Values.for.fitting.S = function(S, Nfit.S = 4, zt = seq(0,94,by
   colnames(PAR.INIT.S) = c('Min.int', 'Amp.int', "phase.int", "beta.int")
   
   return(PAR.INIT.S)
-  
-}
-
-set.bounds.gene.s = function(S, range_scalingFactor=5)
-{
-  bounds.int = set.general.bounds.int();
-  
-  lower.g.s = c(min(S)/range_scalingFactor, (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
-  upper.g.s = c(max(S), (max(S)-min(S))*range_scalingFactor, bounds.int$upper[c(3:4)])
-  
-  return(list(upper = upper.g.s, lower = lower.g.s))
   
 }
 
@@ -176,17 +219,7 @@ Sampling.Initial.Values.for.fitting.M = function(M, S, Nfit.M = 6, zt = seq(0,94
   
 }
 
-set.bounds.gene.m = function(M, S, range_scalingFactor=5)
-{
-  bounds.gamma.k = set.general.bounds.degr.splicing();
-  a = mean(M)/mean(S);
-  
-  lower.gamma.k = c(bounds.gamma.k$lower[c(1:3)], a/range_scalingFactor)
-  upper.gamma.k = c(bounds.gamma.k$upper[c(1:3)], a*range_scalingFactor)
-  
-  return(list(upper = upper.gamma.k, lower = lower.gamma.k))
-  
-}
+
 
 ####################
 ## Set gene-specific parameter boundaries and inital values for fitting mRNA and pre-mRNA together
@@ -248,31 +281,5 @@ Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt
   return(PAR.INIT)
 }
 
-set.bounds.gene = function(M, S, model = 4, range_scalingFactor=5)
-{
-  bounds.general = set.bounds.general(model = model)
-  upper = bounds.general$upper;
-  lower = bounds.general$lower;
-  
-  a = mean(M)/mean(S) # define the ratio between splicing rate and degratation rate
-  
-  if(model==2){
-    upper[2] = a*range_scalingFactor;   lower[2] = a/range_scalingFactor;
-    lower[3] = min(S)/range_scalingFactor;     upper[3] = max(S)*range_scalingFactor;
-    lower[4] = (max(S)-min(S))/range_scalingFactor;     upper[4] = (max(S)-min(S))*range_scalingFactor;
-  }
-  if(model==3){	
-    upper[4] = a*range_scalingFactor;     lower[4] = a/range_scalingFactor;
-    lower[5] = min(S)/range_scalingFactor;     upper[5] = max(S)*range_scalingFactor;
-  }
-  if(model==4){
-    upper[4] = a*range_scalingFactor; lower[4] = a/range_scalingFactor;
-    lower[5] = min(S)/range_scalingFactor;  upper[5] = max(S)*range_scalingFactor;
-    lower[6] = (max(S)-min(S))/range_scalingFactor; upper[6] = (max(S)-min(S))*range_scalingFactor;
-  }
-  
-  return(list(upper = upper, lower = lower))
-  
-}
 
 

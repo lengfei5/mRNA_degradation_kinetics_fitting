@@ -13,38 +13,6 @@ source("R/error_functions.R", local = TRUE)
 source("R/kinetic_model.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
-###############
-## utility functions for model fitting
-## these functions are also mainly for the read count table
-## they are not used in gaussian model
-###############
-norm.RPKM = function(nb.reads, length)
-{
-  set.scaling.factors();
-  return(nb.reads/length/scaling.factors*10^9);
-}
-
-convert.nb.reads = function(rpkm, length)
-{
-  set.scaling.factors();
-  return(rpkm*length*scaling.factors/10^9);
-}
-
-## those two function need to be modified and NOT USED 
-norm.RPKM.libary.size = function(nb.reads, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  
-  return(nb.reads/length/ss*10^9);
-}
-
-convert.nb.reads.libary.size = function(rpkm, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  
-  return(rpkm*length*ss/10^9);
-}
-
 #########
 #### fitting all models for one genes and remove outliers with iterations
 #########

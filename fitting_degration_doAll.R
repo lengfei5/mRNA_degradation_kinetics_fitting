@@ -36,7 +36,7 @@ zt = seq(0,94,by = 2)
 ####################
 ## parameter to specify 
 ####################
-outliers.removal = TRUE;
+outliers.removal = FALSE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'

@@ -19,8 +19,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   absolute.signal = TRUE)
 {
   ####################
-  ## check the parameters
+  ## define here global variables and general functions used for all steps; 
   ####################
+  source("R/utilities_generalFunctions.R", local = TRUE);
+  
   gene.name = T$gene[gene.index];
   R.m = T[gene.index, ZT.ex]
   R.s = T[gene.index, ZT.int]
@@ -86,52 +88,18 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## Analyze non-identifiability using Profile Likelihood approache
   ####################
-  if(Identifiablity.Analysis.by.Profile.Likelihood.gamma)
-  {
+  if(Identifiablity.Analysis.by.Profile.Likelihood.gamma){
     source("R/identifiability_analysis.R", local = TRUE)
+    
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
-    
-    M = norm.RPKM(R.m, L.m)
-    S = norm.RPKM(R.s, L.s)
-    a = mean(M)/mean(S) # ratio between splicing rate and degratation rate
-    
-    for(model in c(2:4))
-    {
-      cat('Model ', model, '\n');
-      bounds = set.bounds(model = model);
-      upper = bounds$upper; 
-      lower = bounds$lower;
-      error.fit = param.fits.results[which(names(param.fits.results)==paste('error.m', model, sep=''))];
-      res.fit = param.fits.results[grep(paste('.m', model, sep=''), names(param.fits.results))];
-      res.fit = res.fit[-1];
-      if(model==2){
-        res.fit = res.fit[1:6];
-        lower[2] = a/5;upper[2] = a*5;
-        lower[3] = min(S)/5; upper[3] = max(S)*5;
-        lower[4] = (max(S)-min(S))/5; upper[4] = (max(S)-min(S))*5;
-      }
-      if(model==3){
-        res.fit = res.fit[1:5];
-        lower[4] = a/5;upper[4] = a*5; 
-        lower[5] = min(S)/5; upper[5] = max(S)*5;
-      } 
-      if(model==4){
-        res.fit = res.fit[1:8];
-        lower[4] = a/5;upper[4] = a*5;
-        lower[5] = min(S)/5;upper[5] = max(S)*5;
-        lower[6] = (max(S)-min(S))/5;upper[6] = (max(S)-min(S))*5;
-      } 
-      res.nonident.analysis.gamma = Identifiablity.analysis.gamma.each.model(error.opt=error.fit, params.opt =res.fit, 
-                                                                             lower = lower, upper = upper, 
-                                                                             R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=a.m, alpha.s=a.s, 
-                                                                             outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, 
-                                                                             PLOT.PL = PLOT.Ident.analysis, gene2plot=gene.name);
-      
-      names(res.nonident.analysis.gamma) = paste(names(res.nonident.analysis.gamma), '.m', model, sep='');
-      param.fits.results = c(param.fits.results, res.nonident.analysis.gamma);
-      #names(param.fits.results)[length(param.fits.results)] = paste('non.identifiability.gamma.m', model, sep = '') 
-    }
-    
+    res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results,
+                                                                                      R.m, R.s, 
+                                                                                      L.m, L.s,
+                                                                                      alpha.m = a.m, 
+                                                                                      alpha.s = a.s, 
+                                                                                      outlier.m = outlier.m, 
+                                                                                      outlier.s = outlier.s,
+                                                                                      zt = zt);
   }
   
   ####################
@@ -151,6 +119,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(debug){cat('final result is \n')}
   
-  return(c(param.fits.results, outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')));
+  return(list(param.fits.results = param.fits.results, 
+              outlier.m = paste(outlier.m, sep='', collapse = ';'), 
+              outlier.s = paste(outlier.s, sep='', collapse = ';'))
+         );
   
 }
