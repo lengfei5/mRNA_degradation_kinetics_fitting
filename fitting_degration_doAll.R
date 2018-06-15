@@ -40,7 +40,7 @@ outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
-Identifiablity.Analysis = FALSE
+Identifiablity.Analysis = TRUE
 
 gg = 'Per3'
 gene.index = which(T$gene==gg)
