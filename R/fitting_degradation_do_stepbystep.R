@@ -119,10 +119,11 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(debug){cat('final result is \n')}
   
-  return(list(param.fits = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
+  return(list(param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
+              param.fit = param.transformed,
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')),
               model.sel = res.model.sel
