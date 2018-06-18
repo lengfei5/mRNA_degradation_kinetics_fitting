@@ -49,12 +49,12 @@ gene.index = which(T$gene==gg)
 ## test the current functions 
 ####################
 #rm(list = lsf.str())
-## install package dependency
+source("R/utilities_generalFunctions.R", local = TRUE); ## import global functions
 
 source("R/fitting_degradation_do_stepbystep.R")
 #source("R/fitting_degradation_do_stepbystep.R")
 ptm <- proc.time()
-fit.res = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
+res.fit = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, 
                                                                             outliers.removal = outliers.removal,
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
@@ -117,7 +117,8 @@ if(Test.circadian.gene.examples){
     res.fit = as.numeric(param.fits.results[-index])
     names(res.fit) = names(param.fits.results)[-index]
     
-    missing.data = length(unlist(strsplit(param.fits.results[index[1]], ';'))) + length(unlist(strsplit(param.fits.results[index[2]], ';')))
+    nb.outliers = c(unlist(strsplit(param.fits.results[index[1]], ';')), unlist(strsplit(param.fits.results[index[2]], ';')))
+    nb.outliers = length(nb.outliers[which(!is.na(nb.outliers))])
     test1 = c(res.fit, my.model.selection.one.gene.loglike(res.fit, nb.data = (96-missing.data), method = 'BIC'))
     print(test1);
     m = test1[which(names(test1)=='BIC.best.model')]

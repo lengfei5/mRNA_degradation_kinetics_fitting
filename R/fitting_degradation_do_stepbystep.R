@@ -19,10 +19,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                   absolute.signal = TRUE)
 {
   ####################
-  ## define here global variables and general functions used for all steps; 
+  ## define here global variables for all steps; 
   ####################
-  source("R/utilities_generalFunctions.R", local = TRUE);
-  
   gene.name = T$gene[gene.index];
   R.m = T[gene.index, ZT.ex]
   R.s = T[gene.index, ZT.int]
@@ -108,7 +106,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   if(debug){cat('starting model selection \n')}
   source("R/model_selection.R", local = TRUE);
   res.model.sel = my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC', 
-                                                                 outliers.m = outliers.m, outliers.s = outliers.s) 
+                                                                 outlier.m = outlier.m, outlier.s = outlier.s) 
   
   ####################
   ## parameter transformation 
@@ -120,7 +118,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ## output  
   ####################
   if(debug){cat('final result is \n')}
-  
   
   return(list(param.fits = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
