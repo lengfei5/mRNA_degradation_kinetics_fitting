@@ -23,8 +23,7 @@ my.model.selection.one.gene.loglike = function(param.fits.results, method = 'BIC
   error.m4 = param.fits.results[index[4]]
   
   cat('nb of data --', nb.data, "\n");
-  nb.data.without.ouliers = nb.data 
-  #- length(outlier.m[which(!is.na(outlier.m)==TRUE)]) - length(outlier.s[which(!is.na(outlier.s)==TRUE)]);
+  nb.data.without.ouliers = nb.data - length(outlier.m[which(!is.na(outlier.m)==TRUE)]) - length(outlier.s[which(!is.na(outlier.s)==TRUE)]);
   
   ## the formula of BIC used here is chi-square+k*ln(n)==error/sigma^2+k(ln(n)) in which sigma of noise is supported to be known.
   if(method == 'BIC') {

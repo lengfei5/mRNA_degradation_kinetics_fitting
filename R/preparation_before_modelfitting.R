@@ -2,6 +2,7 @@
 ##########################################################################
 ## Project:
 ## Script purpose: 
+## 0) import libraries
 ## 1) processing the expresson table 
 ## 2) calculate the size factor and dispersion parameters using DESeq2
 ## 3) calculate variances using voom
@@ -12,6 +13,16 @@
 ## Date of creation: Tue Jun  5 11:31:45 2018
 ##########################################################################
 ##########################################################################
+library(emdbook)
+library(deSolve)
+library(fdrtool)
+library(circular)
+library(preprocessCore)
+library(gtools)
+library(biomaRt)
+library(numDeriv)
+library('Matrix')
+
 set.scaling.factors = function()
 {
   #ptm = proc.time()

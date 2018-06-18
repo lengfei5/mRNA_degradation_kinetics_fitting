@@ -18,16 +18,4 @@ ipak <- function(pkg){
 packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
 ipak(packages)
 
-library(emdbook)
-library(deSolve)
-library(fdrtool)
-library(circular)
-library(preprocessCore)
-library(gtools)
-library(biomaRt)
-#library(plotrix)
-library(numDeriv)
-library('Matrix')
-#library('matrixcalc')
-#source("https://bioconductor.org/biocLite.R")
-#biocLite("biomaRt")
+

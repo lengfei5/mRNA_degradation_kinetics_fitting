@@ -2939,7 +2939,11 @@ nb.outliers = function(param.fit, index.outliers = c(182, 183))
 {
   if(length(index.outliers)==2)
   {
-    return(length(unlist(strsplit(param.fit[index.outliers[1]], ';'))) + length(unlist(strsplit(param.fit[index.outliers[2]], ';'))))
+    # the following is the bug in the origin code
+    #return(length(unlist(strsplit(param.fit[index.outliers[1]], ';'))) + length(unlist(strsplit(param.fit[index.outliers[2]], ';'))))
+    outers = c(unlist(strsplit(param.fit[index.outliers[1]], ';')), unlist(strsplit(param.fit[index.outliers[2]], ';')))
+    outers = outers[which(outers != "NA")]
+    return(length(outers))
   }else
   {
     return('error')

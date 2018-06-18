@@ -24,7 +24,6 @@ source("R/configure.R")
 ## import data example and create an object
 ## prepare the table, geneNames, geneLengths, sizeFactors, dispersion estiamtion and variance estimation 
 ####################
-source("R/preparation_before_modelfitting.R")
 data.version = "data_example_readCount"
 dataDir = "data/"
 load(file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
@@ -33,6 +32,7 @@ ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
+source("R/preparation_before_modelfitting.R")
 ####################
 ## parameter to specify
 ####################
@@ -49,10 +49,10 @@ gene.index = which(T$gene==gg)
 ## test the current functions 
 ####################
 #rm(list = lsf.str())
-source("R/utilities_generalFunctions.R", local = TRUE); ## import global functions
+source("R/utilities_generalFunctions.R"); ## import global functions
 
 source("R/fitting_degradation_do_stepbystep.R")
-#source("R/fitting_degradation_do_stepbystep.R")
+
 ptm <- proc.time()
 res.fit = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, 
@@ -117,9 +117,11 @@ if(Test.circadian.gene.examples){
     res.fit = as.numeric(param.fits.results[-index])
     names(res.fit) = names(param.fits.results)[-index]
     
-    nb.outliers = c(unlist(strsplit(param.fits.results[index[1]], ';')), unlist(strsplit(param.fits.results[index[2]], ';')))
-    nb.outliers = length(nb.outliers[which(!is.na(nb.outliers))])
-    test1 = c(res.fit, my.model.selection.one.gene.loglike(res.fit, nb.data = (96-missing.data), method = 'BIC'))
+    outers = c(unlist(strsplit(param.fits.results[index[1]], ';')), unlist(strsplit(param.fits.results[index[2]], ';')))
+    outers = outers[which(outers != "NA")]
+    nb.outliers = length(outers)
+    
+    test1 = c(res.fit, my.model.selection.one.gene.loglike(res.fit, nb.data = (96-nb.outliers), method = 'BIC'))
     print(test1);
     m = test1[which(names(test1)=='BIC.best.model')]
     name1 = paste('gamma.m', m, sep='');
