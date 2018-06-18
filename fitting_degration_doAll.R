@@ -34,9 +34,9 @@ ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
 ####################
-## parameter to specify 
+## parameter to specify
 ####################
-outliers.removal = FALSE;
+outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
@@ -54,7 +54,7 @@ gene.index = which(T$gene==gg)
 source("R/fitting_degradation_do_stepbystep.R")
 #source("R/fitting_degradation_do_stepbystep.R")
 ptm <- proc.time()
-param.fits.results = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
+fit.res = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, 
                                                                             outliers.removal = outliers.removal,
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);

@@ -90,8 +90,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(Identifiablity.Analysis.by.Profile.Likelihood.gamma){
     source("R/identifiability_analysis.R", local = TRUE)
-    
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
+    
     res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results,
                                                                                       R.m, R.s, 
                                                                                       L.m, L.s,
@@ -119,9 +119,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(debug){cat('final result is \n')}
   
-  return(list(param.fits.results = param.fits.results, 
-              outlier.m = paste(outlier.m, sep='', collapse = ';'), 
-              outlier.s = paste(outlier.s, sep='', collapse = ';'))
-         );
+  return(list(param.fits = param.fits.results,
+              nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
+              outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';'))
+              )
+         )
   
 }

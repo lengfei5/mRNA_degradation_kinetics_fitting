@@ -29,14 +29,16 @@ make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug =
     
     if(model == 1)
     {
-      Param.fit.for.gene = param.fit
+      Param.fit.for.gene = list("m1" = param.fit)
     }else{
-      Param.fit.for.gene = c(Param.fit.for.gene, param.fit)
+      #x[["married"]] <- FALSE
+      Param.fit.for.gene[[paste0("m", model)]] = param.fit
     }
     if(debug){cat('\t model ',model,' finished \n')};
   }
   
   return(Param.fit.for.gene)
+
 }
 
 make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, zt = seq(0,46,by = 2), 
