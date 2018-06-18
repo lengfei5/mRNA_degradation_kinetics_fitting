@@ -17,23 +17,20 @@ source("R/set_bounds_initialize_values.R", local = TRUE)
 #### fitting all models for one genes and remove outliers with iterations
 #########
 make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug = FALSE, zt = seq(0,46,by = 2),
-                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
+                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, 
+                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
-    
+  
+  Param.fit.for.gene = c();
   for(model in 1:4)
   {
     if(debug){cat('\t starting model ',model,'\n');}
     
-    param.fit = make.fit.spec.model(T = T, gene.index = gene.index, model = model, debug = debug, zt = zt, i.ex = i.ex, i.int = i.int, outliers=outliers);
+    param.fit = make.fit.spec.model(T = T, gene.index = gene.index, model = model, debug = debug, 
+                                    zt = zt, i.ex = i.ex, i.int = i.int, outliers=outliers);
+    Param.fit.for.gene = c(Param.fit.for.gene, param.fit)
     
-    if(model == 1)
-    {
-      Param.fit.for.gene = list("m1" = param.fit)
-    }else{
-      #x[["married"]] <- FALSE
-      Param.fit.for.gene[[paste0("m", model)]] = param.fit
-    }
     if(debug){cat('\t model ',model,' finished \n')};
   }
   

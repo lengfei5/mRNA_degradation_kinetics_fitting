@@ -106,7 +106,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ## model selection  
   ####################
   if(debug){cat('starting model selection \n')}
-  
+  source("R/model_selection.R", local = TRUE);
+  res.model.sel = my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC', 
+                                                                 outliers.m = outliers.m, outliers.s = outliers.s) 
   
   ####################
   ## parameter transformation 
@@ -119,9 +121,15 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   if(debug){cat('final result is \n')}
   
-  return(list(param.fits = param.fits.results,
+  
+  return(list(param.fits = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
+                                m2 = param.fits.results[grep('.m2', names(param.fits.results))],
+                                m3 = param.fits.results[grep('.m3', names(param.fits.results))],
+                                m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
-              outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';'))
+              outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')),
+              model.sel = res.model.sel
+              
               )
          )
   

@@ -23,89 +23,6 @@ Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, 
 }
 
 ####################
-## function for set general parameter boundaries 
-####################
-set.general.bounds.int = function(lower.user = NULL, 
-                                  upper.user = NULL,
-                                  parametrization =c('cosine.beta'), 
-                                  absolute.signal = TRUE)
-{
-  Min.int.max = 2^20; ## intron signal mean 2^9;
-  Min.int.min = 2^(-20);
-  
-  Amp.int.min = 0;
-  Amp.int.max = 200;
-  
-  phase.int.min = 0;
-  phase.int.max = 24; 
-  
-  beta.int.min = 1;
-  beta.int.max = 5;
-  
-  param.synthesis.upper = c(Min.int.max, Amp.int.max, phase.int.max, beta.int.max)
-  param.synthesis.lower = c(Min.int.min, Amp.int.min, phase.int.min, beta.int.min)
-  names(param.synthesis.upper) = c("Min.int", "Amp.int", "phase.int", "beta.int")
-  names(param.synthesis.lower) = names(param.synthesis.upper);
-
-  return(list(lower = param.synthesis.lower, upper = param.synthesis.upper))
-}
-
-set.general.bounds.degr.splicing = function(lower.user = NULL, 
-                                  upper.user = NULL,
-                                  parametrization =c('cosine.beta'), 
-                                  absolute.signal = TRUE)
-{
-  ### minimum and maximum of gamma
-  gamma.min = log(2)/24
-  gamma.max = log(2)/(10/60);  
-  
-  ### relative amplitudes of gamma (normalized)
-  eps.gamma.min = 0;
-  eps.gamma.max = 1;
-  
-  ### phases of gamma (normalized)
-  phase.gamma.min = 0;
-  phase.gamma.max = 24; 
-  
-  ### ratio between splicing rate and degradation rate   
-  splicing.k.max = 10^5 ## 1s of splicing time;
-  splicing.k.min = 10^(-1) ## 30 min of splicing time;
-  
-  degr.splicing.upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max)
-  degr.splicing.lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min)
-  
-  names(degr.splicing.upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k")
-  names(degr.splicing.lower) =  names(degr.splicing.upper)
-  
-  return(list(lower = degr.splicing.lower, upper = degr.splicing.upper))
-  
-}
-
-
-set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
-                              parametrization =c('cosine.beta'), absolute.signal = TRUE)
-{
-  bounds.int = set.general.bounds.int();
-  bounds.degr.splicing = set.general.bounds.degr.splicing();
-  
-  upper = c(bounds.degr.splicing$upper, bounds.int$upper);
-  lower = c(bounds.degr.splicing$lower, bounds.int$lower);
-  #upper = c(gamma.max, eps.gamma.max, phase.gamma.max, splicing.k.max,  param.synthesis.upper)
-  #lower = c(gamma.min, eps.gamma.min, phase.gamma.min, splicing.k.min,  param.synthesis.lower)
-  #names(upper) = c("gamma", "eps.gamma", "phase.gamma", "splicing.k", 
-  #                         "Min.int", "Amp.int", "phase.int", "beta.int")
-  #names(lower) =  names(upper)
-  
-  if(absolute.signal){
-    if(model==1){ upper = upper[c(1, 4, 5)];  lower = lower[c(1, 4, 5)]; }
-    if(model==2){ upper = upper[c(1, 4, 5:8)];  lower = lower[c(1, 4, 5:8)];}
-    if(model==3){ upper = upper[c(1:5)]; lower = lower[c(1:5)]; }
-  }
-  
-  return(list(lower = lower, upper = upper))
-}
-
-####################
 ## function for set gene-specific parameter boundaries 
 ####################
 set.bounds.gene.m = function(M, S, range_scalingFactor=5)
@@ -218,7 +135,6 @@ Sampling.Initial.Values.for.fitting.M = function(M, S, Nfit.M = 6, zt = seq(0,94
   return(PAR.INIT.M)
   
 }
-
 
 
 ####################

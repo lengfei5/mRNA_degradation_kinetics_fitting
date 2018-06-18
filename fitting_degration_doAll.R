@@ -60,6 +60,7 @@ fit.res = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.ind
                                                                             Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
 proc.time() - ptm
 
+
 ###########################
 ## compare with origine function
 ###########################
@@ -77,7 +78,6 @@ proc.time() - ptm
 index = match(c('outlier.m', 'outlier.s'), names(param.fits.results))
 res.fit = as.numeric(param.fits.results[-index])
 names(res.fit) = names(param.fits.results)[-index]
-
 
 ####################
 ## test a list of examples of circadian genes
