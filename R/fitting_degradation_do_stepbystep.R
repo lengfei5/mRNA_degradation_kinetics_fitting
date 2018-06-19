@@ -119,8 +119,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   if(debug){cat('starting parameter transformation \n')}
   source("R/params_transformation_cleaning.R", local = TRUE);
   
+  param.fits.results.save4test = param.fits.results;
   param.transformed.cleaned = transform.parameter.combinations.cleaning(param.fits.results)
-    
+  
   ####################
   ## output  
   ####################
