@@ -28,6 +28,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   a.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
+  
   Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis
   
   ####################
@@ -119,8 +122,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   if(debug){cat('starting parameter transformation \n')}
   source("R/params_transformation_cleaning.R", local = TRUE);
   
-  param.fits.results.save4test = param.fits.results;
-  param.transformed.cleaned = transform.parameter.combinations.cleaning(param.fits.results)
+  # param.fits.results.save4test = param.fits.results;
+  param.transformed.cleaned = transform.parameter.combinations.cleaning(param.fits.results,
+                                                                        res.model.sel,
+                                                                        res.nonident.analysis.gamma.all.models)
   
   ####################
   ## output  
@@ -130,16 +135,16 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   return(list(gene = gene.name,
               gene.length = list(L.s = L.s, L.m = L.m),
               readCounts = list(R.s = R.s, R.m = R.m),
+              norm.RPKM = list(norm.S = S, norm.M = M),
               dispersions.param = list(dispersion.s = a.s, dispersion.m = a.m),
               param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
-              param.fit.cleaned = param.transformed.cleaned,
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')),
-              model.sel = res.model.sel
-              
+              model.sel = res.model.sel,
+              param.fit.cleaned = param.transformed.cleaned
               )
          )
   
