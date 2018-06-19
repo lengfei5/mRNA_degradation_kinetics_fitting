@@ -22,12 +22,12 @@ my.model.selection.one.gene.loglike = function(param.fits.results, method = 'BIC
   error.m3 = param.fits.results[index[3]]
   error.m4 = param.fits.results[index[4]]
   
-  cat('nb of data --', nb.data, "\n");
+  cat('\t nb of data --', nb.data, "\n");
   nb.data.without.ouliers = nb.data - length(outlier.m[which(!is.na(outlier.m)==TRUE)]) - length(outlier.s[which(!is.na(outlier.s)==TRUE)]);
   
   ## the formula of BIC used here is chi-square+k*ln(n)==error/sigma^2+k(ln(n)) in which sigma of noise is supported to be known.
   if(method == 'BIC') {
-    cat('nb of data to use for model selection --', nb.data.without.ouliers, "\n");
+    cat('\t nb of data to use for model selection --', nb.data.without.ouliers, "\n");
     score.m1 = (error.m1) + log(nb.data.without.ouliers)*n.param[1];
     score.m2 = (error.m2) + log(nb.data.without.ouliers)*n.param[2];
     score.m3 = (error.m3) + log(nb.data.without.ouliers)*n.param[3];

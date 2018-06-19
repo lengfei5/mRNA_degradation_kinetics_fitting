@@ -28,6 +28,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   a.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
+  Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis
   
   ####################
   ## fitting the data for each model
@@ -98,6 +99,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
                                                                                       outlier.m = outlier.m, 
                                                                                       outlier.s = outlier.s,
                                                                                       zt = zt);
+  }else{
+    res.nonident.analysis.gamma.all.models = rep(NA, 8);
+    names(res.nonident.analysis.gamma.all.models) = paste0(c('non.identifiability.gamma.L.m', 'non.identifiability.gamma.R.m'), 
+                                                          rep(c(1:4), each=2))
   }
   
   ####################
@@ -117,7 +122,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## output  
   ####################
-  if(debug){cat('final result is \n')}
+  if(debug){cat('final result is ----------\n')}
   
   return(list(param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
