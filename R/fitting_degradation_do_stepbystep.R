@@ -117,18 +117,24 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ## parameter transformation 
   ####################
   if(debug){cat('starting parameter transformation \n')}
+  source("R/params_transformation_cleaning.R", local = TRUE);
   
-  
+  param.transformed.cleaned = transform.parameter.combinations.cleaning(param.fits.results)
+    
   ####################
   ## output  
   ####################
   if(debug){cat('final result is ----------\n')}
   
-  return(list(param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
+  return(list(gene = gene.name,
+              gene.length = list(L.s = L.s, L.m = L.m),
+              readCounts = list(R.s = R.s, R.m = R.m),
+              dispersions.param = list(dispersion.s = a.s, dispersion.m = a.m),
+              param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
-              param.fit = param.transformed,
+              param.fit.cleaned = param.transformed.cleaned,
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')),
               model.sel = res.model.sel

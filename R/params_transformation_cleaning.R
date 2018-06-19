@@ -103,31 +103,12 @@ transform.parameter.combinations = function(T = T)
 Make.Table.Main.Results = FALSE
 if(Make.Table.Main.Results)
 {
-  source('functions.R')
-  
   Make.Summary.Results = FALSE
   if(Make.Summary.Results)
   {
-    res.version.old = '_total_counts_all_genes_norm_params_v6';
-    res.version = '_total_counts_all_genes_norm_params_final_v7';
-        
-    load(file = paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_optim_RNA_seq_beta_cos', res.version.old, '_OLD.Rdata',sep = ''))
-    load(file = paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_optim_RNA_seq_beta_cos', res.version, '.Rdata',sep = ''))
-    
-    load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_RNA_seq_total_counts_table_sx', res.version.old, '.Rdata',sep = ''))
-    load(file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_RNA_seq_total_counts_table_sx_All', res.version.old, '.Rdata',sep = ''))
-    
-    names = colnames(keep)[1:25]
-    index = setdiff(c(1:nrow(T)), keep$index)
-    
-    kk = index
     source('functions.R')
     xx = Transform.Scoring.parameters(T)
     xx = data.frame(T, xx, stringsAsFactors = FALSE)
-    
-    kk = c(138:187, 190:200, 224)
-    yy = xx[, -kk]
-    mm = match(yy$gene, R.norm$gene)
     
     ii = grep('.rpkm.', colnames(yy)); print(colnames(yy)[ii])
     jj = grep('.log2rpkm.', colnames(R.norm)); print(colnames(R.norm)[jj])
@@ -143,11 +124,7 @@ if(Make.Table.Main.Results)
     yy$best.model[which(yy$prob.best.model<=0.5)] = NA
     
     T = yy;
-    res.version = '_total_counts_all_genes_norm_params_final_v7_All_summary';
-    res.version.old = '_total_counts_all_genes_norm_params_v6_OLD';
-    save(T, file = paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_optim_RNA_seq_beta_cos', res.version, '.Rdata',sep = ''))
-    save(T.old, keepAll, keep, file=paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myRdata/my_genes_fits_optim_RNA_seq_beta_cos', 
-                                          res.version.old, '.Rdata',sep = ''))
+  
   }
   
     
