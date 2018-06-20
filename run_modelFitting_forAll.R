@@ -32,7 +32,7 @@ ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
 zt = seq(0,94,by = 2)
 
-source("R/preparation_before_modelfitting.R")
+source("R/preprocess_prepare_for_fitting.R")
 ####################
 ## parameter to specify
 ####################
