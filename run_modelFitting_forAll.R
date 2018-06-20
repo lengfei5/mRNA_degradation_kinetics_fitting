@@ -50,6 +50,7 @@ gene.index = which(T$gene==gg)
 ####################
 #rm(list = lsf.str())
 source("R/utilities_generalFunctions.R"); ## import global functions
+mds = MDfitDataSet(T=T, zt=zt, i.ex. = ZT.ex, i.int = ZT.int)
 
 source("R/fitting_degradation_do_stepbystep.R")
 
