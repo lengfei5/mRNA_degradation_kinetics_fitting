@@ -2,6 +2,7 @@
 ##########################################################################
 ## Project:
 ## Script purpose: 
+## preprocess the data table and estimate parameters required afterwards but needs the whole dataset to obtain
 ## 0) import libraries
 ## 1) processing the expresson table 
 ## 2) calculate the size factor and dispersion parameters using DESeq2
