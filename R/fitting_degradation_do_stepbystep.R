@@ -7,14 +7,14 @@
 ## Date of creation: Tue Jun  5 11:03:16 2018
 ##########################################################################
 ##########################################################################
-make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T, 
+make.fits.with.all.models.for.one.gene.remove.outliers = function(mds, 
                                                                   gene.index = 1, 
                                                                   zt = seq(0,94,by = 2), 
                                                                   i.ex = ZT.ex, 
                                                                   i.int = ZT.int, 
                                                                   debug = FALSE,
                                                                   outliers.removal = FALSE, 
-                                                                  Identifiablity.Analysis.by.Profile.Likelihood.gamma = FALSE, 
+                                                                  identifiablity.analysis.gamma = FALSE, 
                                                                   parametrization = c('cosine.beta'), 
                                                                   absolute.signal = TRUE)
 {
@@ -31,7 +31,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   M = norm.RPKM(R.m, L.m)
   S = norm.RPKM(R.s, L.s)
   
-  Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis
+  #identifiablity.analysis.gamma = Identifiablity.Analysis
   
   ####################
   ## fitting the data for each model
@@ -90,7 +90,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(T = T,
   ####################
   ## Analyze non-identifiability using Profile Likelihood approache
   ####################
-  if(Identifiablity.Analysis.by.Profile.Likelihood.gamma){
+  if(identifiablity.analysis.gamma){
     source("R/identifiability_analysis.R", local = TRUE)
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
     

@@ -1,6 +1,7 @@
 ##########################################################################
 ##########################################################################
-## Project: fitting temporal profiles of pre-mRNA and mRNA with a kinetic model to infer the rhythmic transcriptional and post-transcriptional regulation
+## Project: fitting temporal profiles of pre-mRNA and mRNA with a kinetic model to infer the rhythmic transcriptional 
+## and post-transcriptional regulation
 ## Script purpose: this script is the function of the highest order for R package
 ## Usage example: 
 ## Author: Jingkui Wang (jingkui.wang@imp.ac.at)
@@ -34,13 +35,19 @@ zt = seq(0,94,by = 2)
 
 source("R/preprocess_prepare_for_fitting.R")
 ####################
-## parameter to specify
+## creat a MDfitDataSet object (a S3 class)
+## 
+####################
+mds = MDfitDataSet(T=T, zt=zt, i.ex. = ZT.ex, i.int = ZT.int)
+
+####################
+## parameter required to specify
 ####################
 outliers.removal = TRUE;
 debug = TRUE;
 absolute.signal = TRUE
 parametrization = 'cosine.beta'
-Identifiablity.Analysis = TRUE
+identifiablity.analysis.gamma = TRUE
 
 gg = 'Per3'
 gene.index = which(T$gene==gg)
@@ -50,17 +57,14 @@ gene.index = which(T$gene==gg)
 ####################
 #rm(list = lsf.str())
 source("R/utilities_generalFunctions.R"); ## import global functions
-mds = MDfitDataSet(T=T, zt=zt, i.ex. = ZT.ex, i.int = ZT.int)
 
 source("R/fitting_degradation_do_stepbystep.R")
 
 ptm <- proc.time()
-res.fit = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = debug,
-                                                                            zt = zt, i.ex = ZT.ex, i.int = ZT.int, 
+res.fit = make.fits.with.all.models.for.one.gene.remove.outliers(mds, gene.index = gene.index, debug = debug,
                                                                             outliers.removal = outliers.removal,
-                                                                            Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
+                                                                            identifiablity.analysis.gamma = identifiablity.analysis.gamma);
 proc.time() - ptm
-
 
 ###########################
 ## compare with origine function
@@ -73,7 +77,8 @@ source('origin/functions_origin.R')
 ptm <- proc.time()
 param.fits.results.v0 = make.fits.with.all.models.for.one.gene.remove.outliers(T = T, gene.index = gene.index, debug = TRUE,
                                                                             zt = zt, i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal,
-                                                                            Identifiablity.Analysis.by.Profile.Likelihood.gamma = Identifiablity.Analysis);
+                                                                            Identifiablity.Analysis.by.Profile.Likelihood.gamma 
+                                                                            = Identifiablity.Analysis);
 proc.time() - ptm
 
 index = match(c('outlier.m', 'outlier.s'), names(param.fits.results))
@@ -127,7 +132,8 @@ if(Test.circadian.gene.examples){
     m = test1[which(names(test1)=='BIC.best.model')]
     name1 = paste('gamma.m', m, sep='');
     name2 = paste('gamma.stderr.m', m, sep='')
-    eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))',
+    eval(parse(text=paste('print(c(half.lfie=log(2)/test1[which(names(test1)==name1)], 
+                          test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))',
                           sep='')));
    
     keep2compare = rbind(keep2compare, test1) 
