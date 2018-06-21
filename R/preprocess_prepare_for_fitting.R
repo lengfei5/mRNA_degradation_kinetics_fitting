@@ -30,7 +30,7 @@ library(DESeq2)
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
 MDfitDataSet = function(T=T, zt=zt, i.ex. = ZT.ex, i.int = ZT.int)
 {
-  
+  cat("creat a MDfitDataSet (S3 class)...")
   
   return(mds)
 }
