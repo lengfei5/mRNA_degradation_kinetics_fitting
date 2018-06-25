@@ -38,7 +38,7 @@ source("R/preprocess_prepare_for_fitting.R")
 ## creat a MDfitDataSet object (a S3 class)
 ## 
 ####################
-mds = MDfitDataSet(T=T, zt=zt, i.ex. = ZT.ex, i.int = ZT.int)
+mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt)
 
 ####################
 ## parameter required to specify
