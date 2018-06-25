@@ -31,14 +31,16 @@ load(file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
 
 ZT.int = grep('.count.premRNA', colnames(T))
 ZT.ex = grep('.count.mRNA', colnames(T))
+length.int = which(colnames(T) == "length.premRNA")
+length.ex = which(colnames(T) == "length.mRNA")
 zt = seq(0,94,by = 2)
 
-source("R/preprocess_prepare_for_fitting.R")
 ####################
 ## creat a MDfitDataSet object (a S3 class)
 ## 
 ####################
-mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt)
+source("R/preprocess_prepare_for_fitting.R")
+mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt)
 
 ####################
 ## parameter required to specify
@@ -55,7 +57,6 @@ gene.index = which(T$gene==gg)
 ####################
 ## test the current functions 
 ####################
-#rm(list = lsf.str())
 source("R/utilities_generalFunctions.R"); ## import global functions
 
 source("R/fitting_degradation_do_stepbystep.R")

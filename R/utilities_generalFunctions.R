@@ -12,21 +12,21 @@
 ## these functions are also mainly for the read count table
 ## they are not used in gaussian model
 ###############
-set.nb.data.param = function(absolute.signal=TRUE)
-{
-  nb.data <<- 96; 
-  n.param <<- c(2,6,5,8);
-  #n.param <<- c(0,6,5,8); #the one before 
-  #n.param = c(0,5,3,7) from Laura's function
-}
-
 set.scaling.factors = function()
 {
   scaling.factors <<- c(39920608, 42250245, 38121270, 45609244, 41511752, 45781196, 43722568, 39638552, 30496638, 30573333, 54950572, 47158379,
                         31722765, 39931646, 36317783, 35382708, 47293167, 42408985, 39842283, 40230336, 43691685, 39237518, 51051196, 44778546,
                         43858841, 42791401, 42357301, 49782402, 44628140, 44561463, 43485553, 47853067, 43318817, 45055723, 30180984, 46825671,
                         43270558, 37496344, 40971385, 45828360, 37065376, 35776330, 45025514, 43026714, 43116633, 35173387, 28538212, 36707156);
-    
+  
+}
+
+set.nb.data.param = function(absolute.signal=TRUE)
+{
+  nb.data <<- 96; 
+  n.param <<- c(2,6,5,8);
+  #n.param <<- c(0,6,5,8); #the one before 
+  #n.param = c(0,5,3,7) from Laura's function
 }
 
 norm.RPKM = function(nb.reads, length)
