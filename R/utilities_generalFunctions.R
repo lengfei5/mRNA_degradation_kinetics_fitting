@@ -42,22 +42,6 @@ convert.nb.reads = function(rpkm, length)
   return(rpkm*length*scaling.factors/10^9);
 }
 
-## those two function need to be modified and NOT USED 
-norm.RPKM.libary.size = function(nb.reads, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  
-  return(nb.reads/length/ss*10^9);
-}
-
-convert.nb.reads.libary.size = function(rpkm, length)
-{
-  load(file='Libary_size_48_samples.Rdata')
-  
-  return(rpkm*length*ss/10^9);
-}
-
-
 ####################
 ## function for set general parameter boundaries 
 ####################
