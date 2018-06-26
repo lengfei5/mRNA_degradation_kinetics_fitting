@@ -30,7 +30,7 @@ library(DESeq2)
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
 MDfitDataSet = function(P, M, length.P, length.M, zt=zt, fitType.dispersion = "local")
 {
-  cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...")
+  cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...\n")
   
   mds = list();
   class(mds) = "MDfitDataSet"
@@ -53,10 +53,23 @@ MDfitDataSet = function(P, M, length.P, length.M, zt=zt, fitType.dispersion = "l
   # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
   # large differences in gene expression mean between time points requires this. 
   estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
+  
   mds$dispersions.P = estimateDispersions$alphas.P 
   mds$dispersions.M = estimateDispersions$alphas.M
   
   return(mds)
+}
+
+print.MDfitDataSet = function(mds)
+{
+  cat("MDfitDataSet object (S3 class) \n")
+  
+  for(n in 1:length(mds))
+  {
+    cat("$", names(mds)[n], "\n")
+    if(is.vector(mds[[n]])) cat("\t", mds[[n]][1:length(mds$zt)], "\n")
+    if(is.data.frame(mds[[n]])) print(mds[[n]][c(1:2), ])
+  }
 }
 
 calculate.SizeFactors.DESeq2 = function(countData)
@@ -91,8 +104,8 @@ calculate.scaling.factors.DESeq2 = function(P, M, zt)
 
 calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.dispersion = "local") 
 {
-  require('DESeq2')
-  # P = T[, ZT.int]; M = T[, ZT.ex]
+  # require('DESeq2')
+  # P = T[, ZT.int]; M = T[, ZT.ex]; fitType.dispersion = "local"
   countData = rbind(as.matrix(M), as.matrix(P))
   size.factors = calculate.SizeFactors.DESeq2(countData)
   
@@ -107,7 +120,7 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
   for(n in 1:ncol(alphas))
   {
     index.reps = which(zt.24==zt.uniq[n])
-    cat('ZT ',  zt.uniq[n], "--", length(index.reps), "replicates", '\n');
+    cat('ZT',  zt.uniq[n], "--", length(index.reps), "replicates", '\n');
     
     #countData2 = countData[, index];
     dds = DESeqDataSetFromMatrix(countData[, index.reps], DataFrame(condition), ~1);
@@ -117,19 +130,17 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
     alphas[,n] = dispersions(dds);
     
     #plotDispEsts(dds)
-    
     #plot(alphas[c(1:nrow(T)), 1], T$alpha.mRNA.ZT0, log='xy', cex=0.2);abline(0, 1, lwd=2.0, col='red')
-    
-    #alphas.genes[,n] = mcols(dds)$dispGeneEst
   }
   
+  alphas.all = alphas[, match(zt.24, zt.uniq)]
+  alphas.M = data.frame(alphas.all[c(1:nrow(M)), ])
+  alphas.P = data.frame(alphas.all[-c(1:nrow(M)), ])  
   
-  xx = data.frame(alphas[c(1:nrow(T)),], alphas[-c(1:nrow(T)), ])
-  colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
-  alphas = xx;
+  #colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
+  colnames(alphas.P) = paste0('alpha.premRNA.ZT', zt)
+  colnames(alphas.M) = paste0('alpha.mRNA.ZT', zt)
   
-  # T = data.frame(T[,c(1:3)], alphas, T[, -c(1:5)], stringsAsFactors = FALSE)
-  #Disps = 1;
   return(list(alphas.P = alphas.P, alphas.M = alphas.M))
   
 }
