@@ -9,9 +9,6 @@
 ##########################################################################
 make.fits.with.all.models.for.one.gene.remove.outliers = function(mds, 
                                                                   gene.index = 1, 
-                                                                  zt = seq(0,94,by = 2), 
-                                                                  i.ex = ZT.ex, 
-                                                                  i.int = ZT.int, 
                                                                   debug = FALSE,
                                                                   outliers.removal = FALSE, 
                                                                   identifiablity.analysis.gamma = FALSE, 
@@ -19,17 +16,24 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
                                                                   absolute.signal = TRUE)
 {
   ####################
-  ## define here global variables for all steps; 
+  ## define here global variables and global functions that are accessed for all steps; 
   ####################
-  gene.name = T$gene[gene.index];
-  R.m = T[gene.index, ZT.ex]
-  R.s = T[gene.index, ZT.int]
-  a.m = rep(as.numeric(T[gene.index, grep('alpha.mRNA.ZT', colnames(T))]), 4);
-  a.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
+  source("R/utilities_generalFunctions.R"); ## import global functions
+  set.scaling.factors(mds$scaling.factors)
+  
+  # gene.name = T$gene[gene.index];
+  R.m = mds$M[gene.index, ]
+  R.s = mds$P[gene.index, ]
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
+  
+  a.m = mds$dispersions.M[gene.index, ]
+  a.s = mds$dispersions.P[gene.index, ]
+  
   M = norm.RPKM(R.m, L.m)
   S = norm.RPKM(R.s, L.s)
+  
+  zt  = mds$zt
   
   #identifiablity.analysis.gamma = Identifiablity.Analysis
   
@@ -132,8 +136,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   if(debug){cat('final result is ----------\n')}
   
-  return(list(gene = gene.name,
-              gene.length = list(L.s = L.s, L.m = L.m),
+  return(list(gene.length = list(L.s = L.s, L.m = L.m),
               readCounts = list(R.s = R.s, R.m = R.m),
               norm.RPKM = list(norm.S = S, norm.M = M),
               dispersions.param = list(dispersion.s = a.s, dispersion.m = a.m),

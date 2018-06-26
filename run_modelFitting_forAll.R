@@ -40,8 +40,9 @@ zt = seq(0,94,by = 2)
 ## 
 ####################
 source("R/preprocess_prepare_for_fitting.R")
-mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt,
-                   fitType.dispersion = "local")
+#mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt, fitType.dispersion = "local")
+#save(mds, file = "data/MDfitDataSet_example.Rdata")
+load(file = "data/MDfitDataSet_example.Rdata")
 
 ####################
 ## parameter required to specify
@@ -58,8 +59,6 @@ gene.index = which(T$gene==gg)
 ####################
 ## test the current functions 
 ####################
-source("R/utilities_generalFunctions.R"); ## import global functions
-
 source("R/fitting_degradation_do_stepbystep.R")
 
 ptm <- proc.time()
