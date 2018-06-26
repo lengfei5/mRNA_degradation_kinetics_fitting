@@ -32,13 +32,13 @@ set.nb.data.param = function(absolute.signal=TRUE)
 
 norm.RPKM = function(nb.reads, length)
 {
-  set.scaling.factors();
+  #set.scaling.factors();
   return(nb.reads/length/scaling.factors*10^9);
 }
 
 convert.nb.reads = function(rpkm, length)
 {
-  set.scaling.factors();
+  #set.scaling.factors();
   return(rpkm*length*scaling.factors/10^9);
 }
 

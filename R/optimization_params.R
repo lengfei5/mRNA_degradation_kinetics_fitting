@@ -16,8 +16,9 @@ source("R/set_bounds_initialize_values.R", local = TRUE)
 #########
 #### fitting all models for one genes and remove outliers with iterations
 #########
-make.fits.with.all.models.for.one.gene = function(T = T, gene.index = 1, debug = FALSE, zt = seq(0,46,by = 2),
-                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, 
+make.fits.with.all.models.for.one.gene = function(R.m, R.s, alpha.m, alpha.s, L.m, L.s, 
+                                                  zt = seq(0,94,by = 2), 
+                                                  debug = FALSE, outliers = FALSE, 
                                                   parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
@@ -81,10 +82,12 @@ calculate.error.for.flat.model = function(T = T,
   R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
+ 
   alpha.m = rep(as.numeric(T[gene.index, grep('alpha.mRNA.ZT', colnames(T))]), 4);
   alpha.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
+  
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
   
   if(outliers)
   {
