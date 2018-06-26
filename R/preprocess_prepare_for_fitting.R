@@ -52,7 +52,9 @@ MDfitDataSet = function(P, M, length.P, length.M, zt=zt)
   # dispersion parameter for each time point and for pre-mRNA and mRNA respectivley, calculated by DESeq2
   # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
   # large differences in gene expression mean between time points requires this. 
-  mds$dispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt)
+  estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt)
+  mds$dispersions.P = estimateDispersions$alphas.P 
+  mds$dispersions.M = estimateDispersions$alphas.M
   
   return(mds)
 }
@@ -87,7 +89,7 @@ calculate.scaling.factors.DESeq2 = function(P, M, zt)
   
 }
 
-calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt)
+calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt, fitType = 'local')
 {
   require('DESeq2')
   # P = T[, ZT.int]; M = T[, ZT.ex]
@@ -111,8 +113,13 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt)
     dds = DESeqDataSetFromMatrix(countData[, index.reps], DataFrame(condition), ~1);
     sizeFactors(dds) = size.factors[index.reps]
     
-    dds <- estimateDispersions(dds, maxit = 500)
+    dds <- estimateDispersions(dds, maxit = 500, fitType=fitType)
     alphas[,n] = dispersions(dds);
+    
+    plotDispEsts(dds)
+    
+    plot(alphas[c(1:nrow(T)), 1], T$alpha.mRNA.ZT0, log='xy', cex=0.2);abline(0, 1, lwd=2.0, col='red')
+    
     #alphas.genes[,n] = mcols(dds)$dispGeneEst
   }
   
@@ -123,7 +130,7 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt)
   
   # T = data.frame(T[,c(1:3)], alphas, T[, -c(1:5)], stringsAsFactors = FALSE)
   #Disps = 1;
-  return(alphas)
+  return(list(alphas.P = alphas.P, alphas.M = alphas.M))
   
 }
 
