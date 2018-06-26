@@ -40,7 +40,8 @@ zt = seq(0,94,by = 2)
 ## 
 ####################
 source("R/preprocess_prepare_for_fitting.R")
-mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt)
+mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt,
+                   fitType.dispersion = "local")
 
 ####################
 ## parameter required to specify

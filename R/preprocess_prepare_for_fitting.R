@@ -28,7 +28,7 @@ library(DESeq2)
 ## creat a S3 class MDfitDataSet to store data matrix, (P and M for pre-mRNA and mRNA), time points (zt), length.pre-mRNA and length.mRNA
 ## scaling factors for rpkm calculation, dispersion parameters
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
-MDfitDataSet = function(P, M, length.P, length.M, zt=zt)
+MDfitDataSet = function(P, M, length.P, length.M, zt=zt, fitType.dispersion = "local")
 {
   cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...")
   
@@ -52,7 +52,7 @@ MDfitDataSet = function(P, M, length.P, length.M, zt=zt)
   # dispersion parameter for each time point and for pre-mRNA and mRNA respectivley, calculated by DESeq2
   # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
   # large differences in gene expression mean between time points requires this. 
-  estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt)
+  estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
   mds$dispersions.P = estimateDispersions$alphas.P 
   mds$dispersions.M = estimateDispersions$alphas.M
   
@@ -89,7 +89,7 @@ calculate.scaling.factors.DESeq2 = function(P, M, zt)
   
 }
 
-calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt, fitType = 'local')
+calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.dispersion = "local") 
 {
   require('DESeq2')
   # P = T[, ZT.int]; M = T[, ZT.ex]
@@ -113,12 +113,12 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt, fitType = 
     dds = DESeqDataSetFromMatrix(countData[, index.reps], DataFrame(condition), ~1);
     sizeFactors(dds) = size.factors[index.reps]
     
-    dds <- estimateDispersions(dds, maxit = 500, fitType=fitType)
+    dds <- estimateDispersions(dds, maxit = 500, fitType=fitType.dispersion)
     alphas[,n] = dispersions(dds);
     
-    plotDispEsts(dds)
+    #plotDispEsts(dds)
     
-    plot(alphas[c(1:nrow(T)), 1], T$alpha.mRNA.ZT0, log='xy', cex=0.2);abline(0, 1, lwd=2.0, col='red')
+    #plot(alphas[c(1:nrow(T)), 1], T$alpha.mRNA.ZT0, log='xy', cex=0.2);abline(0, 1, lwd=2.0, col='red')
     
     #alphas.genes[,n] = mcols(dds)$dispGeneEst
   }
