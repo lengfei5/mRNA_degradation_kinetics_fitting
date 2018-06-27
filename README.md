@@ -1,6 +1,11 @@
 # mRNA kinetic model fitting 
 This R package is aiming to fit kinetic model for temporal profiles of pre-mRNA and mRNA to infer mRNA degradation  
 
+## TODO
+In general, I found DESeq2 R package is good example of implementing complicated functions in R.
+1. now the code is design just for fitting one gene. Ideally the code can easily fit all genes in the data in parallel.
+Thus the parallization should be taken into consideration now. 
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -10,7 +15,29 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg))
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+
+# usage
+packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
+ipak(packages)
+
+# all libraries required
+library(emdbook)
+library(deSolve)
+library(fdrtool)
+library(circular)
+library(preprocessCore)
+library(gtools)
+library(biomaRt)
+library(numDeriv)
+library(Matrix)
+library(DESeq2)
+
 ```
 
 ### Installing

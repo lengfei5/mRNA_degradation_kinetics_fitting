@@ -255,6 +255,7 @@ make.optimization = function(T = T,
     eval(parse(text = paste('res.fit.', fit.number, ' = opt$par', sep = '')))
         
     if(debug){cat('\t\t optimization # ',fit.number,' finished : \t', opt$par, '\t',opt$value, '\n')}
+  
   }
     
   ## choose the best estimated parameters
