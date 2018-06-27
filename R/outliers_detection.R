@@ -42,21 +42,23 @@ index.outliers = function(data.xx)
 ####################
 ## main function for outlier detection 
 ####################
-detect.ouliters.loglike = function(param.fits.results,
-                                   R.m,
-                                   R.s,
-                                   a.m, 
-                                   a.s,
-                                   L.m,
-                                   L.s,
-                                   outlier.m = c(), 
-                                   outlier.s = c(),
-                                   nb.additonal.m = 1,
-                                   nb.additonal.s = 1
-                                   )
+detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
 {
+  zt = unlist(GeneDataSet$zt)
+  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+  
+  alpha.m = unlist(GeneDataSet$alpha.m)
+  alpha.s = unlist(GeneDataSet$alpha.s)
+  
+  outlier.m = unlist(GeneDataSet$outlier.m)
+  outlier.s = unlist(GeneDataSet$outlier.s)
+  
   loglike.m = matrix(NA, nrow=3, ncol=48)
   loglike.s = matrix(NA, nrow=3, ncol=48)
+  
   
   for(model in c(2:4))
   {
@@ -90,10 +92,10 @@ detect.ouliters.loglike = function(param.fits.results,
     read.m = convert.nb.reads(m, L.m)
     read.s = convert.nb.reads(s, L.s)
     
-    loglike = -2*dnbinom(as.numeric(R.m), size=1/a.m, mu=as.numeric(read.m), log = TRUE)
+    loglike = -2*dnbinom(as.numeric(R.m), size=1/alpha.m, mu=as.numeric(read.m), log = TRUE)
     #cat(index.outliers.loglike(loglike), '\n')
     loglike.m[(model-1), ] = loglike
-    loglike = -2*dnbinom(as.numeric(R.s), size=1/a.s, mu=as.numeric(read.s), log = TRUE)
+    loglike = -2*dnbinom(as.numeric(R.s), size=1/alpha.s, mu=as.numeric(read.s), log = TRUE)
     #cat(index.outliers.loglike(loglike), '\n')
     loglike.s[(model-1), ] = loglike
   }
@@ -102,28 +104,28 @@ detect.ouliters.loglike = function(param.fits.results,
   #additional.m = intersect(index.outliers.loglike(loglike.m[3,]), intersect(index.outliers.loglike(loglike.m[1,]), index.outliers.loglike(loglike.m[2,])))
   #additional.s = intersect(index.outliers.loglike(loglike.s[3,]), intersect(index.outliers.loglike(loglike.s[1,]), index.outliers.loglike(loglike.s[2,])))
    
-  index.outliers.m = index.outliers.loglike(loglike.m[3,]); 
-  index.outliers.s = index.outliers.loglike(loglike.s[3,]);
+  new.outliers.m = index.outliers.loglike(loglike.m[3,]); 
+  new.outliers.s = index.outliers.loglike(loglike.s[3,]);
     
   if(length(outlier.m)==0){
-    outlier.m = index.outliers.m;
+    outlier.m = new.outliers.m;
   }else{
-    index.outliers.m = setdiff(index.outliers.m, outlier.m);
-    outlier.m = c(outlier.m, index.outliers.m);
+    new.outliers.m = setdiff(new.outliers.m, outlier.m);
+    outlier.m = c(outlier.m, new.outliers.m);
   }
   
   if(length(outlier.s)==0){
-    outlier.s = index.outliers.s;
+    outlier.s = new.outliers.s;
   }else{
-    index.outliers.s = setdiff(index.outliers.s, outlier.s);
-    outlier.s = c(outlier.s, index.outliers.s);
+    new.outliers.s = setdiff(new.outliers.s, outlier.s);
+    outlier.s = c(outlier.s, new.outliers.s);
   }
   
   outlier.m = outlier.m[order(outlier.m)];
   outlier.s = outlier.s[order(outlier.s)];
   
-  res.outliers.detection = list(nb.newOutliers.m = length(index.outliers.m), 
-                                nb.newOutliers.s = length(index.outliers.s), 
+  res.outliers.detection = list(nb.newOutliers.m = length(new.outliers.m), 
+                                nb.newOutliers.s = length(new.outliers.s), 
                                 outlier.m = outlier.m,
                                 outlier.s = outlier.s);
   

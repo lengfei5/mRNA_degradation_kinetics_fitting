@@ -144,15 +144,20 @@ Identifiablity.analysis.gamma.each.model = function (error.opt, params.opt, lowe
   
 }
 
-Identifiablity.analysis.gamma.all.models = function(param.fits.results,
-                                                    R.m, R.s, 
-                                                    L.m, L.s,
-                                                    alpha.m = a.m, 
-                                                    alpha.s = a.s, 
-                                                    outlier.m = outlier.m, 
-                                                    outlier.s = outlier.s,
-                                                    zt = zt)
+Identifiablity.analysis.gamma.all.models = function(param.fits.results, GeneDataSet)
 {
+  zt = unlist(GeneDataSet$zt)
+  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+  
+  alpha.m = unlist(GeneDataSet$alpha.m)
+  alpha.s = unlist(GeneDataSet$alpha.s)
+  
+  outlier.m = unlist(GeneDataSet$outlier.m)
+  outlier.s = unlist(GeneDataSet$outlier.s)
+  
   M = norm.RPKM(R.m, L.m)
   S = norm.RPKM(R.s, L.s)
   a = mean(M)/mean(S) # ratio between splicing rate and degratation rate

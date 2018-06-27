@@ -66,8 +66,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     
     nb.newOutliers.m = 1; 
     nb.newOutliers.s = 1;
-    #T$mRNA.outlier[gene.index] = '';  T$premRNA.outlier[gene.index] = '';
-    
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
       if(debug){cat('starting optimization with outlier detection ----------\n ');
@@ -76,20 +74,18 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       
       param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE, debug = debug); 
       
-      res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, alpha.m, alpha.s, L.m, L.s,  
-                                                                  outlier.m = outlier.m, outlier.s = outlier.s, 
-                                                                  nb.additonal.m = nb.additonal.m, 
-                                                                  nb.additonal.s = nb.additonal.s);
+      res.outliers.detection = detect.ouliters.loglike(param.fits.results, GeneDataSet);
       
       nb.newOutliers.m = res.outliers.detection$nb.newOutliers.m
       nb.newOutliers.s = res.outliers.detection$nb.newOutliers.s
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
-      
+    
+      GeneDataSet$outlier.m = outlier.m;
+      GeneDataSet$outlier.s = outlier.s;
       # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
       #T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
       #T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
-    
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 
@@ -103,14 +99,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     source("R/identifiability_analysis.R", local = TRUE)
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
     
-    res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results,
-                                                                                      R.m, R.s, 
-                                                                                      L.m, L.s,
-                                                                                      alpha.m = alpha.m, 
-                                                                                      alpha.s = alpha.s, 
-                                                                                      outlier.m = outlier.m, 
-                                                                                      outlier.s = outlier.s,
-                                                                                      zt = zt);
+    res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet);
+                                                                                      
   }else{
     res.nonident.analysis.gamma.all.models = rep(NA, 8);
     names(res.nonident.analysis.gamma.all.models) = paste0(c('non.identifiability.gamma.L.m', 'non.identifiability.gamma.R.m'), 
