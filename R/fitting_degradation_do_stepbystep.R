@@ -52,7 +52,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
                                                                 alpha.m = alpha.m, alpha.s = alpha.s, 
                                                                 L.m = L.m, L.s = L.s, 
                                                                 zt = zt,
-                                                                debug = debug, outliers = outliers.removal); 
+                                                                debug = debug); 
     #param.fits.results = make.fits.with.all.models.for.one.gene();
     outlier.m = NA;
     outlier.s = NA;
@@ -75,7 +75,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       }
       
       param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
-                                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = outliers.removal);
+                                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
       
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, alpha.m, alpha.s, L.m, L.s,  
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
