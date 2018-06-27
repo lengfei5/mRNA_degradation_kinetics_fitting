@@ -2,9 +2,14 @@
 This R package is aiming to fit kinetic model for temporal profiles of pre-mRNA and mRNA to infer mRNA degradation  
 
 ## TODO
-In general, I found DESeq2 R package is good example of implementing complicated functions in R.
+In general, I found DESeq2 R package is good example of implementing complicated functions in R, which we can inspire very much from it.
+
 1. now the code is design just for fitting one gene. Ideally the code can easily fit all genes in the data in parallel.
 Thus the parallization should be taken into consideration now. 
+
+2. Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
+that they can be easily to be adapted to do so 
+
 
 ## Getting Started
 

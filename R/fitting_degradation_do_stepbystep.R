@@ -23,16 +23,25 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   
   # set scaling factors here as global variables
   set.scaling.factors(mds$scaling.factors)
+  set.time.points(mds$zt) #actually this can be also a global parameter, because it is gene-independent
   
-  zt  = mds$zt
   # gene.name = T$gene[gene.index];
-  R.m = mds$M[gene.index, ]
-  R.s = mds$P[gene.index, ]
+  R.m = unlist(mds$M[gene.index, ])
+  R.s = unlist(mds$P[gene.index, ])
   L.m = T$length.mRNA[gene.index];
   L.s = T$length.premRNA[gene.index];
   
-  alpha.m = mds$dispersions.M[gene.index, ]
-  alpha.s = mds$dispersions.P[gene.index, ]
+  alpha.m = unlist(mds$dispersions.M[gene.index, ])
+  alpha.s = unlist(mds$dispersions.P[gene.index, ])
+  
+  outlier.m = c(); 
+  outlier.s = c();
+  
+  GeneDataSet = list(R.m = R.m, R.s = R.s, 
+                     L.m = L.m, L.s = L.s, 
+                     alpha.m = alpha.m, alpha.s = alpha.s,
+                     outlier.m = outlier.m, outlier.s = outlier.s,
+                     zt = zt)
   
   M = norm.RPKM(R.m, L.m)
   S = norm.RPKM(R.s, L.s)
@@ -44,38 +53,28 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   source("R/optimization_params.R", local = TRUE)
   
-  if(!outliers.removal){
-    ## without outlier detection and removal
-    if(debug){cat('starting optimization without outliers \n ')}
+  if(!outliers.removal){ ## without outlier detection and removal
     
-    param.fits.results = make.fits.with.all.models.for.one.gene(R.m = R.m, R.s = R.s, 
-                                                                alpha.m = alpha.m, alpha.s = alpha.s, 
-                                                                L.m = L.m, L.s = L.s, 
-                                                                zt = zt,
-                                                                debug = debug); 
+    if(debug){cat('starting optimization without outliers \n ')}
+    param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
     #param.fits.results = make.fits.with.all.models.for.one.gene();
     outlier.m = NA;
     outlier.s = NA;
     
-  }else{
-    ## outlier detection and removal
+  }else{ ## outlier detection and removal
     source("R/outliers_detection.R", local = TRUE)
     
-    outlier.m = c(); 
-    outlier.s = c();
     nb.newOutliers.m = 1; 
     nb.newOutliers.s = 1;
-    T$mRNA.outlier[gene.index] = '';  T$premRNA.outlier[gene.index] = '';
+    #T$mRNA.outlier[gene.index] = '';  T$premRNA.outlier[gene.index] = '';
     
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
       if(debug){cat('starting optimization with outlier detection ----------\n ');
         cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
-        cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n');
-      }
+        cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n'); }
       
-      param.fits.results = make.fits.with.all.models.for.one.gene(T = T, gene.index = gene.index, debug = debug, zt = zt, 
-                                                                  i.ex = ZT.ex, i.int = ZT.int, outliers = TRUE);
+      param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE, debug = debug); 
       
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, R.m, R.s, alpha.m, alpha.s, L.m, L.s,  
                                                                   outlier.m = outlier.m, outlier.s = outlier.s, 
@@ -88,8 +87,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       outlier.s = res.outliers.detection$outlier.s;
       
       # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
-      T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
-      T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
+      #T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
+      #T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
     
     }
     
@@ -151,7 +150,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
-              outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ';'), outlier.s = paste(outlier.s, sep='', collapse = ';')),
+              outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ','), outlier.s = paste(outlier.s, sep='', collapse = ',')),
               model.sel = res.model.sel,
               param.fit.cleaned = param.transformed.cleaned
               )

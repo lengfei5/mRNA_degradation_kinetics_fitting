@@ -22,6 +22,11 @@ set.scaling.factors = function(sfs)
   
 }
 
+set.time.points = function(time.points)
+{
+  zt <<- time.points;
+}
+
 set.nb.data.param = function(absolute.signal=TRUE)
 {
   nb.data <<- 96; 

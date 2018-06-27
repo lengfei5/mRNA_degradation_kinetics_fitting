@@ -16,10 +16,8 @@ source("R/set_bounds_initialize_values.R", local = TRUE)
 #########
 #### fitting all models for one genes and remove outliers with iterations
 #########
-make.fits.with.all.models.for.one.gene = function(R.m, R.s, alpha.m, alpha.s, L.m, L.s, 
-                                                  zt = seq(0,94,by = 2), 
-                                                  debug = FALSE, outliers = FALSE, 
-                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE)
+make.fits.with.all.models.for.one.gene = function(GeneDataSet, outliers = FALSE,
+                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE, debug = FALSE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
   
@@ -28,8 +26,7 @@ make.fits.with.all.models.for.one.gene = function(R.m, R.s, alpha.m, alpha.s, L.
   {
     if(debug){cat('\t starting model ',model,'\n');}
     
-    param.fit = make.fit.spec.model(T = T, gene.index = gene.index, model = model, debug = debug, 
-                                    zt = zt, i.ex = i.ex, i.int = i.int, outliers=outliers);
+    param.fit = make.fit.spec.model(GeneDataSet, model = model, outliers=outliers, debug = debug);
     Param.fit.for.gene = c(Param.fit.for.gene, param.fit)
     
     if(debug){cat('\t model ',model,' finished \n')};
@@ -39,26 +36,22 @@ make.fits.with.all.models.for.one.gene = function(R.m, R.s, alpha.m, alpha.s, L.
 
 }
 
-make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, zt = seq(0,46,by = 2), 
-                               i.ex = ZT.ex, i.int = ZT.int, outliers = FALSE, parametrization = c('cosine.beta'), absolute.signal = TRUE)
+make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE, 
+                               parametrization = c('cosine.beta'), absolute.signal = TRUE, debug = FALSE)
 {
   param.fit = NA;
   
   ## error for model 1
   if(model == 1){
-    param.fit = calculate.error.for.flat.model(T = T, 
-                                               gene.index = gene.index, 
-                                               debug = debug,  
-                                               zt = zt, i.ex = i.ex, i.int = i.int, 
-                                               outliers = outliers, 
+    param.fit = calculate.error.for.flat.model(GeneDataSet, outliers = outliers, 
                                                parametrization = parametrization, 
-                                               absolute.signal = absolute.signal)
+                                               absolute.signal = absolute.signal,
+                                               debug = debug)
   }
   
   ## parameter estimations for model 2,3,4
   if(model > 1){
-    param.fit = make.optimization(T = T, i = gene.index, model = model, Nfit = NA, debug = debug, zt = zt, i.ex = i.ex, i.int = i.int, 
-                                  outliers = outliers)
+    param.fit = make.optimization(GeneDataSet, model = model, Nfit = NA, outliers = outliers, debug = debug)
   }
   
   return(param.fit)
@@ -68,35 +61,28 @@ make.fit.spec.model = function(T = T, gene.index = 1, model = 1, debug = FALSE, 
 ###########
 ## error for model 1
 ###########
-calculate.error.for.flat.model = function(T = T, 
-                                          gene.index = 1, 
-                                          debug = FALSE, 
-                                          zt = seq(0,46,by = 2), 
-                                          i.ex = ZT.ex, 
-                                          i.int = ZT.int, 
-                                          outliers = FALSE, 
-                                          parametrization = c('cosine.beta'), 
-                                          absolute.signal = TRUE)
+calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers = FALSE, 
+                                          parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
-  R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-  R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-  L.m = T$length.mRNA[gene.index];
-  L.s = T$length.premRNA[gene.index];
- 
-  alpha.m = rep(as.numeric(T[gene.index, grep('alpha.mRNA.ZT', colnames(T))]), 4);
-  alpha.s = rep(as.numeric(T[gene.index, grep('alpha.premRNA.ZT', colnames(T))]), 4);
+  zt = unlist(GeneDataSet$zt)
+  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
   
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
+  alpha.m = unlist(GeneDataSet$alpha.m)
+  alpha.s = unlist(GeneDataSet$alpha.s)
   
-  if(outliers)
-  {
-    outlier.m = as.numeric(unlist(strsplit(as.character(T$mRNA.outlier[gene.index]), ';')))
-    outlier.s = as.numeric(unlist(strsplit(as.character(T$premRNA.outlier[gene.index]), ';'))) 
+  if(outliers) {
+    outlier.m = unlist(GeneDataSet$outlier.m)
+    outlier.s = unlist(GeneDataSet$outlier.s)
   }else{
     outlier.m = c();
     outlier.s = c();
   }
+  
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
   
   mu.m = convert.nb.reads(rep(mean(M), length(R.m)), L.m);
   mu.s = convert.nb.reads(rep(mean(S), length(R.s)), L.s);
@@ -112,13 +98,9 @@ calculate.error.for.flat.model = function(T = T,
 ####################
 ## main optimization function for Model 2, 3 and 4
 ####################
-make.optimization = function(T = T, 
-                             i = 1, 
+make.optimization = function(GeneDataSet,
                              model = 4, 
                              Nfit = NA,
-                             zt =  seq(0,94,by = 2), 
-                             i.ex = ZT.ex, 
-                             i.int = ZT.int, 
                              outliers = FALSE,
                              parametrization =c('cosine.beta'), 
                              debug = FALSE,
@@ -131,27 +113,29 @@ make.optimization = function(T = T,
   ## prepare parameters for the optimization 
   ####################
   w = 2*pi/24;
-  gene2opt = T$gene[i];
+  # gene2opt = T$gene[i];
   param.fit = NA
-  R.m = unlist(T[i, i.ex]) ## nb of reads for exon
-  R.s = unlist(T[i, i.int]) ## nb of reads for intron
-  L.m = T$length.mRNA[i];
-  L.s = T$length.premRNA[i];
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
-  #alpha.m = T$alpha.mRNA[i];
-  #alpha.s = T$alpha.premRNA[i];
-  alpha.m = rep(as.numeric(T[i, grep('alpha.mRNA.ZT', colnames(T))]), 4);  # dispersion parameter alpha for each time points
-  alpha.s = rep(as.numeric(T[i, grep('alpha.premRNA.ZT', colnames(T))]), 4); 
   
-  if(outliers){
-    outlier.m = as.numeric(unlist(strsplit(as.character(T$mRNA.outlier[i]), ';')))
-    outlier.s = as.numeric(unlist(strsplit(as.character(T$premRNA.outlier[i]), ';'))) 
+  zt = unlist(GeneDataSet$zt)
+  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+  
+  alpha.m = unlist(GeneDataSet$alpha.m)
+  alpha.s = unlist(GeneDataSet$alpha.s)
+  
+  if(outliers) {
+    outlier.m = unlist(GeneDataSet$outlier.m)
+    outlier.s = unlist(GeneDataSet$outlier.s)
   }else{
     outlier.m = c();
     outlier.s = c();
   }
   
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
+    
   ####################
   ## Prefix parameters in optimization process
   ####################
