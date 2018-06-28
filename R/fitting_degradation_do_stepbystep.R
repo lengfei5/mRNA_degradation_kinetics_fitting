@@ -64,12 +64,13 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   }else{ ## outlier detection and removal
     source("R/outliers_detection.R", local = TRUE)
     
+    if(debug){cat('starting optimization with outlier detection ----------\n ');}
+    
     nb.newOutliers.m = 1; 
     nb.newOutliers.s = 1;
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
-      if(debug){cat('starting optimization with outlier detection ----------\n ');
-        cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
+      if(debug){ cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
         cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n'); }
       
       param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE, debug = debug); 
