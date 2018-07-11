@@ -1,5 +1,8 @@
-# mRNA kinetic model fitting 
-This R package is aiming to fit kinetic model for temporal profiles of pre-mRNA and mRNA to infer mRNA degradation  
+mRNA kinetic model fitting 
+====================
+This R package is fitting circadian (temproal) profiles of pre-mRNA and mRNA with a kineticc model,
+dissecting the contributions of rhythmic transcription and mRNA degradation 
+and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitude and phase of rhythmic degradation.
 
 ## TODO
 In general, I found DESeq2 R package is good example of implementing complicated functions in R, which we can inspire very much from it.
@@ -10,28 +13,10 @@ Thus the parallization should be taken into consideration now.
 2. Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
 that they can be easily to be adapted to do so 
 
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
+# Installation
 ### Prerequisites
-
-What things you need to install the software and how to install them
-
+* R 3.0.0 or R 3.0.1. May also work with R 2.14 and 2.15. (to check) 
 ```
-ipak <- function(pkg){
-  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-  if (length(new.pkg))
-    install.packages(new.pkg, dependencies = TRUE)
-  sapply(pkg, require, character.only = TRUE)
-}
-
-# usage
-packages <- c("fdrtool", "circular", "preprocessCore", "gtools", "biomaRt", "numDeriv", "Matrix")
-ipak(packages)
-
-# all libraries required
 library(emdbook)
 library(deSolve)
 library(fdrtool)
@@ -44,6 +29,19 @@ library(Matrix)
 library(DESeq2)
 
 ```
+
+### Cloning repository
+```
+cd dir_to_place_repository
+git clone https://github.com/lengfei5/mRNA_degradation_kinetics_fitting
+
+```
+
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+
 
 ### Installing
 
