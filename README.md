@@ -4,11 +4,10 @@ This R package is fitting circadian (temproal) profiles of pre-mRNA and mRNA wit
 dissecting the contributions of rhythmic transcription and mRNA degradation 
 and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitude and phase of rhythmic degradation.
 
-## TODO
+## TO-DO
 
-In general, I found DESeq2 R package is good example of implementing complicated functions in R, which we can inspire very much from it.
-
-1. now the code is design just for fitting one gene. Ideally the code can easily fit all genes in the data in parallel.
+1. now the code is designed just for fitting one gene. 
+Ideally the code can easily fit all genes in the data in parallel.
 Thus the parallization should be taken into consideration now. 
 2. Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
 that they can be easily to be adapted to do so 
@@ -125,10 +124,4 @@ See also the list of [contributors](https://github.com/your/project/contributors
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
