@@ -5,12 +5,15 @@ dissecting the contributions of rhythmic transcription and mRNA degradation
 and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitude and phase of rhythmic degradation.
 
 ## TO-DO
+Here is the reminder for the improvement:
 
-1. now the code is designed just for fitting one gene. 
+* Now the code is designed just for fitting one gene. 
 Ideally the code can easily fit all genes in the data in parallel.
 Thus the parallization should be taken into consideration now. 
-2. Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
-that they can be easily to be adapted to do so 
+*  Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
+that they can be easily to be adapted to do it. 
+And keep in mind that JW has done it, at least partially, 
+in the inital effort (in the folder`origin/`).  
 
 ## Directory structure
 * **run_modelFitting_forAll.R** -- the script showing how to run the main function and to specify the parameters
@@ -19,6 +22,7 @@ that they can be easily to be adapted to do so
 * **origin/** -- origin scripts based on which we implement this pacakge and also the scripts used for the PNAS paper (before cleaning)
 
 ## Code structure
+
 
 ## Installation
 #### Prerequisites
@@ -114,10 +118,6 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Laura Symul ** - *Initial work* - [PurpleBooth]
-* **Jingkui Wang ** - *Initial work* - [PurpleBooth]
-* **Felix Naef ** - *Initial work* - [PurpleBooth]
-* **Pal Westernmark ** - *Initial work* - [PurpleBooth]
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
