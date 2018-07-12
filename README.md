@@ -10,18 +10,54 @@ Here is the reminder for the improvement:
 * Now the code is designed just for fitting one gene. 
 Ideally the code can easily fit all genes in the data in parallel.
 Thus the parallization should be taken into consideration now. 
-*  Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
+
+* Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
 that they can be easily to be adapted to do it. 
 And keep in mind that JW has done it, at least partially, 
 in the inital effort (in the folder`origin/`).  
 
+* Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
+
+* Headers in all scripts should probably removed or modified
+
+
 ## Directory structure
-* **run_modelFitting_forAll.R** -- the script showing how to run the main function and to specify the parameters
+* **run_modelFitting_forAll.R** (#run_modelFitting_forAll.R)-- the script showing how to run the main function and to specify the parameters
 * **data/** -- data example (the read count table used in the PNAS paper) 
 * **R/** -- scripts for the main function
 * **origin/** -- origin scripts based on which we implement this pacakge and also the scripts used for the PNAS paper (before cleaning)
 
 ## Code structure
+Here is the structure of inital code:
+
+#### run_modelFitting_forAll.R
+
+The script mainly show how to use the package :
+
+- install required R packages in case they are absent
+  - `R/configure.R`
+
+- Important data table, time points, pre-mRNA and mRNA lengths...  
+
+- Estimate scaling factors for each sample (e.g. 48 samples in our case), 
+  dispersion parameter for each time point (e.g. 12 time points in our case) and store all those parameters in a so-called 
+  MDfitDataSet object (S3 class)
+  
+  `R/preprocess_prepare_for_fitting.R`
+  
+  `MDfitDataSet(P, M, length.P, length.M, zt, fitType.dispersion = "local")` -- main function
+  - `print.MDfitDataSet` -- define simply print function for object MDfitDataSet
+  - `calculate.SizeFactors.DESeq2` -- size factor from DESeq2
+  - `calculate.scaling.factors.DESeq2` -- size factor * constant close to libary size (here is arbitrarily defined, just a constant) 
+  - `calculate.dispersions.for.each.time.point.DESeq2` -- dispersion estiamtion for each time point
+
+- Run the main function after specifying the parameters
+  
+  `R/fitting_degradation_do_stepbystep.R`
+  
+  `make.fits.with.all.models.for.one.gene.remove.outliers(mds, gene.index, debug, outliers.removal, identifiablity.analysis.gamma);`
+
+- Compare the output with the origin code
 
 
 ## Installation
