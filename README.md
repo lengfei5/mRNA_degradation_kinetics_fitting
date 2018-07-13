@@ -7,20 +7,22 @@ and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitud
 ## TO-DO
 Here is the reminder for the improvement:
 
+* Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way 
+that they can be easily to be adapted to do it. 
+And also keep in mind that JW has done it, at least partially, 
+in the inital effort (in the folder`origin/`).  
+
 * Now the code is designed just for fitting one gene. 
 Ideally the code can easily fit all genes in the data in parallel.
 Thus the parallization should be taken into consideration now. 
 
-* Since we are also planning to add the option for "Gaussian model", we should think how to design the fucntions in such way 
-that they can be easily to be adapted to do it. 
-And keep in mind that JW has done it, at least partially, 
-in the inital effort (in the folder`origin/`).  
-
 * Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
+
+* Parameter cleaning in the last step is not clear how to integrate from the origin code
 
 * Headers in all scripts should probably removed or modified
 
-* connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
+* Connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
 
 ## Directory structure
 * **[run_modelFitting_forAll.R]** -- the script showing how to run the main function and to specify the parameters
@@ -118,14 +120,20 @@ in `R/fitting_degradation_do_stepbystep.R`
         - `Sampling.Initial.Values.for.fitting.S()` -- gene-specific initial values for pre-mRNA parameters, in `set_bounds_initialize_value.R` 
         - `set.bounds.gene.s()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
         - `f2min.int()` -- -2loglikelihood for pre-mRNA, in `error_functions.R`
+      
       - fit only mRNA for M4 by fixing the pre-mRNA parameters from previous step
         - `Sampling.Initial.Values.for.fitting.M()` -- gene-specific initial values for mRNA degradation, in `set_bounds_initialize_value.R` 
         - `set.bounds.gene.m()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
         - `f2min.mrna()` -- -2loglikelihood for mRNA, in `error_functions.R`
+      
       - fit both pre-mRNA and mRNA
-        - `Sampling.Initial.Values.for.fitting.M()` -- gene-specific initial values, in `set_bounds_initialize_value.R` 
-        - `set.bounds.gene.m()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
-        - `f2min.mrna()` -- -2loglikelihood for mRNA, in `error_functions.R`
+        - `Sampling.Initial.Values.for.fitting.M.S()` -- gene-specific initial values, in `set_bounds_initialize_value.R` 
+        - `set.bounds.gene()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
+        - `f2min()` -- -2loglikelihood, in `error_functions.R`
+          - `sigmoid.bound.contraint`   
+          use a signmoid function to impose smooth constrain for relative amplitude of rhythmic degradation
+        
+      - compute the Standard Error of estimates using hessian function
     
 - **`detect.ouliters.loglike(param.fits.results, GeneDataSet);`**   
   function to detect outliers using the output of optimization function as input arguments  
