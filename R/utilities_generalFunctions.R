@@ -12,6 +12,8 @@
 ## these functions are also mainly for the read count table
 ## they are not used in gaussian model
 ###############
+source("R/kinetic_model.R", local = TRUE)
+
 set.scaling.factors = function(sfs)
 {
   scaling.factors <<- unlist(sfs);

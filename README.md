@@ -89,13 +89,43 @@ in `R/fitting_degradation_do_stepbystep.R`
     - `set.general.bounds.int()` -- general param boundaries for pre-mRNAs
     - `set.general.bounds.degr.splicing()` -- general param boundaries for mRAN degradation and splicing
   
+  - **`kinetic_model.R`**     
+    as general utility function becasue called by many steps:   
+    parameter optimizaiton in `R/error_function.R`;  
+    outlier detection in `R/outliers_detection.R`;  
+    identifiability analysis in `R/identifiability_analysis.R`     
+    - `compute.s.beta()` -- pre-mRNA concentration from the kinetic model
+    - `compute.s.beta.v1()` -- NOT USED pre-mRNA but based on slightly different formular using mean instead of minimun in the model
+    - `compute.m.beta()` -- main function to calculte mRNA concentration
+      - `integrate.m()` -- intergrate method (not working always)  
+        - `Gamma()`
+        - `f2integrate()`
+      - `simulate.m()` -- by simulation
+        - `dmdt()`
       
 - extracting data and required parameters for one gene and wrap them into a list called `GeneDataSet`  
   
+  
 - **`make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug)`**  
-  function to fit the model and optimize parameter  
+  Function to fit the model and optimize parameter  
   in the `R/optimization_params.R`
-    
+  
+  - `make.fit.spec.model()` -- fit data for specific model (M1-M4)
+    - `calculate.error.for.flat.model()` -- for M1
+      - `NB.error()` -- calcualte -2loglikelihood for NB (in `R/error_functions.R`)
+    - `make.optimization()` -- fit M2-M4
+      - fit only pre-mRNA for M2 and M4 
+        - `Sampling.Initial.Values.for.fitting.S()` -- gene-specific initial values for pre-mRNA parameters, in `set_bounds_initialize_value.R` 
+        - `set.bounds.gene.s()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
+        - `f2min.int()` -- -2loglikelihood for pre-mRNA, in `error_functions.R`
+      - fit only mRNA for M4 by fixing the pre-mRNA parameters from previous step
+        - `Sampling.Initial.Values.for.fitting.M()` -- gene-specific initial values for mRNA degradation, in `set_bounds_initialize_value.R` 
+        - `set.bounds.gene.m()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
+        - `f2min.mrna()` -- -2loglikelihood for mRNA, in `error_functions.R`
+      - fit both pre-mRNA and mRNA
+        - `Sampling.Initial.Values.for.fitting.M()` -- gene-specific initial values, in `set_bounds_initialize_value.R` 
+        - `set.bounds.gene.m()` -- gene-specific parameter boundaries, in `set_bounds_initialize_value.R`
+        - `f2min.mrna()` -- -2loglikelihood for mRNA, in `error_functions.R`
     
 - **`detect.ouliters.loglike(param.fits.results, GeneDataSet);`**   
   function to detect outliers using the output of optimization function as input arguments  

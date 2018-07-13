@@ -7,10 +7,8 @@
 ## Date of creation: Mon Jun  4 13:49:17 2018
 ##########################################################################
 ##########################################################################
-
 ## import function dependencies
 source("R/error_functions.R", local = TRUE)
-source("R/kinetic_model.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
 #########

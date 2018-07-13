@@ -84,7 +84,7 @@ integrate.m = function(t=seq(0, 46, by=2), gamma=log(2)/5, eps.gamma=0.2, phase.
   for(i in 1:length(t))
   {
     time = t[i]; 
-    m[i] = splicing.k*exp(-Gamma(t = Tstable+time, gamma = gamma, eps.gamma=eps.gamma, phase.gamma=phase.gamma)) * integrate(f2integrate, lower = 0, upper = Tstable+time, par = c(gamma, eps.gamma, phase.gamma, Min, Amp, phase, beta))$value
+    m[i] = splicing.k*exp(-Gamma(t = Tstable+time, gamma = gamma, eps.gamma=eps.gamma, phase.gamma=phase.gamma)) *integrate(f2integrate, lower = 0, upper = Tstable+time, par = c(gamma, eps.gamma, phase.gamma, Min, Amp, phase, beta))$value
   }
   return(m)
 }
