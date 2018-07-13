@@ -23,17 +23,17 @@ in the inital effort (in the folder`origin/`).
 * connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
 
 ## Directory structure
-* **run_modelFitting_forAll.R** (#run_modelFitting_forAll.R)-- the script showing how to run the main function and to specify the parameters
+* **run_modelFitting_forAll.R** [#run_modelFitting_forAll.R]-- the script showing how to run the main function and to specify the parameters
 * **data/** -- data example (the read count table used in the PNAS paper) 
 * **R/** -- scripts for the main function
 * **origin/** -- origin scripts based on which we implement this pacakge and also the scripts used for the PNAS paper (before cleaning)
 
 ## Code structure
-Here is the structure of inital code:
+Here is the structure of inital codes:
 
-#### run_modelFitting_forAll.R
+### run_modelFitting_forAll.R
 
-The script mainly show how to use the package :
+**The script mainly show the usage of the package**
 
 - install required R packages in case they are absent
   - `R/configure.R`
@@ -45,70 +45,82 @@ The script mainly show how to use the package :
   MDfitDataSet object (S3 class)
   
   `MDfitDataSet(P, M, length.P, length.M, zt, fitType.dispersion = "local")`    
-  in `R/preprocess_prepare_for_fitting.R`  
-  - `print.MDfitDataSet` -- define simply print function for object MDfitDataSet
-  - `calculate.SizeFactors.DESeq2` -- size factor from DESeq2
-  - `calculate.scaling.factors.DESeq2` -- size factor * constant close to libary size (here is arbitrarily defined, just a constant) 
-  - `calculate.dispersions.for.each.time.point.DESeq2` -- dispersion estiamtion for each time point
 
 - Run the main function after specifying the parameters
   
-  **This is the main function for the pacakge**  
   `make.fits.with.all.models.for.one.gene.remove.outliers(mds, gene.index, debug, outliers.removal, identifiablity.analysis.gamma)`  
   in `R/fitting_degradation_do_stepbystep.R`  
-  `mds` -- the MDfitDataSet object <br />
-  `gene.index` -- the index of gene to fit (e.g.  gene.index = 1 (first), 2 (second), 4 (4th))<br />
-  `debug` -- TRUE or FALSE, print the results for each step<br />
-  `outlier.remove` -- TRUE or FALSE, remove the outliers or not<br />
-  `identifiability.anlaysis.gamma` -- TRUE or FLASE, perform identifiability analysis for gamma (degradatio rate) or not <br />
-  
-  - `R/utilities_generalFunctions.R` -- general utility function in this script
-    - `set.scaling.factors(mds$scaling.factors)` -- set scaling factors  
-    - `set.time.points(mds$zt) ` -- set time points  
-    - `set.nb.data.param()` -- set number of data points  
-    - `norm.RPKM() ` -- convert read counts to RPKM using scaling factors 
-    - `convert.nb.reads() ` -- convert the RPKM (the output of model) to read counts
-    - `set.bounds.general()` -- set general parameter boundaries (which can be modified by the users)   
-      - `set.general.bounds.int()` -- general param boundaries for pre-mRNAs
-      - `set.general.bounds.degr.splicing()` -- general param boundaries for mRAN degradation and splicing
-  
-      
-  - extracting data and required parameters for one gene and wrap them into a list called `GeneDataSet`  
-  
-  - `make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug)`  
-    function to fit the model and optimize parameter  
-    which is in the `R/optimization_params.R`
-    
-    
-  - `detect.ouliters.loglike(param.fits.results, GeneDataSet);`   
-    function to detect outliers using the output of optimization function as input arguments  
-    which is in `R/outliers_detection.R`  
-    
-  
-  - `Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet)`   
-    function to analyze the identifiability for parameter gamma  
-    which is in `R/identifiability_analysis.R`
-      - `set.bounds.gene(M, S, model)` -- set gene-specific parameter boundaries  
-      - `Identifiablity.analysis.gamma.each.model() ` -- identifibility analysis for each model 
-        - `f2min.profile() ` -- log profile-likelihood function
-            
-  - `my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC', outlier.m = outlier.m, outlier.s = outlier.s)`  
-    function to do the model selection   
-    in `R/model_selection.R`  
-    
-    
-  - `transform.parameter.combinations.cleaning(param.fits.results, res.model.sel, res.nonident.analysis.gamma.all.models)`  
-    function to transform the estimated parameters to more biology-relevant parameters (e.g. degradation rate to half-life)  
-    and also converted the parameter combination used in the model fitting  
-    and clean the parameter estimation and calculate the error bars  
-    in `R/params_transformation_cleaning.R`
-      - `transform.parameter.combinations()` -- convert the parameter combinations 
-      - `parameter.cleaning()` -- filter and clean the estimated parameter and also test parameter if identifiable 
-    
-    
     
 - Compare the output with the origin code
 
+
+### MDfitDataSet(P, M, length.P, length.M, zt, fitType.dispersion = "local")
+
+**Generate a MDfitDataSet object (S3 class) in which the data were processed and prepared for the main function**
+
+in `R/preprocess_prepare_for_fitting.R`  
+
+- `print.MDfitDataSet()` -- define simply print function for object MDfitDataSet
+
+- `calculate.SizeFactors.DESeq2()` -- size factor from DESeq2
+
+- `calculate.scaling.factors.DESeq2()` -- size factor * constant close to libary size (here is arbitrarily defined, just a constant) 
+
+- `calculate.dispersions.for.each.time.point.DESeq2()` -- dispersion estiamtion for each time point
+
+### make.fits.with.all.models.for.one.gene.remove.outliers(mds, gene.index, debug, outliers.removal, identifiablity.analysis.gamma)
+
+**This is the main function for the pacakge**  
+in `R/fitting_degradation_do_stepbystep.R`  
+`mds` -- the MDfitDataSet object <br />
+`gene.index` -- the index of gene to fit (e.g.  gene.index = 1 (first), 2 (second), 4 (4th))<br />
+`debug` -- TRUE or FALSE, print the results for each step<br />
+`outlier.remove` -- TRUE or FALSE, remove the outliers or not<br />
+`identifiability.anlaysis.gamma` -- TRUE or FLASE, perform identifiability analysis for gamma (degradatio rate) or not <br />
+  
+- `R/utilities_generalFunctions.R` -- general utility function in this script
+  - `set.scaling.factors(mds$scaling.factors)` -- set scaling factors  
+  - `set.time.points(mds$zt) ` -- set time points  
+  - `set.nb.data.param()` -- set number of data points  
+  - `norm.RPKM() ` -- convert read counts to RPKM using scaling factors 
+  - `convert.nb.reads() ` -- convert the RPKM (the output of model) to read counts
+  - `set.bounds.general()` -- set general parameter boundaries (which can be modified by the users)   
+    - `set.general.bounds.int()` -- general param boundaries for pre-mRNAs
+    - `set.general.bounds.degr.splicing()` -- general param boundaries for mRAN degradation and splicing
+  
+      
+- extracting data and required parameters for one gene and wrap them into a list called `GeneDataSet`  
+  
+- `make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug)`  
+  function to fit the model and optimize parameter  
+  in the `R/optimization_params.R`
+    
+    
+- `detect.ouliters.loglike(param.fits.results, GeneDataSet);`   
+  function to detect outliers using the output of optimization function as input arguments  
+  in `R/outliers_detection.R`  
+    
+  
+- `Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet)`   
+  function to analyze the identifiability for parameter gamma  
+  which is in `R/identifiability_analysis.R`
+    - `set.bounds.gene(M, S, model)` -- set gene-specific parameter boundaries  
+    - `Identifiablity.analysis.gamma.each.model() ` -- identifibility analysis for each model 
+      - `f2min.profile() ` -- log profile-likelihood function
+            
+- `my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC', outlier.m = outlier.m, outlier.s = outlier.s)`  
+  function to do the model selection   
+  in `R/model_selection.R`  
+    
+    
+- `transform.parameter.combinations.cleaning(param.fits.results, res.model.sel, res.nonident.analysis.gamma.all.models)`  
+  function to transform the estimated parameters to more biology-relevant parameters (e.g. degradation rate to half-life)  
+  and also converted the parameter combination used in the model fitting  
+  and clean the parameter estimation and calculate the error bars  
+  in `R/params_transformation_cleaning.R`
+    - `transform.parameter.combinations()` -- convert the parameter combinations 
+    - `parameter.cleaning()` -- filter and clean the estimated parameter and also test parameter if identifiable 
+    
 
 ## Installation
 #### Prerequisites
