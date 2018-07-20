@@ -14,6 +14,10 @@ in the inital effort (in the folder`origin/`).
   - The empirical Bayes for the variance in gaussian noise have been implemented in limma pacakge for microarray; however, it can not be  
     directly borrowed, because the limma estimate first the gene-wide variance by fitting a GLM, which is applicable in our case. 
     we need to understand how it works in some detailed steps and to ajust it for our case.
+  - In the limma package, two main papers were done for the variance estiamtion with EB shrinkage  
+    Smyth (2004) and Phipson et al. (2016), the latter addes a robust option to deal with outliers;  
+    And "limma-trend" option was also added, which is relevant to our case and   
+    integrated the idea from the paper Sartor et al. BMC (2006) which proposed the intensity-based EB method for variance estimation
   
 * Now the code is designed just for fitting one gene. 
 Ideally the code can easily fit all genes in the data in parallel.
