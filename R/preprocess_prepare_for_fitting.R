@@ -28,7 +28,7 @@ library(DESeq2)
 ## creat a S3 class MDfitDataSet to store data matrix, (P and M for pre-mRNA and mRNA), time points (zt), length.pre-mRNA and length.mRNA
 ## scaling factors for rpkm calculation, dispersion parameters
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
-MDfitDataSet = function(P, M, length.P, length.M, zt=zt, fitType.dispersion = "local")
+MDfitDataSet = function(P, M, length.P=c(), length.M=c(), zt=zt, mode = "NB", fitType.dispersion = "local")
 {
   cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...\n")
   
@@ -36,26 +36,39 @@ MDfitDataSet = function(P, M, length.P, length.M, zt=zt, fitType.dispersion = "l
   class(mds) = "MDfitDataSet"
   
   # store the input tables
-  mds$P = P;
-  mds$M = M;
-  
-  # lengths of pre-mRNA and mRNA
-  mds$length.P = length.P
-  mds$length.M = length.M
+  mds$P = data.frame(P);
+  mds$M = data.frame(M);
   
   # associated time points
   mds$zt = zt;
   
-  # scaling factor for each time points calculated by DESeq2 
-  mds$scaling.factors = calculate.scaling.factors.DESeq2(P, M, zt)
+  mds$mode = mode;
   
-  # dispersion parameter for each time point and for pre-mRNA and mRNA respectivley, calculated by DESeq2
-  # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
-  # large differences in gene expression mean between time points requires this. 
-  estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
-  
-  mds$dispersions.P = estimateDispersions$alphas.P 
-  mds$dispersions.M = estimateDispersions$alphas.M
+  if(mode == "NB")
+  {
+    # lengths of pre-mRNA and mRNA
+    mds$length.P = length.P
+    mds$length.M = length.M
+    
+    # scaling factor for each time points calculated by DESeq2 
+    mds$scaling.factors = calculate.scaling.factors.DESeq2(P, M, zt)
+    
+    # dispersion parameter for each time point and for pre-mRNA and mRNA respectivley, calculated by DESeq2
+    # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
+    # large differences in gene expression mean between time points requires this. 
+    estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
+    
+    mds$dispersions.P = estimateDispersions$alphas.P 
+    mds$dispersions.M = estimateDispersions$alphas.M
+  }else{
+    
+    if(mode == "logNormal"){
+      
+    }else{
+      stop("current function supports only 'NB' and 'logNormal' two modes")
+    }
+    
+  }
   
   return(mds)
 }
@@ -67,7 +80,10 @@ print.MDfitDataSet = function(mds)
   for(n in 1:length(mds))
   {
     cat("$", names(mds)[n], "\n")
-    if(is.vector(mds[[n]])) cat("\t", mds[[n]][1:length(mds$zt)], "\n")
+    if(is.vector(mds[[n]])) {
+      max.nb = min(length(mds[[n]]), length(mds$zt))
+      cat("\t", mds[[n]][1:max.nb], "\n")
+    }
     if(is.data.frame(mds[[n]])) print(mds[[n]][c(1:2), ])
   }
 }
@@ -155,6 +171,23 @@ test.make.S3.class = function()
     cat("salary", wrkr$salary, "\n")
     cat("union member", wrkr$union, "\n")
   }
+}
+
+Make.data.example.RPKM = function(mds)
+{
+  xx = matrix(NA, nrow = nrow(mds$P), ncol = ncol(mds$P))
+  yy = xx;
   
+  for(n in 1:nrow(xx))
+  {
+    xx[n, ] = norm.RPKM(unlist(mds$P[n,]), mds$length.P[n]) 
+    yy[n, ] = norm.RPKM(unlist(mds$M[n,]), mds$length.M[n]) 
+  }
+  colnames(xx) = paste0('ZT', mds$zt, ".rpkm.premRNA")
+  colnames(yy) = paste0('ZT', mds$zt, ".rpkm.mRNA")
+  
+  R = cbind(xx, yy)
+  return(R);
   
 }
+

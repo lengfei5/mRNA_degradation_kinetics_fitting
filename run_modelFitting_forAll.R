@@ -19,30 +19,70 @@ rm(list=ls())
 ####################
 ## install dependencies step 
 ####################
-source("R/configure.R")
+#source("R/configure.R")
 
 ####################
 ## import data example and create an object
 ## prepare the table, geneNames, geneLengths, sizeFactors, dispersion estiamtion and variance estimation 
 ####################
-data.version = "data_example_readCount"
 dataDir = "data/"
-load(file = paste0(dataDir, "fitting_degrdation_all_", data.version, ".Rdata"))
+TEST.readCount.NB = FALSE
 
-ZT.int = grep('.count.premRNA', colnames(T))
-ZT.ex = grep('.count.mRNA', colnames(T))
-length.int = which(colnames(T) == "length.premRNA")
-length.ex = which(colnames(T) == "length.mRNA")
-zt = seq(0,94,by = 2)
+if(TEST.readCount.NB){
+  data.version = "data_example_readCount"
+  load(file = paste0(dataDir, "fitting_degradation_all_", data.version, ".Rdata"))
+  
+  ZT.int = grep('.count.premRNA', colnames(T))
+  ZT.ex = grep('.count.mRNA', colnames(T))
+  length.int = which(colnames(T) == "length.premRNA")
+  length.ex = which(colnames(T) == "length.mRNA")
+  zt = seq(0,94,by = 2)
+  
+  Make.data.example_4rpkm = FALSE
+  if(Make.data.example_4rpkm){
+    load(file = "data/MDfitDataSet_example.Rdata")
+    source("R/utilities_generalFunctions.R");
+    # set scaling factors here as global variables
+    set.scaling.factors(mds$scaling.factors)
+    source("R/preprocess_prepare_for_fitting.R")
+    
+    R = Make.data.example.RPKM(mds);
+    save(R, file = paste0(dataDir, "fitting_degradation_all_data_example_rpkm.Rdata"))
+    
+  }
 
-####################
-## creat a MDfitDataSet object (a S3 class)
-## 
-####################
-source("R/preprocess_prepare_for_fitting.R")
-#mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt, fitType.dispersion = "local")
-#save(mds, file = "data/MDfitDataSet_example.Rdata")
-load(file = "data/MDfitDataSet_example.Rdata")
+  ####################
+  ## creat a MDfitDataSet object (a S3 class)
+  ####################
+  source("R/preprocess_prepare_for_fitting.R")
+  #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt, fitType.dispersion = "local")
+  #save(mds, file = "data/MDfitDataSet_example.Rdata")
+  load(file = "data/MDfitDataSet_example.Rdata")
+  
+  
+}else{
+  ####################
+  ## Here import and process the data for gaussian familly
+  ####################
+  data.version = "data_example_rpkm"
+  load(file = paste0(dataDir, "fitting_degradation_all_", data.version, ".Rdata"))
+  
+  ZT.int = grep('.rpkm.premRNA', colnames(R))
+  ZT.ex = grep('.rpkm.mRNA', colnames(R))
+  zt = seq(0,94,by = 2)
+  
+  source("R/preprocess_prepare_for_fitting.R")
+  
+  mds = MDfitDataSet(P = R[, ZT.int], M = R[, ZT.ex], zt=zt, mode = "logNormal")
+  #save(mds, file = "data/MDfitDataSet_example.Rdata")
+  
+  
+  load(file = "data/MDfitDataSet_example.Rdata")
+  
+}
+
+
+
 
 ####################
 ## parameter required to specify
