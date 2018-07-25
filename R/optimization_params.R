@@ -56,43 +56,6 @@ make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE,
   
 }
 
-###########
-## error for model 1
-###########
-calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers = FALSE, 
-                                          parametrization = c('cosine.beta'), absolute.signal = TRUE)
-{
-  zt = unlist(GeneDataSet$zt)
-  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
-  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
-  
-  alpha.m = unlist(GeneDataSet$alpha.m)
-  alpha.s = unlist(GeneDataSet$alpha.s)
-  
-  if(outliers) {
-    outlier.m = unlist(GeneDataSet$outlier.m)
-    outlier.s = unlist(GeneDataSet$outlier.s)
-  }else{
-    outlier.m = c();
-    outlier.s = c();
-  }
-  
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
-  
-  mu.m = convert.nb.reads(rep(mean(M), length(R.m)), L.m);
-  mu.s = convert.nb.reads(rep(mean(S), length(R.s)), L.s);
-  
-  err = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, 
-                 mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
-  names(err) = 'error.m1';
-  
-  return(err)
-  
-}
-
 ####################
 ## main optimization function for Model 2, 3 and 4
 ####################
