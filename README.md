@@ -26,6 +26,7 @@ Thus the parallization should be taken into consideration now.
 * Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
 
 * Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
+  https://cran.r-project.org/web/packages/bbmle/index.html
 
 * Parameter cleaning in the last step is not clear how to integrate from the origin code
 
