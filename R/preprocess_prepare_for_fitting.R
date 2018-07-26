@@ -24,6 +24,7 @@ library(biomaRt)
 library(numDeriv)
 library(Matrix)
 library(DESeq2)
+library(limma)
 
 ## creat a S3 class MDfitDataSet to store data matrix, (P and M for pre-mRNA and mRNA), time points (zt), length.pre-mRNA and length.mRNA
 ## scaling factors for rpkm calculation, dispersion parameters
@@ -62,9 +63,20 @@ MDfitDataSet = function(P, M, length.P=c(), length.M=c(), zt=zt, mode = "NB", fi
     mds$dispersions.M = estimateDispersions$alphas.M
     
   }else{
-    
     if(mode == "logNormal"){
+      ####################
+      # logNormal mode
+      # employ limma package to estimate variances for eahc gene and for each time points (empirical Bayes methods implemented in limma
+      # and the shrinked variance estimation is more robust in the context of small samples)
+      # in addtion, here only the sample for the same time points considered as biological replicates 
+      # to have the gene-wise and time-wise variance estiamtion, because for circadian genes, the expression can change dramatically and 
+      # variance depends on the expression. Thus commonly used only gene-wise variance (e.g. DESeq2 and limma) is not appropriate any more.
+      ####################
+      estimateDispersions = estimateVariances.for.each.time.point.limma(P, M, zt)
       
+      mds$s2.P = estimateVariances.for.each.time.point.limma$s2.P 
+      mds$s2.M = estimateVariances.for.each.time.point.limma$s2.M
+              
     }else{
       stop("current function supports only 'NB' and 'logNormal' two modes")
     }
@@ -162,6 +174,49 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
   
 }
 
+
+estimateVariances.for.each.time.point.limma = function(P, M, zt)
+{
+  # P = R[, ZT.int]; M = R[, ZT.ex];
+  
+  normData = rbind(as.matrix(M), as.matrix(P))
+    
+  # estimate dispersion parameters with Deseq2 for each gene and each condition
+  zt.24 = zt%%24
+  zt.uniq = unique(zt.24)
+  alphas = matrix(NA, nrow=nrow(countData), ncol=length(zt.uniq))
+  
+  condition <- factor(rep(c(1), 4))
+  rownames(countData) = c(1:nrow(countData))
+  
+  for(n in 1:ncol(alphas))
+  {
+    index.reps = which(zt.24==zt.uniq[n])
+    cat('ZT',  zt.uniq[n], "--", length(index.reps), "replicates", '\n');
+    
+    #countData2 = countData[, index];
+    dds = DESeqDataSetFromMatrix(countData[, index.reps], DataFrame(condition), ~1);
+    sizeFactors(dds) = size.factors[index.reps]
+    
+    dds <- estimateDispersions(dds, maxit = 500, fitType=fitType.dispersion)
+    alphas[,n] = dispersions(dds);
+    
+    #plotDispEsts(dds)
+    #plot(alphas[c(1:nrow(T)), 1], T$alpha.mRNA.ZT0, log='xy', cex=0.2);abline(0, 1, lwd=2.0, col='red')
+  }
+  
+  alphas.all = alphas[, match(zt.24, zt.uniq)]
+  alphas.M = data.frame(alphas.all[c(1:nrow(M)), ])
+  alphas.P = data.frame(alphas.all[-c(1:nrow(M)), ])  
+  
+  #colnames(xx) = c(paste('alpha.mRNA.ZT', c(0:11)*2, sep=''),  paste('alpha.premRNA.ZT', c(0:11)*2, sep=''))
+  colnames(alphas.P) = paste0('alpha.premRNA.ZT', zt)
+  colnames(alphas.M) = paste0('alpha.mRNA.ZT', zt)
+  
+  return(list(alphas.P = alphas.P, alphas.M = alphas.M))
+  
+}
+
 test.make.S3.class = function()
 {
   j = list (name = "Joe", salary = 2000, union = T)
@@ -190,5 +245,46 @@ Make.data.example.RPKM = function(mds)
   R = cbind(xx, yy)
   return(R);
   
+}
+
+Test.limma.eBayes = function()
+{
+  #  Simulate gene expression data,
+  #  6 microarrays and 100 genes with one gene differentially expressed
+  set.seed(2016)
+  sigma2 <- 0.05 / rchisq(100, df=10) * 10
+  y <- matrix(rnorm(100*6,sd=sqrt(sigma2)),100,6)
+  design <- cbind(Intercept=1,Group=c(0,0,0,1,1,1))
+  y[1,4:6] <- y[1,4:6] + 1
+  fit <- lmFit(y,design)
+  
+  ## part of source code from eBayes function in limma
+  trend = TRUE;
+  robust = TRUE;
+  coefficients <- fit$coefficients
+  stdev.unscaled <- fit$stdev.unscaled
+  sigma <- fit$sigma
+  df.residual <- fit$df.residual
+  if(is.null(coefficients) || is.null(stdev.unscaled) || is.null(sigma) || is.null(df.residual)) stop("No data, or argument is not a valid lmFit object")
+  if(all(df.residual==0)) stop("No residual degrees of freedom in linear model fits")
+  if(all(!is.finite(sigma))) stop("No finite residual standard deviations")
+  if(trend) {
+    covariate <- fit$Amean
+    if(is.null(covariate)) stop("Need Amean component in fit to estimate trend")
+  } else {
+    covariate <- NULL
+  }
+  
+  #	Moderated t-statistic
+  out <- squeezeVar(sigma^2, df.residual, covariate=covariate, robust=robust)
+  out$s2.prior <- out$var.prior
+  out$s2.post <- out$var.post
+  out$var.prior <- out$var.post <- NULL
+  out$t <- coefficients / stdev.unscaled / sqrt(out$s2.post)
+  df.total <- df.residual + out$df.prior
+  df.pooled <- sum(df.residual,na.rm=TRUE)
+  df.total <- pmin(df.total,df.pooled)
+  out$df.total <- df.total
+  out$p.value <- 2*pt(-abs(out$t),df=df.total)
 }
 
