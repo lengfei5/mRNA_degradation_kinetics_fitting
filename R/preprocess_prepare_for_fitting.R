@@ -60,6 +60,7 @@ MDfitDataSet = function(P, M, length.P=c(), length.M=c(), zt=zt, mode = "NB", fi
     
     mds$dispersions.P = estimateDispersions$alphas.P 
     mds$dispersions.M = estimateDispersions$alphas.M
+    
   }else{
     
     if(mode == "logNormal"){
