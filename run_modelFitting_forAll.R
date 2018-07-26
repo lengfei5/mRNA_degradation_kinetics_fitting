@@ -73,11 +73,10 @@ if(TEST.readCount.NB){
   
   source("R/preprocess_prepare_for_fitting.R")
   
-  mds = MDfitDataSet(P = R[, ZT.int], M = R[, ZT.ex], zt=zt, mode = "logNormal")
-  #save(mds, file = "data/MDfitDataSet_example.Rdata")
+  #mds = MDfitDataSet(P = R[, ZT.int], M = R[, ZT.ex], zt=zt, mode = "logNormal")
+  # save(mds, file = "data/MDfitDataSet_example_logNormal.Rdata")
   
-  
-  load(file = "data/MDfitDataSet_example.Rdata")
+  load(file = "data/MDfitDataSet_example_logNormal.Rdata")
   
 }
 
