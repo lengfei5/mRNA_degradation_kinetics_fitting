@@ -71,37 +71,36 @@ make.optimization = function(GeneDataSet,
                              model = 4, 
                              Nfit = NA,
                              outliers = FALSE,
-                             parametrization =c('cosine.beta'), 
                              debug = FALSE,
+                             parametrization =c('cosine.beta'), 
                              norm.params = TRUE, 
                              absolute.signal = TRUE)
 {
-  # i = gene.index; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 4;outliers = TRUE; 
-  
+  # i = gene.index; zt =  seq(0,94,by = 2); i.ex = ZT.ex; i.int = ZT.int;absolute.signal = TRUE; Nfit=NA; debug = TRUE; model = 4;outliers = TRUE;
+
   ####################
   ## prepare parameters for the optimization 
   ####################
   param.fit = NA
+  #if( ! outliers) {
+  #  outlier.m = unlist(GeneDataSet$outlier.m)
+  #  outlier.s = unlist(GeneDataSet$outlier.s)
+  #}else{
+  #  outlier.m = c();
+  #  outlier.s = c();
+  #}
   
-  zt = unlist(GeneDataSet$zt)
-  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
-  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+  #zt = unlist(GeneDataSet$zt)
+  #R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  #R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  #L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  #L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
   
-  alpha.m = unlist(GeneDataSet$alpha.m)
-  alpha.s = unlist(GeneDataSet$alpha.s)
-  
-  if(outliers) {
-    outlier.m = unlist(GeneDataSet$outlier.m)
-    outlier.s = unlist(GeneDataSet$outlier.s)
-  }else{
-    outlier.m = c();
-    outlier.s = c();
-  }
-  
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
+  #alpha.m = unlist(GeneDataSet$alpha.m)
+  #alpha.s = unlist(GeneDataSet$alpha.s)
+    
+  #M = norm.RPKM(R.m, L.m)
+  #S = norm.RPKM(R.s, L.s)
     
   ####################
   ## Prefix parameters in optimization process
@@ -123,11 +122,11 @@ make.optimization = function(GeneDataSet,
   ## fit premRNA individually for M2 and M4 with the aim of having good initial values for its parameters 
   ####################
   #ptm = proc.time();
-  if((model==2|model==4) & prefit.S) 
+  if((model==2|model==4) & prefit.S)
   {
     ## set initial values of parameters for S fitting
-    PAR.INIT.S = Sampling.Initial.Values.for.fitting.S(S , Nfit.S, zt)
-    bounds.g.s = set.bounds.gene.s(S, range_scalingFactor=5)
+    PAR.INIT.S = Sampling.Initial.Values.for.fitting.S(GeneDataSet, Nfit.S)
+    bounds.g.s = set.bounds.gene.s(GeneDataSet, range_scalingFactor=5)
 
     errors.fit.s = rep(NA, Nfit.S)
     
@@ -155,8 +154,8 @@ make.optimization = function(GeneDataSet,
   if(model==4 & prefit.M)
   {
     ### sampling initial values of parameters for M fitting
-    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(M, S, Nfit, zt = zt)
-    bounds.g.m = set.bounds.gene.m(M, S, range_scalingFactor=5)
+    PAR.INIT.M = Sampling.Initial.Values.for.fitting.M(GeneDataSet, Nfit)
+    bounds.g.m = set.bounds.gene.m(GeneDataSet, range_scalingFactor=5)
     
     errors.fit.m = rep(NA, Nfit.M)
     for(fit.nb.m in 1:Nfit.M)
@@ -185,8 +184,8 @@ make.optimization = function(GeneDataSet,
   if(model == 2) {res.fit.m = NULL;}
   if(model == 3) {res.fit.s = NULL; res.fit.m = NULL}
   
-  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(M, S, model, Nfit, zt, res.fit.s, res.fit.m)
-  bounds.g = set.bounds.gene(M, S, model = model)
+  PAR.INIT = Sampling.Initial.Values.for.fitting.M.S(GeneDataSet, model, Nfit, res.fit.s, res.fit.m)
+  bounds.g = set.bounds.gene(GeneDataSet, model = model)
   
   errors.fit = rep(NA, Nfit)
   

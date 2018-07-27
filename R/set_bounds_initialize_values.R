@@ -25,8 +25,10 @@ Gamma.Initiation = function(eps.gamma.init, min.half.life=0.5, max.half.life=6, 
 ####################
 ## function for set gene-specific parameter boundaries 
 ####################
-set.bounds.gene.m = function(M, S, range_scalingFactor=5)
+set.bounds.gene.m = function(GeneDataSet, range_scalingFactor=5)
 {
+  M = GeneDataSet$Norm.m;
+  S = GeneDataSet$Norm.s;
   bounds.gamma.k = set.general.bounds.degr.splicing();
   a = mean(M)/mean(S);
   
@@ -37,8 +39,10 @@ set.bounds.gene.m = function(M, S, range_scalingFactor=5)
   
 }
 
-set.bounds.gene.s = function(S, range_scalingFactor=5)
+set.bounds.gene.s = function(GeneDataSet, range_scalingFactor=5)
 {
+  S = GeneDataSet$Norm.s;
+  
   bounds.int = set.general.bounds.int();
   
   lower.g.s = c(min(S)/range_scalingFactor, (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
@@ -48,8 +52,11 @@ set.bounds.gene.s = function(S, range_scalingFactor=5)
   
 }
 
-set.bounds.gene = function(M, S, model = 4, range_scalingFactor=5)
+set.bounds.gene = function(GeneDataSet, model = 4, range_scalingFactor=5)
 {
+  M = GeneDataSet$Norm.m;
+  S = GeneDataSet$Norm.s;
+  
   bounds.general = set.bounds.general(model = model)
   upper = bounds.general$upper;
   lower = bounds.general$lower;
@@ -79,8 +86,11 @@ set.bounds.gene = function(M, S, model = 4, range_scalingFactor=5)
 ##  set inital values for fitting pre-mRNAs
 ## Initial values were smapled 
 ####################
-Sampling.Initial.Values.for.fitting.S = function(S, Nfit.S = 4, zt = seq(0,94,by = 2)) 
+Sampling.Initial.Values.for.fitting.S = function(GeneDataSet, Nfit.S = 4) 
 {
+  S = GeneDataSet$Norm.s;
+  zt = GeneDataSet$zt;
+  
   set.seed(8675309);
   
   bounds.general = set.bounds.general(model = 2);
@@ -109,8 +119,12 @@ Sampling.Initial.Values.for.fitting.S = function(S, Nfit.S = 4, zt = seq(0,94,by
 ## Set gene-specific parameter boundaries and inital values for fitting mRNAs
 ## Initial values were smapled 
 ####################
-Sampling.Initial.Values.for.fitting.M = function(M, S, Nfit.M = 6, zt = seq(0,94,by = 2)) 
+Sampling.Initial.Values.for.fitting.M = function(GeneDataSet, Nfit.M = 6)
 {
+  M = GeneDataSet$Norm.m;
+  S = GeneDataSet$Norm.s;
+  zt = GeneDataSet$zt;
+  
   set.seed(8675309);
   eps.m = min((max(M) - min(M))/mean(M)/2, 1);
   if(Nfit.M%%2==0){
@@ -141,11 +155,13 @@ Sampling.Initial.Values.for.fitting.M = function(M, S, Nfit.M = 6, zt = seq(0,94
 ## Set gene-specific parameter boundaries and inital values for fitting mRNA and pre-mRNA together
 ## Initial values were smapled 
 ####################
-Sampling.Initial.Values.for.fitting.M.S = function(M, S, model = 4, Nfit = 6, zt = seq(0,94,by = 2), 
-                                                   res.fit.s = NULL, res.fit.m = NULL) 
+Sampling.Initial.Values.for.fitting.M.S = function(GeneDataSet, model = 4, Nfit = 6, res.fit.s = NULL, res.fit.m = NULL) 
 {
-  set.seed(8675309);
+  M = GeneDataSet$Norm.m;
+  S = GeneDataSet$Norm.s;
+  zt = GeneDataSet$zt;
   
+  set.seed(8675309);
   ### Define the initial values for degradation and splicing parameters
   a = mean(M)/mean(S) 
   a.init = lseq(max(0.1, a/5), min(10^5, a*5), length=Nfit)

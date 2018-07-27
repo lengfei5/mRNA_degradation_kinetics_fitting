@@ -28,6 +28,7 @@ sigmoid.bound.contraint = function(eps.gamma)
 calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers = FALSE, 
                                           parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
+  # unwrap GeneDataSet
   zt = unlist(GeneDataSet$zt)
   R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
   R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron

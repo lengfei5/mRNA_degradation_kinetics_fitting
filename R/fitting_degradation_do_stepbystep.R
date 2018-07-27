@@ -34,7 +34,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   source("R/optimization_params.R", local = TRUE)
   
-  if(!outliers.removal){ ## without outlier detection and removal
+  if(!outliers.removal){ 
+    # ignore outliers 
+    # without outlier detection and removal
     
     if(debug){cat('starting optimization without outliers \n ')}
     param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
