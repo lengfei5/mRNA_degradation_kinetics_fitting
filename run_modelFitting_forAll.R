@@ -28,9 +28,10 @@ rm(list=ls())
 dataDir = "data/"
 TEST.readCount.NB = FALSE
 
+data.version = "data_example_readCount"
+load(file = paste0(dataDir, "fitting_degradation_all_", data.version, ".Rdata"))
+
 if(TEST.readCount.NB){
-  data.version = "data_example_readCount"
-  load(file = paste0(dataDir, "fitting_degradation_all_", data.version, ".Rdata"))
   
   ZT.int = grep('.count.premRNA', colnames(T))
   ZT.ex = grep('.count.mRNA', colnames(T))

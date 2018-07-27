@@ -7,10 +7,10 @@ and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitud
 ## TO-DO
 Here is the reminder for the improvement:
 
-* Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way 
-that they can be easily to be adapted to do it. 
-And also keep in mind that JW has done it, at least partially, 
-in the inital effort (in the folder`origin/`).   
+- [x] Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way
+  that they can be easily to be adapted to do it. 
+  And also keep in mind that JW has done it, at least partially, 
+  in the inital effort (in the folder`origin/`).   
   - The empirical Bayes for the variance in gaussian noise have been implemented in limma pacakge for microarray; however, it can not be  
     directly borrowed, because the limma estimate first the gene-wide variance by fitting a GLM, which is applicable in our case. 
     we need to understand how it works in some detailed steps and to ajust it for our case.
@@ -20,10 +20,11 @@ in the inital effort (in the folder`origin/`).
     integrated the idea from the paper Sartor et al. BMC (2006) which proposed the intensity-based EB method for variance estimation
   
 * Now the code is designed just for fitting one gene. 
-Ideally the code can easily fit all genes in the data in parallel.
-Thus the parallization should be taken into consideration now. 
+  Ideally the code can easily fit all genes in the data in parallel.
+  Thus the parallization should be taken into consideration now. 
 
 * Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
+
 
 * Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
   https://cran.r-project.org/web/packages/bbmle/index.html
