@@ -81,8 +81,6 @@ if(TEST.readCount.NB){
 }
 
 
-
-
 ####################
 ## parameter required to specify
 ####################
