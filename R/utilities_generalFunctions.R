@@ -12,24 +12,56 @@
 ## these functions are also mainly for the read count table
 ## they are not used in gaussian model
 ###############
-source("R/kinetic_model.R", local = TRUE)
 
-set.scaling.factors = function(sfs)
+### extracting the data for one specific gene
+ExtractGeneData = function(mds, gene.index)
 {
-  scaling.factors <<- unlist(sfs);
-  #scaling.factors <<- c(39920608, 42250245, 38121270, 45609244, 41511752, 45781196, 43722568, 39638552, 30496638, 30573333, 54950572, 47158379,
-  #                      31722765, 39931646, 36317783, 35382708, 47293167, 42408985, 39842283, 40230336, 43691685, 39237518, 51051196, 44778546,
-  #                      43858841, 42791401, 42357301, 49782402, 44628140, 44561463, 43485553, 47853067, 43318817, 45055723, 30180984, 46825671,
-  #                      43270558, 37496344, 40971385, 45828360, 37065376, 35776330, 45025514, 43026714, 43116633, 35173387, 28538212, 36707156);
+  outlier.m = c();
+  outlier.s = c();
+  zt = mds$zt; 
+  mode = mds$mode;
+  if(mds$mode == 'NB')
+  {
+    R.m = unlist(mds$M[gene.index, ])
+    R.s = unlist(mds$P[gene.index, ])
+    L.m = T$length.mRNA[gene.index];
+    L.s = T$length.premRNA[gene.index];
+    
+    alpha.m = unlist(mds$dispersions.M[gene.index, ])
+    alpha.s = unlist(mds$dispersions.P[gene.index, ])
+    
+    M = norm.RPKM(R.m, L.m)
+    S = norm.RPKM(R.s, L.s)
+    
+    GeneDataSet = list(R.m = R.m, R.s = R.s, 
+                       L.m = L.m, L.s = L.s,
+                       Norm.m = M, Norm.s = S, 
+                       alpha.m = alpha.m, alpha.s = alpha.s,
+                       outlier.m = outlier.m, outlier.s = outlier.s,
+                       zt = zt,
+                       mode = mode)
+  }else{
+    
+    GeneDataSet = list(Norm.m = unlist(mds$M[gene.index, ]),
+                       Norm.s = unlist(mds$P[gene.index, ]), 
+                       var.m = unlist(mds$var.M[gene.index, ]),
+                       var.s = unlist(mds$var.P[gene.index, ]),
+                       outlier.m = c(),
+                       outlier.s = c(),
+                       zt = mds$zt,
+                       mode = mds$mode)
+  }
   
+  return(GeneDataSet)
 }
 
+## time points, data, parameters
 set.time.points = function(time.points)
 {
   zt <<- time.points;
 }
 
-set.nb.data.param = function(absolute.signal=TRUE)
+set.nb.data.param = function(absolute.signal=TRUE) ## requires modification 
 {
   nb.data <<- 96; 
   n.param <<- c(2,6,5,8);
@@ -37,21 +69,11 @@ set.nb.data.param = function(absolute.signal=TRUE)
   #n.param = c(0,5,3,7) from Laura's function
 }
 
-norm.RPKM = function(nb.reads, length)
-{
-  #set.scaling.factors();
-  return(nb.reads/length/scaling.factors*10^9);
-}
+###############################
+# import kinetic model and set general parameter boundaries 
+###############################
+source("R/kinetic_model.R", local = TRUE)
 
-convert.nb.reads = function(rpkm, length)
-{
-  #set.scaling.factors();
-  return(rpkm*length*scaling.factors/10^9);
-}
-
-####################
-## function for set general parameter boundaries 
-####################
 set.general.bounds.int = function(lower.user = NULL, 
                                   upper.user = NULL,
                                   parametrization =c('cosine.beta'), 
@@ -132,3 +154,27 @@ set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
   return(list(lower = lower, upper = upper))
 }
 
+###############################
+# general functions for NB mode 
+###############################
+set.scaling.factors = function(sfs)
+{
+  scaling.factors <<- unlist(sfs);
+  #scaling.factors <<- c(39920608, 42250245, 38121270, 45609244, 41511752, 45781196, 43722568, 39638552, 30496638, 30573333, 54950572, 47158379,
+  #                      31722765, 39931646, 36317783, 35382708, 47293167, 42408985, 39842283, 40230336, 43691685, 39237518, 51051196, 44778546,
+  #                      43858841, 42791401, 42357301, 49782402, 44628140, 44561463, 43485553, 47853067, 43318817, 45055723, 30180984, 46825671,
+  #                      43270558, 37496344, 40971385, 45828360, 37065376, 35776330, 45025514, 43026714, 43116633, 35173387, 28538212, 36707156);
+  
+}
+
+norm.RPKM = function(nb.reads, length)
+{
+  #set.scaling.factors();
+  return(nb.reads/length/scaling.factors*10^9);
+}
+
+convert.nb.reads = function(rpkm, length)
+{
+  #set.scaling.factors();
+  return(rpkm*length*scaling.factors/10^9);
+}

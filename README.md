@@ -7,7 +7,7 @@ and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitud
 ## TO-DO
 Here is the reminder for the improvement:
 
-- [x] Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way
+- [ ] Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way
   that they can be easily to be adapted to do it. 
   And also keep in mind that JW has done it, at least partially, 
   in the inital effort (in the folder`origin/`).   
@@ -19,21 +19,23 @@ Here is the reminder for the improvement:
     And "limma-trend" option was also added, which is relevant to our case and   
     integrated the idea from the paper Sartor et al. BMC (2006) which proposed the intensity-based EB method for variance estimation
   
-* Now the code is designed just for fitting one gene. 
+- [ ] Now the code is designed just for fitting one gene. 
   Ideally the code can easily fit all genes in the data in parallel.
   Thus the parallization should be taken into consideration now. 
 
-* Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
-
-
-* Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
+- [ ] Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
   https://cran.r-project.org/web/packages/bbmle/index.html
+  
+- [ ] Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
 
-* Parameter cleaning in the last step is not clear how to integrate from the origin code
+- [ ] Not sure we should do something similar to limma or DESeq2, wrapping data and funciton in one object; and extracting function will show the resutls
+  because I think this will somehow a easy solution for all data and function dependencies. 
 
-* Headers in all scripts should probably removed or modified
+- [ ] Parameter cleaning in the last step is not clear how to integrate from the origin code
 
-* Connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
+- [ ] Headers in all scripts should probably removed or modified
+
+- [ ] Connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
 
 ## Directory structure
 * **[run_modelFitting_forAll.R]** -- the script showing how to run the main function and to specify the parameters

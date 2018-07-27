@@ -7,7 +7,16 @@
 ## Date of creation: Mon Jun  4 13:49:17 2018
 ##########################################################################
 ##########################################################################
-## import function dependencies
+
+###############################
+# import function dependencies
+# Important note : --------
+# this optimization function actually does not use 
+# the real data and keeps the GeneDataSet wrapped
+# the following two functions are the real ones using the data
+# So GeneSetData will be unwrapped or some data will be extracted in those function 
+# NOT in the current function
+###############################
 source("R/error_functions.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
@@ -18,7 +27,6 @@ make.fits.with.all.models.for.one.gene = function(GeneDataSet, outliers = FALSE,
                                                   parametrization = c('cosine.beta'), absolute.signal = TRUE, debug = FALSE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
-  
   Param.fit.for.gene = c();
   for(model in 1:4)
   {
@@ -73,8 +81,6 @@ make.optimization = function(GeneDataSet,
   ####################
   ## prepare parameters for the optimization 
   ####################
-  w = 2*pi/24;
-  # gene2opt = T$gene[i];
   param.fit = NA
   
   zt = unlist(GeneDataSet$zt)

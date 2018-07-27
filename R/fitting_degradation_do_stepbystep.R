@@ -18,36 +18,17 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   ## define here global variables and global functions that are accessed for all steps; 
   ####################
-  # import global functions
+  # import and set global functions
   source("R/utilities_generalFunctions.R"); 
-  
-  # set scaling factors here as global variables
-  set.scaling.factors(mds$scaling.factors)
   set.time.points(mds$zt) #actually this can be also a global parameter, because it is gene-independent
+  if(mds$mode == "NB"){
+    # set scaling factors here as global variables
+    set.scaling.factors(mds$scaling.factors)
+  }
   
-  # gene.name = T$gene[gene.index];
-  R.m = unlist(mds$M[gene.index, ])
-  R.s = unlist(mds$P[gene.index, ])
-  L.m = T$length.mRNA[gene.index];
-  L.s = T$length.premRNA[gene.index];
-  
-  alpha.m = unlist(mds$dispersions.M[gene.index, ])
-  alpha.s = unlist(mds$dispersions.P[gene.index, ])
-  
-  outlier.m = c(); 
-  outlier.s = c();
-  
-  GeneDataSet = list(R.m = R.m, R.s = R.s, 
-                     L.m = L.m, L.s = L.s, 
-                     alpha.m = alpha.m, alpha.s = alpha.s,
-                     outlier.m = outlier.m, outlier.s = outlier.s,
-                     zt = zt)
-  
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
-  
-  #identifiablity.analysis.gamma = Identifiablity.Analysis
-  
+  ## extract the data relevant for one specific gene and wrap it in a list
+  GeneDataSet = ExtractGeneData(mds, gene.index)
+   
   ####################
   ## fitting the data for each model
   ####################
@@ -81,12 +62,11 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       nb.newOutliers.s = res.outliers.detection$nb.newOutliers.s
       outlier.m = res.outliers.detection$outlier.m;
       outlier.s = res.outliers.detection$outlier.s;
-    
+      
+      # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
       GeneDataSet$outlier.m = outlier.m;
       GeneDataSet$outlier.s = outlier.s;
-      # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
-      #T$mRNA.outlier[gene.index] = paste(outlier.m, sep='', collapse = ';')
-      #T$premRNA.outlier[gene.index] = paste(outlier.s, sep='', collapse = ';')
+      
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 
