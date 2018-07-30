@@ -26,6 +26,9 @@ Here is the reminder for the improvement:
 - [ ] Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
   https://cran.r-project.org/web/packages/bbmle/index.html
   
+- [ ] probably revise the profile-likelihood implementation, because it takes much time. 
+  Probably it is better to run it directly after the optimization. 
+  
 - [ ] Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
 
 - [ ] Not sure we should do something similar to limma or DESeq2, wrapping data and funciton in one object; and extracting function will show the resutls

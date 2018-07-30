@@ -53,14 +53,10 @@ make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE,
   param.fit = NA;
   
   ## error for model 1
-  if(model == 1){
-    param.fit = calculate.error.for.flat.model(GeneDataSet, debug = debug)
-  }
+  if(model == 1){ param.fit = calculate.error.for.flat.model(GeneDataSet, debug = debug);}
   
   ## parameter estimations for model 2,3,4
-  if(model > 1){
-    param.fit = make.optimization(GeneDataSet, model = model, Nfit = NA, outliers = outliers, debug = debug)
-  }
+  if(model > 1){param.fit = make.optimization(GeneDataSet, model = model, Nfit = NA, outliers = outliers, debug = debug)}
   
   return(param.fit)
   
@@ -71,7 +67,7 @@ make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE,
 ####################
 make.optimization = function(GeneDataSet,
                              model = 4, 
-                             Nfit = NA,
+                             Nfit = NA, # this parameter supposed to be ajusted by users
                              outliers = FALSE,
                              debug = FALSE,
                              parametrization =c('cosine.beta'), 
@@ -132,11 +128,18 @@ make.optimization = function(GeneDataSet,
     
     errors.fit.s = rep(NA, Nfit.S)
     
+    #require(bbmle)
     for(fit.nb.s in 1:Nfit.S)
     {
+      # fit.nb.s = 1
       par.init.s = PAR.INIT.S[fit.nb.s,]
-      opt.s = optim(par.init.s, f2min.int, R.s=R.s, L.s=L.s, alpha.s=alpha.s, outlier.s=outlier.s, zt = zt, method = 'L-BFGS-B', 
+      #opt.s = optim(par.init.s, f2min.int, R.s=R.s, L.s=L.s, alpha.s=alpha.s, outlier.s=outlier.s, zt = zt, method = 'L-BFGS-B', 
+      #              lower = bounds.g.s$lower, upper = bounds.g.s$upper)
+      opt.s = optim(par.init.s, f2min.int, GeneDataSet=GeneDataSet, method = 'L-BFGS-B', 
                     lower = bounds.g.s$lower, upper = bounds.g.s$upper)
+      
+      #bb.test = mle2(f2min.int, start = par.init.s, GeneDataSet = GeneDataSet, optimizer = "optim", vecpar = TRUE, 
+      #               method = 'L-BFGS-B', lower = bounds.g.s$lower, upper = bounds.g.s$upper)
       
       res.fit.s = opt.s$par
       errors.fit.s[fit.nb.s] = opt.s$value
@@ -146,6 +149,7 @@ make.optimization = function(GeneDataSet,
     ## choose the best-fitting parameters for S
     imin.s = which.min(errors.fit.s); 
     eval(parse(text = paste('res.fit.s = res.fit.s.', imin.s, sep = '')))
+    
   }
   #proc.time() - ptm
   
@@ -162,9 +166,13 @@ make.optimization = function(GeneDataSet,
     errors.fit.m = rep(NA, Nfit.M)
     for(fit.nb.m in 1:Nfit.M)
     {
+      # fit.nb.m = 1
       par.init.m = PAR.INIT.M[fit.nb.m,]
-      opt.m = optim(par.init.m, f2min.mrna, res.fit.s=res.fit.s, R.m=R.m, L.m=L.m, alpha.m=alpha.m, outlier.m=outlier.m, zt = zt, 
-                    norm.params=norm.params, method = 'L-BFGS-B', lower = bounds.g.m$lower, upper = bounds.g.m$upper)
+      opt.m = optim(par.init.m, f2min.mrna, GeneDataSet = GeneDataSet, res.fit.s=res.fit.s,  
+                    method = 'L-BFGS-B', lower = bounds.g.m$lower, upper = bounds.g.m$upper)
+      #opt.m = optim(par.init.m, f2min.mrna, res.fit.s=res.fit.s, R.m=R.m, L.m=L.m, alpha.m=alpha.m, outlier.m=outlier.m, zt = zt, 
+      #              norm.params=norm.params, method = 'L-BFGS-B', lower = bounds.g.m$lower, upper = bounds.g.m$upper)
+      
       res.fit.m = opt.m$par
       errors.fit.m[fit.nb.m] = opt.m$value
       eval(parse(text = paste('res.fit.m.', fit.nb.m, ' = res.fit.m', sep = '')))
@@ -197,10 +205,14 @@ make.optimization = function(GeneDataSet,
     par.init = PAR.INIT[fit.number,]
     if(debug){cat('\t \t optimization # ',fit.number,' started : \t',par.init,'\n')}
     
-    opt = optim(par.init, f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
-                outlier.m = outlier.m, outlier.s = outlier.s, model = model, debug = debug, zt = zt, norm.params=norm.params,
+    opt = optim(par.init, f2min, GeneDataSet = GeneDataSet, model = model, debug = debug, norm.params=norm.params,
                 method = 'L-BFGS-B', lower = bounds.g$lower, upper = bounds.g$upper, 
                 control = list(maxit=500,trace=0), hessian = FALSE)
+    
+    #opt = optim(par.init, f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
+    #            outlier.m = outlier.m, outlier.s = outlier.s, model = model, debug = debug, zt = zt, norm.params=norm.params,
+    #            method = 'L-BFGS-B', lower = bounds.g$lower, upper = bounds.g$upper, 
+    #            control = list(maxit=500,trace=0), hessian = FALSE)
     
     # extract the parameter of optimization results and errors
     errors.fit[fit.number] = opt$value;
@@ -215,8 +227,9 @@ make.optimization = function(GeneDataSet,
   eval(parse(text = paste('res.fit = res.fit.', imin, sep = '')))
     
   ## compute the Standard Error of estimates using hessian function
-  hess = hessian(func=f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
-                 outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, x=res.fit);
+  hess = hessian(func=f2min, GeneDataSet = GeneDataSet, model = model, x=res.fit);
+  #hess = hessian(func=f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
+  #               outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, x=res.fit);
   ttry = try(sqrt(diag(solve(0.5*hess))), silent = FALSE);
   
   if(!inherits(ttry, "try-error")){res.fit.stderr = sqrt(diag(solve(0.5*hess)));}else{res.fit.stderr = rep(NA, length(res.fit))}
@@ -225,4 +238,5 @@ make.optimization = function(GeneDataSet,
   names(param.fit) = paste(c('error', colnames(PAR.INIT), paste(colnames(PAR.INIT), '.stderr', sep='')),'.m',model,sep = ''); 
   
   return(param.fit);
+  
 }
