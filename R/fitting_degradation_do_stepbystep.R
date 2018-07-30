@@ -50,7 +50,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     
     if(debug){cat('starting optimization with outlier detection ----------\n ');}
     
-    nb.newOutliers.m = 1; 
+    outlier.m = GeneDataSet$outlier.m;
+    outlier.s = GeneDataSet$outlier.s;
+    nb.newOutliers.m = 1;
     nb.newOutliers.s = 1;
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
@@ -69,7 +71,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
       GeneDataSet$outlier.m = outlier.m;
       GeneDataSet$outlier.s = outlier.s;
-      
     }
     
     if(length(outlier.m)==0) outlier.m = NA; 
@@ -82,7 +83,6 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   if(identifiablity.analysis.gamma){
     source("R/identifiability_analysis.R", local = TRUE)
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
-    
     res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet);
                                                                                       
   }else{
@@ -115,10 +115,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   if(debug){cat('final result is ----------\n')}
   
-  return(list(gene.length = list(L.s = L.s, L.m = L.m),
-              readCounts = list(R.s = R.s, R.m = R.m),
-              norm.RPKM = list(norm.S = S, norm.M = M),
-              dispersions.param = list(dispersion.s = alpha.s, dispersion.m = alpha.m),
+  return(list(gene.length = list(L.s = GeneDataSet$L.s, L.m = GeneDataSet$L.m),
+              readCounts = list(R.s = GeneDataSet$R.s, R.m = GeneDataSet$L.m),
+              norm.RPKM = list(norm.S = GeneDataSet$Norm.s, norm.M = GeneDataSet$Norm.s),
               param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
@@ -126,8 +125,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ','), outlier.s = paste(outlier.s, sep='', collapse = ',')),
               model.sel = res.model.sel,
-              param.fit.cleaned = param.transformed.cleaned
-              )
+              param.fit.cleaned = param.transformed.cleaned)
          )
   
 }

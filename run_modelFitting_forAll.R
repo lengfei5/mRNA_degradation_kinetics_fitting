@@ -37,8 +37,8 @@ if(TEST.readCount.NB){
   ## creat a MDfitDataSet object (a S3 class)
   ####################
   source("R/preprocess_prepare_for_fitting.R")
-  mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt,
-                     mode = "NB", fitType.dispersion = "local")
+  #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt,
+  #                   mode = "NB", fitType.dispersion = "local")
   #save(mds, file = "data/MDfitDataSet_example.Rdata")
   load(file = "data/MDfitDataSet_example.Rdata")
   
@@ -57,8 +57,6 @@ if(TEST.readCount.NB){
 ####################
 outliers.removal = TRUE;
 debug = TRUE;
-absolute.signal = TRUE
-parametrization = 'cosine.beta'
 identifiablity.analysis.gamma = TRUE
 
 gg = 'Per3'

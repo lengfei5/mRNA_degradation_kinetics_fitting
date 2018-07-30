@@ -37,7 +37,6 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
   outlier.s = unlist(GeneDataSet$outlier.s)
   
   if(GeneDataSet$mode == "NB"){
-    
     R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
     R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
     L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
@@ -50,6 +49,7 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
     
     err = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, 
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
+    
   }else{
     
     var.m = unlist(GeneDataSet$var.m)

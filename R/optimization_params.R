@@ -221,7 +221,7 @@ make.optimization = function(GeneDataSet,
     if(debug){cat('\t\t optimization # ',fit.number,' finished : \t', opt$par, '\t',opt$value, '\n')}
   
   }
-    
+  
   ## choose the best estimated parameters
   imin = which.min(errors.fit); 
   eval(parse(text = paste('res.fit = res.fit.', imin, sep = '')))

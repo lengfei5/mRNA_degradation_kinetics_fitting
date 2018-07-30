@@ -170,7 +170,7 @@ Identifiablity.analysis.gamma.all.models = function(param.fits.results, GeneData
     res.fit = param.fits.results[grep(paste('.m', model, sep=''), names(param.fits.results))];
     res.fit = res.fit[-1];
     
-    bounds.gene = set.bounds.gene(M, S, model);
+    bounds.gene = set.bounds.gene(GeneDataSet = GeneDataSet, model);
     upper = bounds.gene$upper; 
     lower = bounds.gene$lower;
     
