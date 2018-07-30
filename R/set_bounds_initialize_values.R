@@ -45,8 +45,8 @@ set.bounds.gene.s = function(GeneDataSet, range_scalingFactor=5)
   
   bounds.int = set.general.bounds.int();
   
-  lower.g.s = c(min(S)/range_scalingFactor, (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
-  upper.g.s = c(max(S), (max(S)-min(S))*range_scalingFactor, bounds.int$upper[c(3:4)])
+  lower.g.s = c(Min.int = min(S)/range_scalingFactor, Amp.int = (max(S)-min(S))/range_scalingFactor, bounds.int$lower[c(3:4)]);
+  upper.g.s = c(Min.int = max(S), Amp.int = (max(S)-min(S))*range_scalingFactor, bounds.int$upper[c(3:4)])
   
   return(list(upper = upper.g.s, lower = lower.g.s))
   

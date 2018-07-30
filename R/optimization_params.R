@@ -20,11 +20,16 @@
 source("R/error_functions.R", local = TRUE)
 source("R/set_bounds_initialize_values.R", local = TRUE)
 
-#########
-#### fitting all models for one genes and remove outliers with iterations
-#########
-make.fits.with.all.models.for.one.gene = function(GeneDataSet, outliers = FALSE,
-                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE, debug = FALSE)
+###############################
+# fitting all models for one genes and remove outliers with iterations
+# GeneDataSet contains all required arguments, including data, parameters and options
+# the outliers (if ignore known outliers in optimization; 
+# but this would be taken into account automatically by checking the outlier index in outlier.m and outlier.s in GeneDataSet)
+# arametrization = c('cosine.beta'), absolute.signal = TRUE are both legacy options and now they are used by default and no other
+# alternatives are provided.
+###############################
+make.fits.with.all.models.for.one.gene = function(GeneDataSet, debug = FALSE, outliers = FALSE,
+                                                  parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
   Param.fit.for.gene = c();
@@ -32,7 +37,7 @@ make.fits.with.all.models.for.one.gene = function(GeneDataSet, outliers = FALSE,
   {
     if(debug){cat('\t starting model ',model,'\n');}
     
-    param.fit = make.fit.spec.model(GeneDataSet, model = model, outliers=outliers, debug = debug);
+    param.fit = make.fit.spec.model(GeneDataSet, model = model, debug = debug);
     Param.fit.for.gene = c(Param.fit.for.gene, param.fit)
     
     if(debug){cat('\t model ',model,' finished \n')};
@@ -49,10 +54,7 @@ make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE,
   
   ## error for model 1
   if(model == 1){
-    param.fit = calculate.error.for.flat.model(GeneDataSet, outliers = outliers, 
-                                               parametrization = parametrization, 
-                                               absolute.signal = absolute.signal,
-                                               debug = debug)
+    param.fit = calculate.error.for.flat.model(GeneDataSet, debug = debug)
   }
   
   ## parameter estimations for model 2,3,4
@@ -108,7 +110,7 @@ make.optimization = function(GeneDataSet,
   prefit.S = TRUE # optimization warm-up by fitting pre-mRNA individually to have good initial values
   prefit.M = TRUE # optimization warm-up by fitting mRNA individually 
   
-  fitting.factor = 1;  
+  fitting.factor = 1;
   Nfit.S = 4*fitting.factor; # nb of inital values for pre-mRNA
   Nfit.M = 6*fitting.factor; # nb of initial values for mRNA
   if(is.na(Nfit)) # nb of intial valeus for pre-mRNA and mRNA together
@@ -127,7 +129,7 @@ make.optimization = function(GeneDataSet,
     ## set initial values of parameters for S fitting
     PAR.INIT.S = Sampling.Initial.Values.for.fitting.S(GeneDataSet, Nfit.S)
     bounds.g.s = set.bounds.gene.s(GeneDataSet, range_scalingFactor=5)
-
+    
     errors.fit.s = rep(NA, Nfit.S)
     
     for(fit.nb.s in 1:Nfit.S)
