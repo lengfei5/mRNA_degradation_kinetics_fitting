@@ -173,7 +173,7 @@ make.optimization = function(GeneDataSet,
     eval(parse(text = paste('res.fit.m = res.fit.m.', imin.m, sep = '')))
     
     if(debug){cat('\t fitting warm-up for M4 ', res.fit.m, res.fit.s, '\n')};
- 
+  
   }
   #proc.time() - ptm
   

@@ -20,6 +20,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   # import and set global functions
   source("R/utilities_generalFunctions.R"); 
+  
   set.time.points(mds$zt) #actually this can be also a global parameter, because it is gene-independent
   if(mds$mode == "NB"){
     # set scaling factors here as global variables
@@ -39,7 +40,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     # without outlier detection and removal
     
     if(debug){cat('starting optimization without outliers \n ')}
-    param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
+    param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug);
     #param.fits.results = make.fits.with.all.models.for.one.gene();
     outlier.m = NA;
     outlier.s = NA;
