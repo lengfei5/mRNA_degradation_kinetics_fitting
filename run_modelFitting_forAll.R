@@ -50,6 +50,11 @@ if(TEST.readCount.NB){
     R = Make.data.example.RPKM(mds);
     save(R, file = paste0(dataDir, "fitting_degradation_all_data_example_rpkm.Rdata"))
     
+    xx = data.frame(T, R,stringsAsFactors = FALSE)
+    T = xx
+    
+    save(T, file = paste0(dataDir, "fitting_degradation_all_data_example_readCount_rpkm.Rdata"))
+    
   }
 
   ####################
