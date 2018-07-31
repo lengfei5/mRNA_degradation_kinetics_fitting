@@ -25,28 +25,27 @@ load(file = paste0(dataDir, "fitting_degradation_all_data_example_readCount_rpkm
 
 TEST.readCount.NB = FALSE
 
-zt = seq(0,94,by = 2)
+source("R/preprocess_prepare_for_fitting.R")
 
 if(TEST.readCount.NB){
-  ZT.int = grep('.count.premRNA', colnames(T))
-  ZT.ex = grep('.count.mRNA', colnames(T))
-  length.int = which(colnames(T) == "length.premRNA")
-  length.ex = which(colnames(T) == "length.mRNA")
+  # zt = seq(0,94,by = 2)
+  #ZT.int = grep('.count.premRNA', colnames(T))
+  #ZT.ex = grep('.count.mRNA', colnames(T))
+  #length.int = which(colnames(T) == "length.premRNA")
+  #length.ex = which(colnames(T) == "length.mRNA")
   
   ####################
   ## creat a MDfitDataSet object (a S3 class)
   ####################
-  source("R/preprocess_prepare_for_fitting.R")
   #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], length.P = T[, length.int], length.M = T[, length.ex], zt=zt,
   #                   mode = "NB", fitType.dispersion = "local")
   #save(mds, file = "data/MDfitDataSet_example.Rdata")
   load(file = "data/MDfitDataSet_example.Rdata")
   
 }else{
-  ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
-  ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
-  
-  source("R/preprocess_prepare_for_fitting.R")
+  #zt = seq(0,94,by = 2)
+  #ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
+  #ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
   #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal")
   #save(mds, file = "data/MDfitDataSet_example_logNormal.Rdata")
   
