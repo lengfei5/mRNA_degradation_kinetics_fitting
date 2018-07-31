@@ -182,7 +182,7 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
 estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TRUE)
 {
   # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE
-  # normData = as.matrix(M)
+  normData = as.matrix(normData)
   normData[which(normData==0 | is.na(normData))] = 2^-10; 
   normData = log2(normData)
   # estimate dispersion parameters with Deseq2 for each gene and each condition
@@ -199,7 +199,7 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
   df = c()
   for(n in 1:length(zt.uniq))
   {
-    #n = 1
+    # n = 1
     index.reps = which(zt.24==zt.uniq[n])
     cat('\tZT',  zt.uniq[n], "--", length(index.reps), "replicates", '\n');
     norm.sel = normData[, index.reps];
@@ -207,6 +207,11 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
     vars = c(vars, apply(norm.sel, 1, var));
     df = c(df, rep((length(index.reps)-1), nrow(norm.sel)));
     covariate = c(covariate, apply(norm.sel, 1, mean));
+    
+    #out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
+    #plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 4))
+    #points(covariate, vars^(1/4), cex=0.05, col = 'black' )
+    #points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
   }
   
   out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
@@ -215,9 +220,12 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
   dim(out.vars) = c(nrow(normData), length(zt.uniq))
   out.vars.all = out.vars[, match(zt.24, zt.uniq)]
   
-  plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 4))
-  points(covariate, vars^(1/4), cex=0.05, col = 'black' )
-  # points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
+  plot.EB.Trend.shunkage = FALSE
+  if(plot.EB.Trend.shunkage){
+    plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 4))
+    points(covariate, vars^(1/4), cex=0.05, col = 'black' )
+    points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
+  }
   
   colnames(out.vars.all) = paste0("variance.ZT", zt)
   
