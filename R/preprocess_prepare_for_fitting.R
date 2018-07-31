@@ -181,7 +181,7 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
 
 estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TRUE)
 {
-  # P = R[, ZT.int]; M = R[, ZT.ex]; robust = TRUE
+  # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE
   # normData = as.matrix(M)
   normData[which(normData==0 | is.na(normData))] = 2^-10; 
   normData = log2(normData)
@@ -215,8 +215,8 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
   dim(out.vars) = c(nrow(normData), length(zt.uniq))
   out.vars.all = out.vars[, match(zt.24, zt.uniq)]
   
-  # plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 1.5))
-  # points(covariate, vars^(1/4), cex=0.05, col = 'black' )
+  plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 4))
+  points(covariate, vars^(1/4), cex=0.05, col = 'black' )
   # points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
   
   colnames(out.vars.all) = paste0("variance.ZT", zt)

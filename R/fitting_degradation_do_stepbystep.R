@@ -113,18 +113,16 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   ## output  
   ####################
-  if(debug){cat('final result is being wrapped--------- \n Done !!!\n')}
+  if(debug){cat("final result is being wrapped --\n"); cat("----------Done !!!----------\n")}
   
-  return(list(gene.length = list(L.s = GeneDataSet$L.s, L.m = GeneDataSet$L.m),
-              readCounts = list(R.s = GeneDataSet$R.s, R.m = GeneDataSet$L.m),
-              norm.RPKM = list(norm.S = GeneDataSet$Norm.s, norm.M = GeneDataSet$Norm.s),
+  return(list(norm.RPKM = list(norm.S = GeneDataSet$Norm.s, norm.M = GeneDataSet$Norm.s),
               param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
               nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ','), outlier.s = paste(outlier.s, sep='', collapse = ',')),
-              model.sel = res.model.sel,
+              model.selection = res.model.sel,
               param.fit.cleaned = param.transformed.cleaned)
          )
   

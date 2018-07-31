@@ -55,9 +55,9 @@ if(TEST.readCount.NB){
 ####################
 ## parameter required to specify
 ####################
-outliers.removal = TRUE;
+outliers.removal = FALSE;
 debug = TRUE;
-identifiablity.analysis.gamma = TRUE
+identifiablity.analysis.gamma = FALSE
 
 gg = 'Per3'
 gene.index = which(T$gene==gg)

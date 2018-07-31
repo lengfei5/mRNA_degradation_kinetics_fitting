@@ -51,19 +51,15 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
     
   }else{
-    
-    var.m = unlist(GeneDataSet$var.m)
-    var.s = unlist(GeneDataSet$var.s)
-    
-    mu.m = rep(mean(M), length(M));
-    mu.s = rep(mean(S), length(S));
+    var.m = unlist(GeneDataSet$var.m);  var.s = unlist(GeneDataSet$var.s);
+  
+    mu.m = rep(mean(M), length(M)); mu.s = rep(mean(S), length(S));
     
     err = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s, 
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
   }
- 
-  names(err) = 'error.m1';
   
+  names(err) = 'error.m1';
   return(err)
   
 }
@@ -89,15 +85,11 @@ f2min.int = function(par.int, GeneDataSet,
     L.s = as.numeric(GeneDataSet$L.s);
     alpha.s = as.numeric(unlist(GeneDataSet$alpha.s));
     
-    #s = compute.s.beta(t = zt, Min = Min.int, Amp = Amp.int, phase = phase.int, beta= beta.int);
     mu.s = convert.nb.reads(s, L.s); ### convert normalized rpkm calculated from model into nb of reads
-    
-    #err = sum((log(S)-log(s))^2/sigma.ss^2);
     err = NB.error(R.s = R.s, alpha.s = alpha.s, mu.s = mu.s, outlier.s = outlier.s, specie = 'premRNA');
   }else{
     var.s = unlist(GeneDataSet$var.s)
     mu.s = s;
-    
     err = Gaussian.error(S = S, var.s = var.s, mu.s = mu.s, outlier.s=outlier.s, specie = 'premRNA')
     
   }
@@ -108,9 +100,9 @@ f2min.int = function(par.int, GeneDataSet,
 ###
 ### ERROR function for mRNA profile
 ###
-f2min.mrna = function(par.init.m, res.fit.s, GeneDataSet, zt = seq(0,94,by = 2), norm.params=TRUE,
-                      parametrization ='cosine.beta', debug = FALSE)
+f2min.mrna = function(par.init.m, res.fit.s, GeneDataSet, debug = FALSE, norm.params=TRUE, parametrization ='cosine.beta')
 {
+  w = 2*pi/24;
   # R.m=R.m, L.m=L.m, alpha.m=alpha.m, outlier.m=outlier.m, zt = zt, norm.params=norm.params,
   zt = unlist(GeneDataSet$zt)
   M = unlist(GeneDataSet$Norm.m);
@@ -119,7 +111,6 @@ f2min.mrna = function(par.init.m, res.fit.s, GeneDataSet, zt = seq(0,94,by = 2),
   outlier.m = unlist(GeneDataSet$outlier.m)
   outlier.s = unlist(GeneDataSet$outlier.s)
   
-  w = 2*pi/24;
   res.fit.s = as.numeric(unlist(res.fit.s));
   m = compute.m.beta(t = zt, par.init.m[1], 
                      par.init.m[2]*sqrt(1+w^2/par.init.m[1]^2), (par.init.m[3]-atan2(w, par.init.m[1])/w), par.init.m[4]*par.init.m[1],
@@ -198,8 +189,7 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
   m = compute.m.beta(t = zt, gamma, eps.gamma*sqrt(1+w^2/gamma^2), (phase.gamma-atan2(w, gamma)/w), splicing.k*gamma,
                      param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4);
   
-  if(GeneDataSet$mode == "NB")
-  {
+  if(GeneDataSet$mode == "NB"){
     R.m = as.numeric(unlist(GeneDataSet$R.m));
     L.m = as.numeric(GeneDataSet$L.m);
     alpha.m = as.numeric(unlist(GeneDataSet$alpha.m));
@@ -207,7 +197,6 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
     L.s = as.numeric(GeneDataSet$L.s);
     alpha.s = as.numeric(unlist(GeneDataSet$alpha.s));
     
-   
     ### convert rpkm into mean of read numbers
     mu.m = convert.nb.reads(m, L.m);
     mu.s = convert.nb.reads(s, L.s);
@@ -345,8 +334,8 @@ error.from.functions_RPKM_v3.R = function(S,s,M,m, sigma.ss=rep(0.2, length(S)),
   ### Here we estimate gene-specific variances with replicates
   error = error.M + error.S ## -2loglike
   
-  if(intense.debug){cat('______________________________-------- error.S = ',error.S,'\n')}
-  if(intense.debug){cat('______________________________-------- error.M = ',error.M,'\n')}
+  #if(intense.debug){cat('______________________________-------- error.S = ',error.S,'\n')}
+  #if(intense.debug){cat('______________________________-------- error.M = ',error.M,'\n')}
   return(error)  
 }
 
