@@ -56,7 +56,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     nb.newOutliers.s = 1;
     while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
     {
-      if(debug){ cat('-- outlier index of mRNA :', paste0(outlier.m, collapse = ",") );  
+      if(debug){ cat('--outlier index of mRNA :', paste0(outlier.m, collapse = ","), "\n" );  
         cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n'); }
       
       param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE, debug = debug); 
@@ -113,7 +113,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   ## output  
   ####################
-  if(debug){cat('final result is ----------\n')}
+  if(debug){cat('final result is being wrapped--------- \n Done !!!\n')}
   
   return(list(gene.length = list(L.s = GeneDataSet$L.s, L.m = GeneDataSet$L.m),
               readCounts = list(R.s = GeneDataSet$R.s, R.m = GeneDataSet$L.m),

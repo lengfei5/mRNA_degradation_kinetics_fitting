@@ -23,7 +23,8 @@ rm(list=ls())
 dataDir = "data/"
 load(file = paste0(dataDir, "fitting_degradation_all_data_example_readCount_rpkm.Rdata"))
 
-TEST.readCount.NB = TRUE
+TEST.readCount.NB = FALSE
+
 zt = seq(0,94,by = 2)
 
 if(TEST.readCount.NB){
@@ -90,6 +91,11 @@ proc.time() - ptm
 index = match(c('outlier.m', 'outlier.s'), names(param.fits.results))
 res.fit = as.numeric(param.fits.results[-index])
 names(res.fit) = names(param.fits.results)[-index]
+
+Check.dispersion.parameters = FALSE
+if(Check.dispersion.parameters){
+  load(file = "archives/fitting_degradation_all_data_example_readCount.Rdata")
+}
 
 ####################
 ## test a list of examples of circadian genes

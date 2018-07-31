@@ -29,7 +29,7 @@ library(limma)
 ## creat a S3 class MDfitDataSet to store data matrix, (P and M for pre-mRNA and mRNA), time points (zt), length.pre-mRNA and length.mRNA
 ## scaling factors for rpkm calculation, dispersion parameters
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
-MDfitDataSet = function(P, M, length.P=c(), length.M=c(), zt=zt, mode = "NB", fitType.dispersion = "local")
+MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode = "NB", fitType.dispersion = "local")
 {
   cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...\n")
   
@@ -59,7 +59,7 @@ MDfitDataSet = function(P, M, length.P=c(), length.M=c(), zt=zt, mode = "NB", fi
     # large differences in gene expression mean between time points requires this. 
     estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
     
-    mds$dispersions.P = estimateDispersions$alphas.P 
+    mds$dispersions.P = estimateDispersions$alphas.P
     mds$dispersions.M = estimateDispersions$alphas.M
     
   }else{

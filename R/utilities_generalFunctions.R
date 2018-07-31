@@ -130,7 +130,6 @@ set.general.bounds.degr.splicing = function(lower.user = NULL,
   
 }
 
-
 set.bounds.general = function(model = 4, lower.user = NULL, upper.user = NULL,
                               parametrization =c('cosine.beta'), absolute.signal = TRUE)
 {

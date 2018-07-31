@@ -55,8 +55,8 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
     var.m = unlist(GeneDataSet$var.m)
     var.s = unlist(GeneDataSet$var.s)
     
-    mu.m = rep(mean(M), length(R.m));
-    mu.s = rep(mean(S), length(R.s));
+    mu.m = rep(mean(M), length(M));
+    mu.s = rep(mean(S), length(S));
     
     err = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s, 
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
@@ -288,13 +288,13 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
     M = as.numeric(unlist(M));
     s2.m = as.numeric(unlist(var.m));
     mu.m = as.numeric(unlist(mu.m));
-    remain.m = setdiff(c(1:length(M)), outlier.m)
     
+    remain.m = setdiff(c(1:length(M)), outlier.m)
     if(any(M[remain.m]<0)|any(mu.m<=0)){
       error.M = 10^10;
     }else{
       #ptm <- proc.time()
-      error.M = sum((log(M)-log(m))^2/s2.m^2);
+      error.M = sum((log(M)-log(mu.m))^2/s2.m);
       #proc.time() - ptm
     }
   }
@@ -302,13 +302,14 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
     S = as.numeric(unlist(S));
     s2.s = as.numeric(var.s);
     mu.s = as.numeric(unlist(mu.s));
+    
     remain.s = setdiff(c(1:length(S)), outlier.s)
     
     if(any(S[remain.s]<0)|any(mu.s<=0)) {
       error.S = 10^10;
     }else{
-      error.S = sum((log(S)-log(s))^2/s2.s^2);
-    } 
+      error.S = sum((log(S)-log(mu.s))^2/s2.s);
+    }
   }
   
   ## -2loglike in logNormal distributed noise
