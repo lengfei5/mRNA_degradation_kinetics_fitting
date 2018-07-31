@@ -26,7 +26,6 @@ load(file = paste0(dataDir, "fitting_degradation_all_data_example_readCount_rpkm
 TEST.readCount.NB = TRUE
 zt = seq(0,94,by = 2)
 
-
 if(TEST.readCount.NB){
   ZT.int = grep('.count.premRNA', colnames(T))
   ZT.ex = grep('.count.mRNA', colnames(T))
