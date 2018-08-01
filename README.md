@@ -23,16 +23,14 @@ Here is the reminder for the improvement:
   - [ ] Implement Gaussian mode for outlier detection and also profile likelihood
   - [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
   
+- [ ] Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
+  https://cran.r-project.org/web/packages/bbmle/index.html; probably revise the profile-likelihood implementation, because it takes much time. 
+  Probably it is better to run it directly after the optimization. 
+  
 - [ ] Now the code is designed just for fitting one gene. 
   Ideally the code can easily fit all genes in the data in parallel.
   Thus the parallization should be taken into consideration now. 
 
-- [ ] Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
-  https://cran.r-project.org/web/packages/bbmle/index.html
-  
-- [ ] probably revise the profile-likelihood implementation, because it takes much time. 
-  Probably it is better to run it directly after the optimization. 
-  
 - [ ] Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
 
 - [ ] Not sure we should do something similar to limma or DESeq2, wrapping data and funciton in one object; and extracting function will show the resutls
@@ -44,11 +42,26 @@ Here is the reminder for the improvement:
 
 - [ ] Connect the general parameter boundaries (modifiable by used) and gene-specific boundaries (refine the boundaries by the gene data) 
 
+## Roadmap suggestion
+1. Code cleanup by @jiwang. Working code that is possible to understand and that produces correct results on existing data.
+2. Code explanation by @jiwang, just an outline of the main computational steps.
+3. Code review by @Pål Westermark, I will try my best to understand the code. I will then do the tidyverse style conversion, as far as this is possible. This will facilitate future code publication/package creation.
+4. Formal specification of Gaussian mode, presumably by @felix, everyone decides where this goes into the existing code. Here, @jiwang might if necessary do small modifications so that this is a simple matter
+5. Package creation – @Pål Westermark could create a skeleton
+6. Package completion – @Laura @felix @jiwang @Pål Westermark this includes
+  - documentation
+  - vignette
+  - unit tests
+  - inclusion of data sets
+allocation of tasks to persons to be determined ...
+
+
 ## Directory structure
 * **[run_modelFitting_forAll.R]** -- the script showing how to run the main function and to specify the parameters
 * **data/** -- data example (the read count table used in the PNAS paper) 
 * **R/** -- scripts for the main function
 * **origin/** -- origin scripts based on which we implement this pacakge and also the scripts used for the PNAS paper (before cleaning)
+
 
 ## Code structure
 Here is the structure of inital codes:
