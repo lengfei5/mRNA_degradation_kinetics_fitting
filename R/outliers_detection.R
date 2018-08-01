@@ -59,7 +59,6 @@ detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
   loglike.m = matrix(NA, nrow=3, ncol=48)
   loglike.s = matrix(NA, nrow=3, ncol=48)
   
-  
   for(model in c(2:4))
   {
     #cat(' Model ', model, '\n');
@@ -73,8 +72,7 @@ detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
       phase=param.fits.results[which(names(param.fits.results)==paste('phase.int.m', model, sep=''))];
       beta=param.fits.results[which(names(param.fits.results)==paste('beta.int.m', model, sep=''))];
     }
-    if(model == 3)
-    {
+    if(model == 3){
       eps.gamma = param.fits.results[which(names(param.fits.results)==paste('eps.gamma.m', model, sep=''))];
       phase.gamma = param.fits.results[which(names(param.fits.results)==paste('phase.gamma.m', model, sep=''))];
       Amp=0; phase=12; beta=1;

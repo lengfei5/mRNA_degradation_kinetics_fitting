@@ -52,10 +52,9 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
     
   }else{
     var.m = unlist(GeneDataSet$var.m);  var.s = unlist(GeneDataSet$var.s);
-  
     mu.m = rep(mean(M), length(M)); mu.s = rep(mean(S), length(S));
     
-    err = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s, 
+    err = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s,
                    mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
   }
   

@@ -181,10 +181,10 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
 
 estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TRUE)
 {
-  # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE
+  # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE; normData = rbind(as.matrix(M), as.matrix(P));
   normData = as.matrix(normData)
-  normData[which(normData==0 | is.na(normData))] = 2^-10; 
-  normData = log2(normData)
+  normData[which(normData==0 | is.na(normData))] = 10^-10; 
+  normData = log(normData)
   # estimate dispersion parameters with Deseq2 for each gene and each condition
   zt.24 = zt%%24
   zt.uniq = unique(zt.24)
@@ -208,10 +208,18 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
     df = c(df, rep((length(index.reps)-1), nrow(norm.sel)));
     covariate = c(covariate, apply(norm.sel, 1, mean));
     
-    #out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
-    #plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 4))
-    #points(covariate, vars^(1/4), cex=0.05, col = 'black' )
-    #points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
+    out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
+    
+    #covariate.P = covariate;
+    #out.P = out
+    plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 1.5))
+    jj = c(1:(length(covariate)/2))
+    points(covariate[jj], vars[jj]^(1/4), cex=0.05, col = 'black' )
+    points(covariate[-jj], vars[-jj]^(1/4), cex=0.05, col = 'blue' )
+    #points(covariate.P, out.P$var.prior^(1/4), col = 'blue', cex=1.)
+    points(covariate, vars^(1/4), cex=0.05, col = 'black' )
+    points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
+    
   }
   
   out <- squeezeVar(vars, df, covariate=covariate, robust=robust);

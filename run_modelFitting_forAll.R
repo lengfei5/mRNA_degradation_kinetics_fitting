@@ -59,7 +59,7 @@ outliers.removal = FALSE;
 debug = TRUE;
 identifiablity.analysis.gamma = FALSE
 
-gg = 'Per3'
+gg = 'Cp'
 gene.index = which(T$gene==gg)
 
 ####################
