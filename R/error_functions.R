@@ -281,9 +281,7 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
     if(any(M[remain.m]<0)|any(mu.m<=0)){
       error.M = 10^10;
     }else{
-      #ptm <- proc.time()
       error.M = sum((log(M)-log(mu.m))^2/s2.m);
-      #proc.time() - ptm
     }
   }
   if(specie=='both'|specie=='premRNA') {

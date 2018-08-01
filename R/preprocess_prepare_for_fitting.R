@@ -57,10 +57,10 @@ MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode =
     # dispersion parameter for each time point and for pre-mRNA and mRNA respectivley, calculated by DESeq2
     # becasue 4 replicates for each time point ennables us to calculate the dispersion in such way; and also because
     # large differences in gene expression mean between time points requires this. 
-    estimateDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
+    estimatedDispersions = calculate.dispersions.for.each.time.point.DESeq2(P, M, zt,  fitType.dispersion = fitType.dispersion)
     
-    mds$dispersions.P = estimateDispersions$alphas.P
-    mds$dispersions.M = estimateDispersions$alphas.M
+    mds$dispersions.P = estimatedDispersions$alphas.P
+    mds$dispersions.M = estimatedDispersions$alphas.M
     
   }else{
     if(mode == "logNormal"){
@@ -75,9 +75,10 @@ MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode =
       # the variance was estiamted separatetly for pre-mRNAs and mRNAs
       ####################
       #estimateDispersions = estimateVariances.for.each.time.point.limma(P, M, zt)
-      cat("estimate variance for pre-mRNA ---\n")
-      mds$var.P = data.frame(estimateVariances.for.each.time.point.limma(P, zt))
-      cat("estimate variance for mRNA ---\n")
+      cat("estimate variance for pre-mRNA and mRNA---\n")
+      estimatedVars = estimateVariances.for.each.time.point.limma(P = P, M = M, zt);
+      mds$var.P = data.frame(estimatedVars)
+      #cat("estimate variance for mRNA ---\n")
       mds$var.M = data.frame(estimateVariances.for.each.time.point.limma(M, zt))
               
     }else{
