@@ -16,7 +16,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
                                                                   absolute.signal = TRUE)
 {
   ####################
-  ## define here global variables and global functions that are accessed for all steps; 
+  ## define here global variables and global functions that are accessed for all steps;
   ####################
   # import and set global functions
   source("R/utilities_generalFunctions.R"); 
