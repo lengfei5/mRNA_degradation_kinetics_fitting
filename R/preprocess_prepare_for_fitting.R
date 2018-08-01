@@ -29,7 +29,8 @@ library(limma)
 ## creat a S3 class MDfitDataSet to store data matrix, (P and M for pre-mRNA and mRNA), time points (zt), length.pre-mRNA and length.mRNA
 ## scaling factors for rpkm calculation, dispersion parameters
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
-MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode = "NB", fitType.dispersion = "local")
+MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode = "NB", 
+                        fitType.dispersion = "local", fitType.var = "pool")
 {
   cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...\n")
   
@@ -75,12 +76,11 @@ MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode =
       # the variance was estiamted separatetly for pre-mRNAs and mRNAs
       ####################
       #estimateDispersions = estimateVariances.for.each.time.point.limma(P, M, zt)
-      cat("estimate variance for pre-mRNA and mRNA---\n")
-      estimatedVars = estimateVariances.for.each.time.point.limma(P = P, M = M, zt);
-      mds$var.P = data.frame(estimatedVars)
-      #cat("estimate variance for mRNA ---\n")
-      mds$var.M = data.frame(estimateVariances.for.each.time.point.limma(M, zt))
-              
+      estimatedVars = estimateVariances.for.each.time.point.limma(P = P, M = M, zt, fitType.var = fitType.var);
+      
+      mds$var.P = data.frame(estimatedVars$var.P)
+      mds$var.M = data.frame(estimatedVars$var.M)
+      
     }else{
       stop("current function supports only 'NB' and 'logNormal' two modes")
     }
@@ -179,10 +179,31 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
   
 }
 
-
-estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TRUE)
+estimateVariances.for.each.time.point.limma = function(P, M, zt, robust = TRUE, fitType.var = "pool")
 {
-  # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE; normData = rbind(as.matrix(M), as.matrix(P));
+  # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE; 
+  if(fitType.var == "pool"){
+    cat("estimate variance for pre-mRNA and mRNA---\n")
+    
+    normData = rbind(as.matrix(P), as.matrix(M));
+    var.PM = data.frame(squeezeVar.fromMatrix(normData, zt))
+    var.P = var.PM[c(1:nrow(P)), ]
+    var.M = var.PM[(c(nrow(P)+1):nrow(var.PM)), ]
+    
+  }else{
+    cat("estimate variance for pre-mRNA ---\n")
+    var.P = data.frame(squeezeVar.fromMatrix(P, zt))
+    
+    cat("estimate variance for mRNA ---\n")
+    var.M = data.frame(squeezeVar.fromMatrix(M, zt))
+  }
+  
+  return(list(var.P = var.P, var.M = var.M))
+  
+}
+
+squeezeVar.fromMatrix = function(normData, zt, robust = TRUE)
+{
   normData = as.matrix(normData)
   normData[which(normData==0 | is.na(normData))] = 10^-10; 
   normData = log(normData)
@@ -208,19 +229,16 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
     vars = c(vars, apply(norm.sel, 1, var));
     df = c(df, rep((length(index.reps)-1), nrow(norm.sel)));
     covariate = c(covariate, apply(norm.sel, 1, mean));
-    
     out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
-    
     #covariate.P = covariate;
     #out.P = out
-    plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 1.5))
-    jj = c(1:(length(covariate)/2))
-    points(covariate[jj], vars[jj]^(1/4), cex=0.05, col = 'black' )
-    points(covariate[-jj], vars[-jj]^(1/4), cex=0.05, col = 'blue' )
+    #plot(covariate, out$var.prior^(1/4),col = 'red', cex=1., ylim = c(0, 1.5))
+    #jj = c(1:(length(covariate)/2))
+    #points(covariate[jj], vars[jj]^(1/4), cex=0.05, col = 'black' )
+    #points(covariate[-jj], vars[-jj]^(1/4), cex=0.05, col = 'blue' )
     #points(covariate.P, out.P$var.prior^(1/4), col = 'blue', cex=1.)
-    points(covariate, vars^(1/4), cex=0.05, col = 'black' )
-    points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
-    
+    #points(covariate, vars^(1/4), cex=0.05, col = 'black' )
+    #points(covariate, out$var.post^(1/4), col='blue', cex=0.4)
   }
   
   out <- squeezeVar(vars, df, covariate=covariate, robust=robust);
@@ -240,7 +258,6 @@ estimateVariances.for.each.time.point.limma = function(normData, zt, robust = TR
   
   #colnames(alphas.P) = paste0('alpha.premRNA.ZT', zt)
   #colnames(alphas.M) = paste0('alpha.mRNA.ZT', zt)
-  
   return(out.vars.all)
   
 }

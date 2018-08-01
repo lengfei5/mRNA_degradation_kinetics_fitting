@@ -43,13 +43,13 @@ if(TEST.readCount.NB){
   load(file = "data/MDfitDataSet_example.Rdata")
   
 }else{
-  #zt = seq(0,94,by = 2)
-  #ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
-  #ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
-  #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal")
-  #save(mds, file = "data/MDfitDataSet_example_logNormal.Rdata")
+  zt = seq(0,94,by = 2)
+  ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
+  ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
+  mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal", fitType.var = "pool")
+  #save(mds, file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
   
-  load(file = "data/MDfitDataSet_example_logNormal.Rdata")
+  load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
 }
 
 ####################
@@ -59,7 +59,7 @@ outliers.removal = FALSE;
 debug = TRUE;
 identifiablity.analysis.gamma = FALSE
 
-gg = 'Cp'
+gg = "Cry1"
 gene.index = which(T$gene==gg)
 
 ####################
