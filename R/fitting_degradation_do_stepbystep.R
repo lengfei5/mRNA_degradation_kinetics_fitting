@@ -52,7 +52,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     outlier.s = GeneDataSet$outlier.s;
     nb.newOutliers.m = 1;
     nb.newOutliers.s = 1;
-    while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= 12)
+    while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= length(GeneDataSet$zt)/4)
     {
       if(debug){ cat('--outlier index of mRNA :', paste0(outlier.m, collapse = ","), "\n" );  
         cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n'); }

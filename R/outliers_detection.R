@@ -44,17 +44,26 @@ index.outliers = function(data.xx)
 ####################
 detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
 {
+  # extract fitted parameters
   zt = unlist(GeneDataSet$zt)
-  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
-  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
-  
-  alpha.m = unlist(GeneDataSet$alpha.m)
-  alpha.s = unlist(GeneDataSet$alpha.s)
+  M = unlist(GeneDataSet$Norm.m);
+  S = unlist(GeneDataSet$Norm.s);
   
   outlier.m = unlist(GeneDataSet$outlier.m)
   outlier.s = unlist(GeneDataSet$outlier.s)
+  
+  if(GeneDataSet$mode == "NB"){
+    R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+    R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+    L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+    L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+    
+    alpha.m = unlist(GeneDataSet$alpha.m)
+    alpha.s = unlist(GeneDataSet$alpha.s)
+  }else{
+    var.s = unlist(GeneDataSet$var.s)
+    var.m = unlist(GeneDataSet$var.m)
+  }
   
   loglike.m = matrix(NA, nrow=3, ncol=48)
   loglike.s = matrix(NA, nrow=3, ncol=48)
@@ -87,6 +96,7 @@ detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
     
     m = compute.m.beta(zt, gamma, eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta)
     s = compute.s.beta(zt, Min, Amp, phase, beta);
+    
     read.m = convert.nb.reads(m, L.m)
     read.s = convert.nb.reads(s, L.s)
     

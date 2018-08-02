@@ -203,7 +203,6 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
     err.fit = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, mu.m = mu.m, mu.s = mu.s, 
                        outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both');
     
-    
   }else{
     var.s = unlist(GeneDataSet$var.s)
     var.m = unlist(GeneDataSet$var.m)
