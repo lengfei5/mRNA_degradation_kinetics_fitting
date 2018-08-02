@@ -43,10 +43,10 @@ if(TEST.readCount.NB){
   load(file = "data/MDfitDataSet_example.Rdata")
   
 }else{
-  zt = seq(0,94,by = 2)
-  ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
-  ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
-  mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal", fitType.var = "pool")
+  #zt = seq(0,94,by = 2)
+  #ZT.int = intersect(grep('.rpkm.premRNA', colnames(T)), grep("ZT", colnames(T)))
+  #ZT.ex = intersect(grep('.rpkm.mRNA', colnames(T)), grep("ZT", colnames(T)))
+  #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal", fitType.var = "pool")
   #save(mds, file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
   
   load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")

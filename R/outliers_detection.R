@@ -99,9 +99,6 @@ detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
   }
   
   ## identified outlier index
-  #additional.m = intersect(index.outliers.loglike(loglike.m[3,]), intersect(index.outliers.loglike(loglike.m[1,]), index.outliers.loglike(loglike.m[2,])))
-  #additional.s = intersect(index.outliers.loglike(loglike.s[3,]), intersect(index.outliers.loglike(loglike.s[1,]), index.outliers.loglike(loglike.s[2,])))
-   
   new.outliers.m = index.outliers.loglike(loglike.m[3,]); 
   new.outliers.s = index.outliers.loglike(loglike.s[3,]);
     

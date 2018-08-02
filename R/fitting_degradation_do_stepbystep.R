@@ -18,14 +18,12 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   ## define here global variables and global functions that are accessed for all steps;
   ####################
-  # import and set global functions
+  # set global functions
   source("R/utilities_generalFunctions.R");
-  
   set.time.points(mds$zt) #actually this can be also a global parameter, because it is gene-independent
-  if(mds$mode == "NB"){
-    # set scaling factors here as global variables
-    set.scaling.factors(mds$scaling.factors)
-  }
+  
+  # set scaling factors here as global variables for NB mode
+  if(mds$mode == "NB"){set.scaling.factors(mds$scaling.factors);}
   
   ## extract the data relevant for one specific gene and wrap it in a list
   GeneDataSet = ExtractGeneData(mds, gene.index)
@@ -45,9 +43,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     outlier.m = NA;
     outlier.s = NA;
     
-  }else{ ## outlier detection and removal
+  }else{ 
+    ## outlier detection and removal
     source("R/outliers_detection.R", local = TRUE)
-    
     if(debug){cat('starting optimization with outlier detection ----------\n ');}
     
     outlier.m = GeneDataSet$outlier.m;

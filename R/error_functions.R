@@ -256,7 +256,7 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
       error.S = -2*sum(dnbinom(R.s[remain.s], size=1/alpha.s[remain.s], mu=mu.s[remain.s], log = TRUE))
       #error.S = -2*sum(log((1-q)*dnbinom(R.s[remain.s], size=1/alpha.s[remain.s], mu=mu.s[remain.s], log = FALSE) + q*exp(-10)))
       #cat(error.S, error.S2, '\n')
-    } 
+    }
   }
   
   ## -2loglike
