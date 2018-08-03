@@ -7,10 +7,11 @@
 ## Date of creation: Tue Jun  5 12:04:24 2018
 ##########################################################################
 ##########################################################################
-
 ####################
 ## utility functions for outlier detection 
 ####################
+source("R/error_functions.R", local = TRUE)
+
 index.outliers.loglike = function(data.xx, c=1.5)
 {
   #c = 3
