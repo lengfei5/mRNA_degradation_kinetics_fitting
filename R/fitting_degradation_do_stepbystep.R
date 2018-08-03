@@ -36,8 +36,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   if(!outliers.removal){ 
     # ignore outliers 
     # without outlier detection and removal
-    
-    if(debug){cat('starting optimization without outliers \n ')}
+    if(debug){cat('starting optimization without outliers \n')}
     param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug);
     #param.fits.results = make.fits.with.all.models.for.one.gene();
     outlier.m = NA;
@@ -57,8 +56,8 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     {
       if(debug){cat('-- outlier index of mRNA :', paste0(GeneDataSet$outlier.m, collapse = ","), "\n");  
                 cat('-- outlier index of premRNA : ', paste0(GeneDataSet$outlier.s, collapse = ","),  '\n');}
-      GeneDataSet$outlier.m = c(8)
-      GeneDataSet$outlier.s = c(23, 24)
+      #GeneDataSet$outlier.m = c(8)
+      #GeneDataSet$outlier.s = c(23, 24)
       
       param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, GeneDataSet);
@@ -115,7 +114,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   ## output  
   ####################
-  if(debug){cat("final result is being wrapped --\n"); cat("----------Done !!!----------\n")}
+  if(debug){cat("final result is being wrapped --\n"); cat("---------- Done !!! ----------\n")}
   
   return(list(norm.RPKM = list(norm.S = GeneDataSet$Norm.s, norm.M = GeneDataSet$Norm.s),
               param.combinations = list(m1 = param.fits.results[grep('.m1', names(param.fits.results))],

@@ -10,7 +10,6 @@
 ####################
 ## utility functions for outlier detection 
 ####################
-#source("R/error_functions.R", local = TRUE)
 index.outliers.loglike = function(data.xx, c=1.5)
 {
   #c = 3;
@@ -45,57 +44,16 @@ index.outliers = function(data.xx)
 # in addition, the outlier is detected based the most complicated model, i.e. M4; the idea is that if data are identified as outliers 
 # in M4, and they are also outliers in M1-M3
 ####################
+source("R/error_functions.R", local = TRUE)
+
 detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
 {
-  w = 2*pi/24;
-  #loglike.m = matrix(NA, nrow=3, ncol=48)
-  #loglike.s = matrix(NA, nrow=3, ncol=48)
-  
-  ## extract data from GeneDataSet list
-  zt = unlist(GeneDataSet$zt)
-  M = unlist(GeneDataSet$Norm.m);
-  S = unlist(GeneDataSet$Norm.s);
   outlier.m = unlist(GeneDataSet$outlier.m)
   outlier.s = unlist(GeneDataSet$outlier.s)
   
-  ## extract fitted parameters for M4
-  model = 4
-  gamma = param.fits.results[which(names(param.fits.results)==paste('gamma.m', model, sep=''))];
-  eps.gamma = param.fits.results[which(names(param.fits.results)==paste('eps.gamma.m', model, sep=''))];
-  phase.gamma = param.fits.results[which(names(param.fits.results)==paste('phase.gamma.m', model, sep=''))];
-  splicing.k = param.fits.results[which(names(param.fits.results)==paste('splicing.k.m', model, sep=''))];
-  
-  Min.int = param.fits.results[which(names(param.fits.results)==paste('Min.int.m', model, sep=''))];
-  Amp.int = param.fits.results[which(names(param.fits.results)==paste('Amp.int.m', model, sep=''))];
-  phase.int = param.fits.results[which(names(param.fits.results)==paste('phase.int.m', model, sep=''))];
-  beta.int = param.fits.results[which(names(param.fits.results)==paste('beta.int.m', model, sep=''))];
-  
-  #m = compute.m.beta(zt, gamma, eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta)
-  m = compute.m.beta(t = zt, gamma, eps.gamma*sqrt(1+w^2/gamma^2), (phase.gamma-atan2(w, gamma)/w), splicing.k*gamma,
-                     Min.int, Amp.int, phase.int, beta.int);
-  s = compute.s.beta(zt, Min.int, Amp.int, phase.int, beta.int);
-  
-  if(GeneDataSet$mode == "NB"){
-    R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-    R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-    L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
-    L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
-    alpha.m = unlist(GeneDataSet$alpha.m)
-    alpha.s = unlist(GeneDataSet$alpha.s)
-    
-    mu.m = convert.nb.reads(m, L.m);
-    mu.s = convert.nb.reads(s, L.s);
-    
-    loglike.m = -2*dnbinom(as.numeric(R.m), size=1/alpha.m, mu=as.numeric(mu.m), log = TRUE)
-    loglike.s = -2*dnbinom(as.numeric(R.s), size=1/alpha.s, mu=as.numeric(mu.s), log = TRUE)
-    
-  }else{
-    var.s = unlist(GeneDataSet$var.s)
-    var.m = unlist(GeneDataSet$var.m)
-        
-    loglike.m = (log(M)-log(m))^2/var.m;
-    loglike.s = (log(S)-log(s))^2/var.s
-  }
+  loglike.contribution = calculate.loglike.contribution(param.fits.results, GeneDataSet)
+  loglike.m = loglike.contribution$loglike.m;
+  loglike.s = loglike.contribution$loglike.s;
   
   ## not consider the outliers identified already
   if(length(outlier.m)>0) loglike.m[outlier.m] = NA;

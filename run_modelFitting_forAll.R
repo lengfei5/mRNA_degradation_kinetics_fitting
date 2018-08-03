@@ -49,7 +49,8 @@ if(TEST.readCount.NB){
   #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal", fitType.var = "pool")
   #save(mds, file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
   
-  load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
+  #load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
+  load(file = "data/MDfitDataSet_example_logNormal.Rdata")
 }
 
 ####################
@@ -59,7 +60,7 @@ outliers.removal = TRUE;
 debug = TRUE;
 identifiablity.analysis.gamma = FALSE
 
-gg = "Per3"
+gg = "Fus"
 gene.index = which(T$gene==gg)
 
 ####################
@@ -71,6 +72,7 @@ ptm <- proc.time()
 res.fit = make.fits.with.all.models.for.one.gene.remove.outliers(mds, gene.index = gene.index, debug = debug,
                                                                             outliers.removal = outliers.removal,
                                                                             identifiablity.analysis.gamma = identifiablity.analysis.gamma);
+cat("------------- time required ---------------\n")
 proc.time() - ptm
 
 ###########################
@@ -148,7 +150,7 @@ if(Test.circadian.gene.examples){
                           test1[which(names(test1)==name2)]/test1[which(names(test1)==name1)]))',
                           sep='')));
    
-    keep2compare = rbind(keep2compare, test1) 
+    keep2compare = rbind(keep2compare, test1)
   }
   
   keep2compare = data.frame(T[mm[1:7], 1],  keep2compare, stringsAsFactors = FALSE)

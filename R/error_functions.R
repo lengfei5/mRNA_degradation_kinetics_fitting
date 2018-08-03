@@ -48,14 +48,14 @@ calculate.error.for.flat.model = function(GeneDataSet, debug = FALSE, outliers =
     mu.s = convert.nb.reads(rep(mean(S), length(R.s)), L.s);
     
     err = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, 
-                   mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
+                   mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, species = 'both')
     
   }else{
     var.m = unlist(GeneDataSet$var.m);  var.s = unlist(GeneDataSet$var.s);
     mu.m = rep(mean(M), length(M)); mu.s = rep(mean(S), length(S));
     
     err = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s,
-                   mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, specie = 'both')
+                   mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s=outlier.s, species = 'both')
   }
   
   names(err) = 'error.m1';
@@ -85,11 +85,11 @@ f2min.int = function(par.int, GeneDataSet,
     alpha.s = as.numeric(unlist(GeneDataSet$alpha.s));
     
     mu.s = convert.nb.reads(s, L.s); ### convert normalized rpkm calculated from model into nb of reads
-    err = NB.error(R.s = R.s, alpha.s = alpha.s, mu.s = mu.s, outlier.s = outlier.s, specie = 'premRNA');
+    err = NB.error(R.s = R.s, alpha.s = alpha.s, mu.s = mu.s, outlier.s = outlier.s, species = 'premRNA');
   }else{
     var.s = unlist(GeneDataSet$var.s)
     mu.s = s;
-    err = Gaussian.error(S = S, var.s = var.s, mu.s = mu.s, outlier.s=outlier.s, specie = 'premRNA')
+    err = Gaussian.error(S = S, var.s = var.s, mu.s = mu.s, outlier.s=outlier.s, species = 'premRNA')
     
   }
   
@@ -121,11 +121,11 @@ f2min.mrna = function(par.init.m, res.fit.s, GeneDataSet, debug = FALSE, norm.pa
     alpha.m = as.numeric(unlist(GeneDataSet$alpha.m));
     
     mu.m = convert.nb.reads(m, L.m); ### convert normalized rpkm calculated from model into nb of reads
-    err = NB.error(R.m = R.m, alpha.m = alpha.m, mu.m = mu.m, outlier.m = outlier.m, specie = 'mRNA');
+    err = NB.error(R.m = R.m, alpha.m = alpha.m, mu.m = mu.m, outlier.m = outlier.m, species = 'mRNA');
   }else{
     var.m = unlist(GeneDataSet$var.m)
     mu.m = m;
-    err = Gaussian.error(M = M, var.m = var.m, mu.m = mu.m, outlier.m = outlier.m, specie = 'mRNA')
+    err = Gaussian.error(M = M, var.m = var.m, mu.m = mu.m, outlier.m = outlier.m, species = 'mRNA')
   }
   
   eps.non.scaled = par.init.m[2]*sqrt(1+w^2/par.init.m[1]^2); 
@@ -196,15 +196,14 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
     mu.s = convert.nb.reads(s, L.s);
    
     err.fit = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, mu.m = mu.m, mu.s = mu.s, 
-                       outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both');
-    
+                       outlier.m = outlier.m, outlier.s = outlier.s, species = 'both');
   }else{
     var.s = unlist(GeneDataSet$var.s)
     var.m = unlist(GeneDataSet$var.m)
     mu.s = s;
     mu.m = m;
     err.fit = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s, 
-                             mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both')
+                             mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s = outlier.s, species = 'both')
   }
   
   eps.non.scaled = eps.gamma*sqrt(1+w^2/gamma^2);
@@ -215,10 +214,71 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
   return(err.fit)
 }
 
-NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), alpha.s=rep(0.03, 48), 
-                    mu.m=rep(1000, 48), mu.s=rep(100, 48), outlier.m = c(), outlier.s=c(), specie = 'both', intense.debug=FALSE)
+calculate.loglike.contribution = function(param.fits.results, GeneDataSet, model = 4, w = 2*pi/24)
 {
-  if(specie=='both'|specie=='mRNA'){
+  w = 2*pi/24;
+  #loglike.m = matrix(NA, nrow=3, ncol=48)
+  #loglike.s = matrix(NA, nrow=3, ncol=48)
+  
+  ## extract data from GeneDataSet list
+  zt = unlist(GeneDataSet$zt)
+  M = unlist(GeneDataSet$Norm.m);
+  S = unlist(GeneDataSet$Norm.s);
+  outlier.m = unlist(GeneDataSet$outlier.m)
+  outlier.s = unlist(GeneDataSet$outlier.s)
+  
+  ## extract fitted parameters for M4
+  #model = 4
+  gamma = param.fits.results[which(names(param.fits.results)==paste('gamma.m', model, sep=''))];
+  eps.gamma = param.fits.results[which(names(param.fits.results)==paste('eps.gamma.m', model, sep=''))];
+  phase.gamma = param.fits.results[which(names(param.fits.results)==paste('phase.gamma.m', model, sep=''))];
+  splicing.k = param.fits.results[which(names(param.fits.results)==paste('splicing.k.m', model, sep=''))];
+  
+  Min.int = param.fits.results[which(names(param.fits.results)==paste('Min.int.m', model, sep=''))];
+  Amp.int = param.fits.results[which(names(param.fits.results)==paste('Amp.int.m', model, sep=''))];
+  phase.int = param.fits.results[which(names(param.fits.results)==paste('phase.int.m', model, sep=''))];
+  beta.int = param.fits.results[which(names(param.fits.results)==paste('beta.int.m', model, sep=''))];
+  
+  #m = compute.m.beta(zt, gamma, eps.gamma, phase.gamma, splicing.k, Min, Amp, phase, beta)
+  m = compute.m.beta(t = zt, gamma, eps.gamma*sqrt(1+w^2/gamma^2), (phase.gamma-atan2(w, gamma)/w), splicing.k*gamma,
+                     Min.int, Amp.int, phase.int, beta.int);
+  s = compute.s.beta(zt, Min.int, Amp.int, phase.int, beta.int);
+  
+  if(GeneDataSet$mode == "NB"){
+    R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+    R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+    L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+    L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+    alpha.m = unlist(GeneDataSet$alpha.m)
+    alpha.s = unlist(GeneDataSet$alpha.s)
+    
+    mu.m = convert.nb.reads(m, L.m);
+    mu.s = convert.nb.reads(s, L.s);
+    
+    loglike.m = -2*dnbinom(as.numeric(R.m), size=1/alpha.m, mu=as.numeric(mu.m), log = TRUE)
+    loglike.s = -2*dnbinom(as.numeric(R.s), size=1/alpha.s, mu=as.numeric(mu.s), log = TRUE)
+    
+  }else{
+    var.s = unlist(GeneDataSet$var.s)
+    var.m = unlist(GeneDataSet$var.m)
+    
+    loglike.m = (log(M)-log(m))^2/var.m;
+    loglike.s = (log(S)-log(s))^2/var.s
+  }
+  
+  return(list(loglike.m = loglike.m, loglike.s = loglike.s))
+  
+}
+
+
+
+########################################################
+# Section: Error functions for NB and Gaussian modes
+########################################################
+NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), alpha.s=rep(0.03, 48), 
+                    mu.m=rep(1000, 48), mu.s=rep(100, 48), outlier.m = c(), outlier.s=c(), species = 'both', intense.debug=FALSE)
+{
+  if(species=='both'|species=='mRNA'){
     R.m = as.numeric(unlist(R.m));
     alpha.m = as.numeric(alpha.m);
     mu.m = as.numeric(unlist(mu.m));
@@ -233,7 +293,7 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
       #proc.time() - ptm
     }
   }
-  if(specie=='both'|specie=='premRNA') {
+  if(species=='both'|species=='premRNA') {
     R.s = as.numeric(unlist(R.s));
     alpha.s = as.numeric(alpha.s);
     mu.s = as.numeric(unlist(mu.s));
@@ -252,9 +312,9 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
   }
   
   ## -2loglike
-  if(specie == 'mRNA') { error = error.M; }
-  if(specie == 'premRNA') { error = error.S;}
-  if(specie == 'both') {error = error.M + error.S; }
+  if(species == 'mRNA') { error = error.M; }
+  if(species == 'premRNA') { error = error.S;}
+  if(species == 'both') {error = error.M + error.S; }
     
   return(error)
   
@@ -262,9 +322,9 @@ NB.error = function(R.m=rep(1000, 48), R.s=c(100, 48), alpha.m=rep(0.02, 48), al
 
 ### error for the Gaussian mode
 Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48), var.s = rep(0.1, 48), 
-               mu.m = rep(90, 48), mu.s = rep(12, 48), outlier.m = c(), outlier.s=c(), specie = 'both', intense.debug=FALSE)
+               mu.m = rep(90, 48), mu.s = rep(12, 48), outlier.m = c(), outlier.s=c(), species = 'both', intense.debug=FALSE)
 {
-  if(specie=='both'|specie=='mRNA'){
+  if(species=='both'|species=='mRNA'){
     M = as.numeric(unlist(M));
     s2.m = as.numeric(unlist(var.m));
     mu.m = as.numeric(unlist(mu.m));
@@ -276,7 +336,7 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
       error.M = sum((log(M[remain.m])-log(mu.m[remain.m]))^2/s2.m[remain.m]);
     }
   }
-  if(specie=='both'|specie=='premRNA') {
+  if(species=='both'|species=='premRNA') {
     S = as.numeric(unlist(S));
     s2.s = as.numeric(var.s);
     mu.s = as.numeric(unlist(mu.s));
@@ -291,9 +351,9 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
   }
   
   ## -2loglike in logNormal distributed noise
-  if(specie == 'mRNA') { error = error.M; }
-  if(specie == 'premRNA') { error = error.S;}
-  if(specie == 'both') { error = error.M + error.S; }
+  if(species == 'mRNA') { error = error.M; }
+  if(species == 'premRNA') { error = error.S;}
+  if(species == 'both') { error = error.M + error.S; }
   
   return(error)
   

@@ -30,7 +30,7 @@ library(limma)
 ## scaling factors for rpkm calculation, dispersion parameters
 ## some simple functions associated to extract these parameters, which will be used as global parameters in the model fitting
 MDfitDataSet = function(P, M, length.P=c(10000), length.M=c(1000), zt=zt, mode = "NB", 
-                        fitType.dispersion = "local", fitType.var = "pool")
+                        fitType.dispersion = "local", fitType.var = "separate")
 {
   cat("creat a S3 class MDfitDataSet to store the tables and also necessary parameters after processing ...\n")
   
@@ -179,7 +179,7 @@ calculate.dispersions.for.each.time.point.DESeq2 = function(P, M, zt,  fitType.d
   
 }
 
-estimateVariances.for.each.time.point.limma = function(P, M, zt, robust = TRUE, fitType.var = "pool")
+estimateVariances.for.each.time.point.limma = function(P, M, zt, robust = TRUE, fitType.var = "separate")
 {
   # P = T[, ZT.int]; M = T[, ZT.ex]; robust = TRUE; 
   if(fitType.var == "pool"){
