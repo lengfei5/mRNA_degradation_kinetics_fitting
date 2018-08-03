@@ -20,12 +20,12 @@ Here is the reminder for the improvement:
     integrated the idea from the paper Sartor et al. BMC (2006) which proposed the intensity-based EB method for variance estimation
     
   - [x] Gaussian mode is implemented in the parameter optimizaiotn function
-  - [ ] Implement Gaussian mode for outlier detection and also profile likelihood
+  - [x] Implement Gaussian mode for outlier detection
+  - [ ] Implement Gaussian mdoe for identifiability analysis; this is inspired from the bbmle package in which a profile-likelihood was implemented
+        Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use. 
+        https://cran.r-project.org/web/packages/bbmle/index.html; probably revise the profile-likelihood implementation, because it takes much time. 
+        Probably it is better to run it directly after the optimization. 
   - [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
-  
-- [ ] Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use.  
-  https://cran.r-project.org/web/packages/bbmle/index.html; probably revise the profile-likelihood implementation, because it takes much time. 
-  Probably it is better to run it directly after the optimization. 
   
 - [ ] Now the code is designed just for fitting one gene. 
   Ideally the code can easily fit all genes in the data in parallel.
