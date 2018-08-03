@@ -54,11 +54,9 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     while((length(newOutliers.m) > 0 | length(newOutliers.s) > 0) & length(GeneDataSet$outlier.m) <= length(GeneDataSet$zt)/8 &
           length(GeneDataSet$outlier.s) <= length(GeneDataSet$zt)/8)
     {
-      if(debug){cat('-- outlier index of mRNA :', paste0(GeneDataSet$outlier.m, collapse = ","), "\n");  
-                cat('-- outlier index of premRNA : ', paste0(GeneDataSet$outlier.s, collapse = ","),  '\n');}
-      #GeneDataSet$outlier.m = c(8)
-      #GeneDataSet$outlier.s = c(23, 24)
-      
+      if(debug){cat('-- outlier index of mRNA : ', paste0(GeneDataSet$outlier.m, collapse = ","), "\n");  
+                cat('-- outlier index of premRNA : ', paste0(GeneDataSet$outlier.s, collapse = ","),  "\n");}
+            
       param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, GeneDataSet);
       

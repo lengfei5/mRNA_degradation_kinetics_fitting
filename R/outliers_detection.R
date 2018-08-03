@@ -79,16 +79,3 @@ detect.ouliters.loglike = function(param.fits.results, GeneDataSet)
   return(res.outliers.detection)
   
 }
-
-## testing the scope of variables in R
-test.funciton = function()
-{
-  cat("test ----------\n")
-  cat("intially defined L.m -- ", L.m , "\n")
-  L.m = 10;
-  cat("newly defefined L.m -- ", L.m, "\n")
-  cat("L.s -- ", L.s /2, "\n")
-  #g <- function(y) { Lm <- 100; f(y); }
-  
-}
-
