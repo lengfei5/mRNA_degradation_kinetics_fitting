@@ -201,12 +201,10 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
   }else{
     var.s = unlist(GeneDataSet$var.s)
     var.m = unlist(GeneDataSet$var.m)
-    
     mu.s = s;
     mu.m = m;
-    
     err.fit = Gaussian.error(M = M, S = S, var.m = var.m, var.s = var.s, 
-                             mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s = outlier.s, specie = 'mRNA')
+                             mu.m = mu.m, mu.s = mu.s, outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both')
   }
   
   eps.non.scaled = eps.gamma*sqrt(1+w^2/gamma^2);

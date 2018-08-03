@@ -57,9 +57,10 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     {
       if(debug){cat('-- outlier index of mRNA :', paste0(GeneDataSet$outlier.m, collapse = ","), "\n");  
                 cat('-- outlier index of premRNA : ', paste0(GeneDataSet$outlier.s, collapse = ","),  '\n');}
+      GeneDataSet$outlier.m = c(8)
+      GeneDataSet$outlier.s = c(23, 24)
       
-      param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE,
-                                                                  debug = debug); 
+      param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, debug = debug); 
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, GeneDataSet);
       
       newOutliers.m = res.outliers.detection$newOutliers.m
@@ -68,6 +69,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
       # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
       if(length(newOutliers.m)>0){GeneDataSet$outlier.m = unique(c(GeneDataSet$outlier.m, unlist(newOutliers.m))); } 
       if(length(newOutliers.s)>0) {GeneDataSet$outlier.s = unique(c(GeneDataSet$outlier.s, unlist(newOutliers.s))); }
+      
     }
     
     if(length(GeneDataSet$outlier.m)==0) {outlier.m = NA; 
