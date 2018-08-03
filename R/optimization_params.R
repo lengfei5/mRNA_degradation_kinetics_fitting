@@ -28,7 +28,7 @@ source("R/set_bounds_initialize_values.R", local = TRUE)
 # arametrization = c('cosine.beta'), absolute.signal = TRUE are both legacy options and now they are used by default and no other
 # alternatives are provided.
 ###############################
-make.fits.with.all.models.for.one.gene = function(GeneDataSet, debug = FALSE, outliers = FALSE,
+make.fits.with.all.models.for.one.gene = function(GeneDataSet, debug = FALSE, outliers = TRUE,
                                                   parametrization = c('cosine.beta'), absolute.signal = TRUE)
 {
   #T = T; gene.index = j; debug = TRUE; parametrization = 'cosine.beta';  zt = zt; i.ex = ZT.ex; i.int = ZT.int; absolute.signal = TRUE
@@ -47,7 +47,7 @@ make.fits.with.all.models.for.one.gene = function(GeneDataSet, debug = FALSE, ou
 
 }
 
-make.fit.spec.model = function(GeneDataSet, model = 1, outliers = FALSE, 
+make.fit.spec.model = function(GeneDataSet, model = 1, outliers = TRUE, 
                                parametrization = c('cosine.beta'), absolute.signal = TRUE, debug = FALSE)
 {
   param.fit = NA;

@@ -115,22 +115,17 @@ f2min.mrna = function(par.init.m, res.fit.s, GeneDataSet, debug = FALSE, norm.pa
                      par.init.m[2]*sqrt(1+w^2/par.init.m[1]^2), (par.init.m[3]-atan2(w, par.init.m[1])/w), par.init.m[4]*par.init.m[1],
                      Min = res.fit.s[1], Amp = res.fit.s[2], phase = res.fit.s[3], beta= res.fit.s[4]); 
   
-  if(GeneDataSet$mode == "NB")
-  {
+  if(GeneDataSet$mode == "NB"){
     R.m = as.numeric(unlist(GeneDataSet$R.m));
     L.m = as.numeric(GeneDataSet$L.m);
     alpha.m = as.numeric(unlist(GeneDataSet$alpha.m));
     
     mu.m = convert.nb.reads(m, L.m); ### convert normalized rpkm calculated from model into nb of reads
-    
     err = NB.error(R.m = R.m, alpha.m = alpha.m, mu.m = mu.m, outlier.m = outlier.m, specie = 'mRNA');
-    
   }else{
     var.m = unlist(GeneDataSet$var.m)
     mu.m = m;
-    
     err = Gaussian.error(M = M, var.m = var.m, mu.m = mu.m, outlier.m = outlier.m, specie = 'mRNA')
-    
   }
   
   eps.non.scaled = par.init.m[2]*sqrt(1+w^2/par.init.m[1]^2); 
@@ -280,7 +275,7 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
     if(any(M[remain.m]<0)|any(mu.m<=0)){
       error.M = 10^10;
     }else{
-      error.M = sum((log(M)-log(mu.m))^2/s2.m);
+      error.M = sum((log(M[remain.m])-log(mu.m[remain.m]))^2/s2.m[remain.m]);
     }
   }
   if(specie=='both'|specie=='premRNA') {
@@ -290,10 +285,10 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
     
     remain.s = setdiff(c(1:length(S)), outlier.s)
     
-    if(any(S[remain.s]<0)|any(mu.s<=0)) {
+    if(any(S[remain.s]<0)|any(mu.s<=0)){
       error.S = 10^10;
     }else{
-      error.S = sum((log(S)-log(mu.s))^2/s2.s);
+      error.S = sum((log(S[remain.s])-log(mu.s[remain.s]))^2/s2.s[remain.s]);
     }
   }
   
@@ -303,6 +298,7 @@ Gaussian.error = function(M = re(100, 48), S = re(10, 48), var.m = rep(0.05, 48)
   if(specie == 'both') { error = error.M + error.S; }
   
   return(error)
+  
 }
 
 # old gaussian error function used in function_RPKM_v3.R

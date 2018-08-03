@@ -55,7 +55,7 @@ if(TEST.readCount.NB){
 ####################
 ## parameter required to specify
 ####################
-outliers.removal = FALSE;
+outliers.removal = TRUE;
 debug = TRUE;
 identifiablity.analysis.gamma = FALSE
 

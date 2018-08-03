@@ -48,31 +48,33 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
     source("R/outliers_detection.R", local = TRUE)
     if(debug){cat('starting optimization with outlier detection ----------\n ');}
     
-    outlier.m = GeneDataSet$outlier.m;
-    outlier.s = GeneDataSet$outlier.s;
-    nb.newOutliers.m = 1;
-    nb.newOutliers.s = 1;
-    while((nb.newOutliers.m > 0 | nb.newOutliers.s > 0) & length(c(outlier.m, outlier.s)) <= length(GeneDataSet$zt)/4)
+    newOutliers.m = c(1);
+    newOutliers.s = c(1);
+    
+    ## Todo: threshold in which the outlier detection stops should be revised ...
+    while((length(newOutliers.m) > 0 | length(newOutliers.s) > 0) & length(GeneDataSet$outlier.m) <= length(GeneDataSet$zt)/8 &
+          length(GeneDataSet$outlier.s) <= length(GeneDataSet$zt)/8)
     {
-      if(debug){ cat('--outlier index of mRNA :', paste0(outlier.m, collapse = ","), "\n" );  
-        cat('-- outlier index of premRNA : ', paste0(outlier.s, collapse = ","),  '\n'); }
+      if(debug){cat('-- outlier index of mRNA :', paste0(GeneDataSet$outlier.m, collapse = ","), "\n");  
+                cat('-- outlier index of premRNA : ', paste0(GeneDataSet$outlier.s, collapse = ","),  '\n');}
       
-      param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE, debug = debug); 
-      
+      param.fits.results = make.fits.with.all.models.for.one.gene(GeneDataSet = GeneDataSet, outliers = TRUE,
+                                                                  debug = debug); 
       res.outliers.detection = detect.ouliters.loglike(param.fits.results, GeneDataSet);
       
-      nb.newOutliers.m = res.outliers.detection$nb.newOutliers.m
-      nb.newOutliers.s = res.outliers.detection$nb.newOutliers.s
-      outlier.m = res.outliers.detection$outlier.m;
-      outlier.s = res.outliers.detection$outlier.s;
+      newOutliers.m = res.outliers.detection$newOutliers.m
+      newOutliers.s = res.outliers.detection$newOutliers.s
       
       # Important Note: change outlier records in the matrix T which is used to pass the outlier index for optimization module
-      GeneDataSet$outlier.m = outlier.m;
-      GeneDataSet$outlier.s = outlier.s;
+      if(length(newOutliers.m)>0){GeneDataSet$outlier.m = unique(c(GeneDataSet$outlier.m, unlist(newOutliers.m))); } 
+      if(length(newOutliers.s)>0) {GeneDataSet$outlier.s = unique(c(GeneDataSet$outlier.s, unlist(newOutliers.s))); }
     }
     
-    if(length(outlier.m)==0) outlier.m = NA; 
-    if(length(outlier.s)==0) outlier.s = NA;
+    if(length(GeneDataSet$outlier.m)==0) {outlier.m = NA; 
+    }else{outlier.m = GeneDataSet$outlier.m; outlier.m = outlier.m[order(outlier.m)]}
+    if(length(GeneDataSet$outlier.s)==0) {outlier.s = NA;
+    }else{outlier.s = GeneDataSet$outlier.s; outlier.s = outlier.s[order(outlier.s)]}
+    
   }
   
   ####################
