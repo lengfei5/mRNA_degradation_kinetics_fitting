@@ -231,8 +231,11 @@ make.optimization = function(GeneDataSet,
   #hess = hessian(func=f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
   #               outlier.m = outlier.m, outlier.s = outlier.s, model = model, zt = zt, x=res.fit);
   ttry = try(sqrt(diag(solve(0.5*hess))), silent = FALSE);
-  
-  if(!inherits(ttry, "try-error")){res.fit.stderr = sqrt(diag(solve(0.5*hess)));}else{res.fit.stderr = rep(NA, length(res.fit))}
+  if(!inherits(ttry, "try-error")){
+    res.fit.stderr = sqrt(diag(solve(0.5*hess)));
+  }else{
+    res.fit.stderr = rep(NA, length(res.fit))
+  }
   
   param.fit = c(errors.fit[imin], res.fit, res.fit.stderr);
   names(param.fit) = paste(c('error', colnames(PAR.INIT), paste(colnames(PAR.INIT), '.stderr', sep='')),'.m',model,sep = ''); 

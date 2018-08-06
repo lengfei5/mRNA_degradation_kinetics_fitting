@@ -7,79 +7,6 @@
 ## Date of creation: Mon Jun  4 13:46:18 2018
 ##########################################################################
 ##########################################################################
-###
-### ERROR function for profile likelihood (identifiability analysis)
-###
-f2min.profile = function(par, par.fixed, index.fixed, R.m, R.s, L.m, L.s, alpha.m, alpha.s, outlier.m = c(), outlier.s = c(), model=3,
-                         zt = seq(0,94,by = 2), norm.params=TRUE)
-{
-  par[index.fixed] = par.fixed; ### fixe one parameter
-  gamma = par[1];
-  if(model==2)	
-  {
-    eps.gamma = 0.0;
-    phase.gamma = 12.0; 
-    splicing.k = par[2];
-    param.synthesis.1 = par[3];
-    param.synthesis.2 = par[4];  
-    param.synthesis.3 = par[5]; 
-    param.synthesis.4 = par[6]; 
-  }
-  if(model==3)
-  {
-    eps.gamma = par[2];
-    phase.gamma = par[3];
-    splicing.k = par[4];
-    param.synthesis.1 = par[5];
-    param.synthesis.2 = 0;  
-    param.synthesis.3 = 0; 
-    param.synthesis.4 = 1; 
-  }
-  if(model==4)
-  {
-    eps.gamma = par[2];
-    phase.gamma = par[3];
-    splicing.k = par[4];
-    param.synthesis.1 = par[5];
-    param.synthesis.2 = par[6];  
-    param.synthesis.3 = par[7]; 
-    param.synthesis.4 = par[8]; 
-  }
-  if(model==3)
-  {
-    param.synthesis.2 = 0;  
-    param.synthesis.3 = 0; 
-    param.synthesis.4 = 1; 
-  }
-  if(model==4)
-  {
-    param.synthesis.2 = par[6];  
-    param.synthesis.3 = par[7]; 
-    param.synthesis.4 = par[8]; 
-  }
-  
-  s = compute.s.beta(t = zt, param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4)
-  #print(par);
-  #print(compute.m.beta(t = zt, gamma, eps.gamma, phase.gamma, splicing.k, param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4, simulation.only=TRUE))
-  w = 2*pi/24;
-  m = compute.m.beta(t = zt, gamma, eps.gamma*sqrt(1+w^2/gamma^2), (phase.gamma-atan2(w, gamma)/w), splicing.k*gamma,
-                     param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4);
-  ### convert rpkm into mean of read numbers
-  mu.m = convert.nb.reads(m, L.m);
-  mu.s = convert.nb.reads(s, L.s);
-  
-  #print(m);
-  err.profile = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, mu.m = mu.m, mu.s = mu.s, 
-                         outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both');
-  eps.non.scaled = eps.gamma*sqrt(1+w^2/gamma^2); 
-  err.profile = err.profile + sigmoid.bound.contraint(eps.non.scaled);  
-  #if(eps.non.scaled>1){err.profile = 10^10;}
-  #print(par);
-  
-  return(err.profile)
-}
-
-
 Identifiablity.analysis.gamma.each.model = function (error.opt, params.opt, lower, upper, R.m, R.s, L.m, L.s, alpha.m, alpha.s, model = 3, zt,
                                                      outlier.m = c(), outlier.s = c(), PLOT.PL = FALSE, gene2plot='Per1') 
 {
@@ -117,8 +44,9 @@ Identifiablity.analysis.gamma.each.model = function (error.opt, params.opt, lowe
   if(model==2) df = 6; if(model==3) df = 5; if(model==4) df = 8;
   threshold1 = qchisq(p=0.95, df=df, lower.tail = TRUE) + error.opt;
   threshold2 = qchisq(p=0.95, df=1, lower.tail = TRUE) + error.opt;
+  
+  ## the following threshod is used for the current code
   threshold3 = qchisq(p=0.68, df=1, lower.tail = TRUE) + error.opt;
-  #qchisq(p=0.68, df=1, lower.tail = TRUE)
   
   if(PLOT.PL){ ## NOT Used here
     #pdf.name = paste('/Users/jiwang/Degradation_Liver/Main_Code_Degradation/myplots/Total/Total_counts/identifiability_test_Real_Data/gamma_nonidentif_',

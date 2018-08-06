@@ -27,6 +27,8 @@ Here is the reminder for the improvement:
         Probably it is better to run it directly after the optimization. 
   - [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
   
+- [ ] Revise the hessian funciton for SE calculation, because either optim function ofr hessina function can yield NA for some parameters
+
 - [ ] Now the code is designed just for fitting one gene. 
   Ideally the code can easily fit all genes in the data in parallel.
   Thus the parallization should be taken into consideration now. 
