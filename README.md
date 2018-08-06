@@ -7,7 +7,7 @@ and finally inferring mRNA kineitc parameters, e.g. half-life, rhythmic amplitud
 ## TO-DO
 Here is the reminder for the improvement:
 
-- [ ] Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way
+- [x] Since we are also planning to add the option for "Gaussian noise", we should think how to design the fucntions in such way
   that they can be easily to be adapted to do it. 
   And also keep in mind that JW has done it, at least partially, 
   in the inital effort (in the folder`origin/`).   
@@ -21,11 +21,12 @@ Here is the reminder for the improvement:
     
   - [x] Gaussian mode is implemented in the parameter optimizaiotn function
   - [x] Implement Gaussian mode for outlier detection
-  - [ ] Implement Gaussian mdoe for identifiability analysis; this is inspired from the bbmle package in which a profile-likelihood was implemented
-        Consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use. 
-        https://cran.r-project.org/web/packages/bbmle/index.html; probably revise the profile-likelihood implementation, because it takes much time. 
-        Probably it is better to run it directly after the optimization. 
-  - [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
+  - [x] Implement Gaussian mdoe for identifiability analysis; Some inspiration could come from the bbmle package in which a profile-likelihood was   
+        implemented. 
+        (Give up) consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use. 
+       
+
+- [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
   
 - [ ] Revise the hessian funciton for SE calculation, because either optim function ofr hessina function can yield NA for some parameters
 
