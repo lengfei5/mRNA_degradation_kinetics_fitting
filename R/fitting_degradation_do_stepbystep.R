@@ -20,6 +20,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ####################
   # set global functions
   source("R/utilities_generalFunctions.R");
+  set.nb.param();
   set.time.points(mds$zt) #actually this can be also a global parameter, because it is gene-independent
   
   # set scaling factors here as global variables for NB mode
@@ -95,6 +96,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ## model selection  
   ####################
   if(debug){cat('starting model selection \n')}
+  set.nb.data(GeneDataSet);
   source("R/model_selection.R", local = TRUE);
   res.model.sel = my.model.selection.one.gene.loglike(param.fits.results, method = 'BIC', 
                                                                  outlier.m = outlier.m, outlier.s = outlier.s) 

@@ -217,64 +217,22 @@ f2min = function(par, GeneDataSet, model=4, debug = FALSE, parametrization =c('c
 ###############################
 # ERROR function for profile likelihood (identifiability analysis)
 ###############################
-f2min.profile = function(par, par.fixed, index.fixed, R.m, R.s, L.m, L.s, alpha.m, alpha.s, outlier.m = c(), outlier.s = c(), model=3,
-                         zt = seq(0,94,by = 2), norm.params=TRUE)
+f2min.profile = function(param.start, GeneDataSet, which.to.fix, value.to.fix, model=4)
 {
-  w = 2*pi/24;
-  
-  par[index.fixed] = par.fixed; ### fixe one parameter
-  gamma = par[1];
-  
-  if(model==2){
-    eps.gamma = 0.0;
-    phase.gamma = 12.0; 
-    splicing.k = par[2];
-    param.synthesis.1 = par[3];
-    param.synthesis.2 = par[4];  
-    param.synthesis.3 = par[5]; 
-    param.synthesis.4 = par[6]; 
-  }
-  if(model==3){
-    eps.gamma = par[2];
-    phase.gamma = par[3];
-    splicing.k = par[4];
-    param.synthesis.1 = par[5];
-    param.synthesis.2 = 0;  
-    param.synthesis.3 = 0; 
-    param.synthesis.4 = 1; 
-    #param.synthesis.2 = 0;  
-    #param.synthesis.3 = 0; 
-    #param.synthesis.4 = 1; 
-  }
-  if(model==4) {
-    eps.gamma = par[2];
-    phase.gamma = par[3];
-    splicing.k = par[4];
-    param.synthesis.1 = par[5];
-    param.synthesis.2 = par[6];  
-    param.synthesis.3 = par[7]; 
-    param.synthesis.4 = par[8]; 
-    #param.synthesis.2 = par[6];  
-    #param.synthesis.3 = par[7]; 
-    #param.synthesis.4 = par[8]; 
+  ## convert back the list of parameters
+  new.starts = rep(NA, length(c(value.to.fix, param.start)))
+  new.starts[which.to.fix] = value.to.fix;
+  if(which.to.fix==1) {
+    new.starts = c(value.to.fix, param.start)
+  }else{
+    if(which.to.fix==(length(param.start)+1)) {
+      new.starts = c(param.start, value.to.fix)
+    }else{
+      new.starts = c(param.start[c(1:(which.to.fix-1))], value.to.fix, param.start[c(which.to.fix:length(param.start))])
+    }
   }
   
-  s = compute.s.beta(t = zt, param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4)
-  #print(par);
-  #print(compute.m.beta(t = zt, gamma, eps.gamma, phase.gamma, splicing.k, param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4, simulation.only=TRUE))
-  
-  m = compute.m.beta(t = zt, gamma, eps.gamma*sqrt(1+w^2/gamma^2), (phase.gamma-atan2(w, gamma)/w), splicing.k*gamma,
-                     param.synthesis.1, param.synthesis.2, param.synthesis.3, param.synthesis.4);
-  
-  ### convert rpkm into mean of read numbers
-  mu.m = convert.nb.reads(m, L.m);
-  mu.s = convert.nb.reads(s, L.s);
-  
-  err.profile = NB.error(R.m = R.m, R.s = R.s, alpha.m = alpha.m, alpha.s = alpha.s, mu.m = mu.m, mu.s = mu.s, 
-                         outlier.m = outlier.m, outlier.s = outlier.s, specie = 'both');
-  
-  eps.non.scaled = eps.gamma*sqrt(1+w^2/gamma^2); 
-  err.profile = err.profile + sigmoid.bound.contraint(eps.non.scaled);  
+  err.profile = f2min(new.starts, GeneDataSet, model=model)
     
   return(err.profile)
   

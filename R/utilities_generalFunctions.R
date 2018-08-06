@@ -56,17 +56,21 @@ ExtractGeneData = function(mds, gene.index)
 }
 
 ## time points, data, parameters
+set.nb.param = function(absolute.signal=TRUE) ## requires modification 
+{
+  nb.param <<- c(2,6,5,8);
+  #n.param <<- c(0,6,5,8); #the one before 
+  #n.param = c(0,5,3,7) from Laura's function
+}
+
 set.time.points = function(time.points)
 {
   zt <<- time.points;
 }
 
-set.nb.data.param = function(absolute.signal=TRUE) ## requires modification 
+set.nb.data = function(GeneDataSet)
 {
-  nb.data <<- 96; 
-  n.param <<- c(2,6,5,8);
-  #n.param <<- c(0,6,5,8); #the one before 
-  #n.param = c(0,5,3,7) from Laura's function
+  nb.data <<- length(GeneDataSet$Norm.m) + length(GeneDataSet$Norm.s) - length(GeneDataSet$outlier.m) - length(GeneDataSet$outlier.s); 
 }
 
 ###############################
