@@ -80,13 +80,14 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   ## Analyze non-identifiability using Profile Likelihood approache
   ####################
   if(identifiablity.analysis.gamma){
-    source("R/identifiability_analysis.R", local = TRUE)
     if(debug){cat('starting non-identifiability analysis for gamma \n')}
-    res.nonident.analysis.gamma.all.models = Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet);
+    
+    source("R/identifiability_analysis.R", local = TRUE)
+    res.nonident.gamma = Identifiablity.analysis.gamma.all.models(param.fits.results, GeneDataSet);
                                                                                       
   }else{
-    res.nonident.analysis.gamma.all.models = rep(NA, 8);
-    names(res.nonident.analysis.gamma.all.models) = paste0(c('non.identifiability.gamma.L.m', 'non.identifiability.gamma.R.m'), 
+    res.nonident.gamma = rep(NA, 8);
+    names(res.nonident.gamma) = paste0(c('non.identifiability.gamma.L.m', 'non.identifiability.gamma.R.m'), 
                                                           rep(c(1:4), each=2))
   }
   
@@ -107,7 +108,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
   # param.fits.results.save4test = param.fits.results;
   param.transformed.cleaned = transform.parameter.combinations.cleaning(param.fits.results,
                                                                         res.model.sel,
-                                                                        res.nonident.analysis.gamma.all.models)
+                                                                        res.nonident.gamma)
   
   ####################
   ## output  
@@ -119,7 +120,7 @@ make.fits.with.all.models.for.one.gene.remove.outliers = function(mds,
                                 m2 = param.fits.results[grep('.m2', names(param.fits.results))],
                                 m3 = param.fits.results[grep('.m3', names(param.fits.results))],
                                 m4 = param.fits.results[grep('.m4', names(param.fits.results))]),
-              nonident.analysis.for.gamma = res.nonident.analysis.gamma.all.models,
+              nonident.analysis.for.gamma = res.nonident.gamma,
               outliers = list(outlier.m = paste(outlier.m, sep='', collapse = ','), outlier.s = paste(outlier.s, sep='', collapse = ',')),
               model.selection = res.model.sel,
               param.fit.cleaned = param.transformed.cleaned)

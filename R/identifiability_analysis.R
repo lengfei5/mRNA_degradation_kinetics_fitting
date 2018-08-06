@@ -7,6 +7,67 @@
 ## Date of creation: Mon Jun  4 13:46:18 2018
 ##########################################################################
 ##########################################################################
+source("R/error_functions.R", local = TRUE)
+source("R/set_bounds_initialize_values.R", local = TRUE)
+
+Identifiablity.analysis.gamma.all.models = function(param.fits.results, GeneDataSet)
+{
+  zt = unlist(GeneDataSet$zt)
+  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
+  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
+  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
+  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
+  
+  alpha.m = unlist(GeneDataSet$alpha.m)
+  alpha.s = unlist(GeneDataSet$alpha.s)
+  
+  outlier.m = unlist(GeneDataSet$outlier.m)
+  outlier.s = unlist(GeneDataSet$outlier.s)
+  
+  M = norm.RPKM(R.m, L.m)
+  S = norm.RPKM(R.s, L.s)
+  a = mean(M)/mean(S) # ratio between splicing rate and degratation rate
+  
+  res.iden.all = c();
+  for(model in c(2:4))
+  {
+    cat('\t model ', model, '\n');
+    error.fit = param.fits.results[which(names(param.fits.results)==paste('error.m', model, sep=''))];
+    res.fit = param.fits.results[grep(paste('.m', model, sep=''), names(param.fits.results))];
+    res.fit = res.fit[-1];
+    
+    bounds.gene = set.bounds.gene(GeneDataSet = GeneDataSet, model);
+    upper = bounds.gene$upper; 
+    lower = bounds.gene$lower;
+    
+    if(model==2) res.fit = res.fit[1:6];
+    if(model==3) res.fit = res.fit[1:5];
+    if(model==4) res.fit = res.fit[1:8];
+    
+    res.nonident.analysis.gamma.spec.model = Identifiablity.analysis.gamma.each.model(error.opt=error.fit, 
+                                                                                      params.opt =res.fit, 
+                                                                                      lower = lower, 
+                                                                                      upper = upper, 
+                                                                                      R.m = R.m, 
+                                                                                      R.s = R.s, 
+                                                                                      L.m=L.m, 
+                                                                                      L.s = L.s, 
+                                                                                      alpha.m=alpha.m, 
+                                                                                      alpha.s=alpha.s, 
+                                                                                      outlier.m = outlier.m, 
+                                                                                      outlier.s = outlier.s, 
+                                                                                      model = model, 
+                                                                                      zt = zt);
+    
+    names(res.nonident.analysis.gamma.spec.model) = paste(names(res.nonident.analysis.gamma.spec.model), '.m', model, sep='');
+    res.iden.all = c(res.iden.all, res.nonident.analysis.gamma.spec.model);
+  }
+  
+  return(res.iden.all)
+  
+}
+
+
 Identifiablity.analysis.gamma.each.model = function (error.opt, params.opt, lower, upper, R.m, R.s, L.m, L.s, alpha.m, alpha.s, model = 3, zt,
                                                      outlier.m = c(), outlier.s = c(), PLOT.PL = FALSE, gene2plot='Per1') 
 {
@@ -71,61 +132,3 @@ Identifiablity.analysis.gamma.each.model = function (error.opt, params.opt, lowe
   return(res.bounds);
   
 }
-
-Identifiablity.analysis.gamma.all.models = function(param.fits.results, GeneDataSet)
-{
-  zt = unlist(GeneDataSet$zt)
-  R.m = unlist(GeneDataSet$R.m) #R.m = unlist(T[gene.index, i.ex]) ## nb of reads for exon
-  R.s = unlist(GeneDataSet$R.s) #R.s = unlist(T[gene.index, i.int]) ## nb of reads for intron
-  L.m = GeneDataSet$L.m # L.m = T$length.mRNA[gene.index];
-  L.s = GeneDataSet$L.s  #L.s = T$length.premRNA[gene.index];
-  
-  alpha.m = unlist(GeneDataSet$alpha.m)
-  alpha.s = unlist(GeneDataSet$alpha.s)
-  
-  outlier.m = unlist(GeneDataSet$outlier.m)
-  outlier.s = unlist(GeneDataSet$outlier.s)
-  
-  M = norm.RPKM(R.m, L.m)
-  S = norm.RPKM(R.s, L.s)
-  a = mean(M)/mean(S) # ratio between splicing rate and degratation rate
-  
-  res.iden.all = c();
-  for(model in c(2:4))
-  {
-    cat('\t model ', model, '\n');
-    error.fit = param.fits.results[which(names(param.fits.results)==paste('error.m', model, sep=''))];
-    res.fit = param.fits.results[grep(paste('.m', model, sep=''), names(param.fits.results))];
-    res.fit = res.fit[-1];
-    
-    bounds.gene = set.bounds.gene(GeneDataSet = GeneDataSet, model);
-    upper = bounds.gene$upper; 
-    lower = bounds.gene$lower;
-    
-    if(model==2) res.fit = res.fit[1:6];
-    if(model==3) res.fit = res.fit[1:5];
-    if(model==4) res.fit = res.fit[1:8];
-    
-    res.nonident.analysis.gamma.spec.model = Identifiablity.analysis.gamma.each.model(error.opt=error.fit, 
-                                                                           params.opt =res.fit, 
-                                                                           lower = lower, 
-                                                                           upper = upper, 
-                                                                           R.m = R.m, 
-                                                                           R.s = R.s, 
-                                                                           L.m=L.m, 
-                                                                           L.s = L.s, 
-                                                                           alpha.m=alpha.m, 
-                                                                           alpha.s=alpha.s, 
-                                                                           outlier.m = outlier.m, 
-                                                                           outlier.s = outlier.s, 
-                                                                           model = model, 
-                                                                           zt = zt);
-    
-    names(res.nonident.analysis.gamma.spec.model) = paste(names(res.nonident.analysis.gamma.spec.model), '.m', model, sep='');
-    res.iden.all = c(res.iden.all, res.nonident.analysis.gamma.spec.model);
-  }
-  
-  return(res.iden.all)
-  
-}
-

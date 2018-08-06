@@ -49,8 +49,8 @@ if(TEST.readCount.NB){
   #mds = MDfitDataSet(P = T[, ZT.int], M = T[, ZT.ex], zt=zt, mode = "logNormal", fitType.var = "pool")
   #save(mds, file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
   
-  #load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
-  load(file = "data/MDfitDataSet_example_logNormal.Rdata")
+  load(file = "data/MDfitDataSet_example_logNormal_varEst.poolPM.Rdata")
+  #load(file = "data/MDfitDataSet_example_logNormal.Rdata")
 }
 
 ####################
@@ -58,9 +58,9 @@ if(TEST.readCount.NB){
 ####################
 outliers.removal = TRUE;
 debug = TRUE;
-identifiablity.analysis.gamma = FALSE
+identifiablity.analysis.gamma = TRUE
 
-gg = "Fus"
+gg = "Per3"
 gene.index = which(T$gene==gg)
 
 ####################
