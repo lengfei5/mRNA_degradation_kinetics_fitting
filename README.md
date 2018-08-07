@@ -24,15 +24,14 @@ Here is the reminder for the improvement:
   - [x] Implement Gaussian mdoe for identifiability analysis; Some inspiration could come from the bbmle package in which a profile-likelihood was   
         implemented. 
         (Give up) consider to use bbmle package in R instead of optim, or at least for profile-likelihood, which could be much faster and more convenient to use. 
-       
-
-- [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
-  
-- [ ] Revise the hessian funciton for SE calculation, because either optim function ofr hessina function can yield NA for some parameters
 
 - [ ] Now the code is designed just for fitting one gene. 
   Ideally the code can easily fit all genes in the data in parallel.
   Thus the parallization should be taken into consideration now. 
+
+- [ ] Since the Gaussian need to calculate error function in log scale, probably need to impute the data if there are zeros
+  
+- [ ] Revise the hessian funciton for SE calculation, because either optim function ofr hessina function can yield NA for some parameters
 
 - [ ] Not sure we should change S3 class to S4 (more strict in the definition and less error-prone in usage)
 
@@ -63,8 +62,8 @@ allocation of tasks to persons to be determined ...
 * **[run_modelFitting_forAll.R]** -- the script showing how to run the main function and to specify the parameters
 * **data/** -- data example (the read count table used in the PNAS paper) 
 * **R/** -- scripts for the main function
+* **src/** -- C++ code
 * **origin/** -- origin scripts based on which we implement this pacakge and also the scripts used for the PNAS paper (before cleaning)
-
 
 ## Code structure
 Here is the structure of inital codes:
