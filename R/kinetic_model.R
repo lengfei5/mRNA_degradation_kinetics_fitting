@@ -30,8 +30,10 @@ compute.s.beta.v1 = function(t = zt, mean = 1, fold.change = 2, phase = 12, beta
 compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, phase.gamma=12, 
                           splicing.k=log(2)/(5/60), Min = 0.5, Amp=5, phase=12, beta=1, simulation.only=FALSE)
 {
-  #gamma=log(2)/5; eps.gamma=0.25; phase.gamma=12; splicing.k=log(2)/(5/60); mean = 10; fold.change=10; phase=6; beta=1;t = seq(0,46, by=2);simulation.only=FALSE
-  #gamma=4.159; eps.gamma=0.3; phase.gamma=24; splicing.k=43.135; Min = 0.01418; Amp=0.215; phase=6.3; beta=5;t = seq(0,94, by=2);simulation.only=FALSE
+  # gamma=log(2)/5; eps.gamma=0.25; phase.gamma=12; splicing.k=log(2)/(5/60); mean = 10; 
+  # fold.change=10; phase=6; beta=1;t = seq(0,46, by=2);simulation.only=FALSE
+  # gamma=4.159; eps.gamma=0.3; phase.gamma=24; splicing.k=43.135; Min = 0.01418; Amp=0.215; phase=6.3; beta=5;
+  # t = seq(0,94, by=2);simulation.only=FALSE
   w = 2*pi/24;
   zt = t;
   
@@ -75,7 +77,9 @@ compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, pha
 ######################################
 ######################################
 #### Integration
-integrate.m = function(t=seq(0, 46, by=2), gamma=log(2)/5, eps.gamma=0.2, phase.gamma=12, splicing.k=log(2)/(5/60), Min = 0.5, Amp=2.0, phase=12, beta=1)
+integrate.m = function(t=seq(0, 46, by=2), 
+                       gamma=log(2)/5, eps.gamma=0.2, phase.gamma=12, splicing.k=log(2)/(5/60), 
+                       Min = 0.5, Amp=2.0, phase=12, beta=1)
 {
   w = 2*pi/24;
   m = rep(0, length(t))
