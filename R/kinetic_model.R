@@ -76,7 +76,9 @@ compute.m.beta = function(t=seq(0, 94, by=2), gamma=log(2)/5, eps.gamma=0.2, pha
 ## Section: low-level functions for the main functions to calculating temporal profiles of pre-mRNA and mRNAs
 ######################################
 ######################################
-#### Integration
+###############################
+# compute m by integreation 
+###############################
 integrate.m = function(t=seq(0, 46, by=2), 
                        gamma=log(2)/5, eps.gamma=0.2, phase.gamma=12, splicing.k=log(2)/(5/60), 
                        Min = 0.5, Amp=2.0, phase=12, beta=1)
@@ -114,7 +116,9 @@ Gamma = function(t = 0, gamma = log(2)/3, eps.gamma = 0.2, phase.gamma = 0)
   return(Gamma)
 }
 
-#### Simulation
+###############################
+# compute m by simulation
+###############################
 dmdt = function(t, y, par)
 {
   m = y	

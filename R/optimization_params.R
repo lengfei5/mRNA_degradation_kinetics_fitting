@@ -207,7 +207,7 @@ make.optimization = function(GeneDataSet,
     
     opt = optim(par.init, f2min, GeneDataSet = GeneDataSet, model = model, debug = debug, norm.params=norm.params,
                 method = 'L-BFGS-B', lower = bounds.g$lower, upper = bounds.g$upper, 
-                control = list(maxit=500,trace=0), hessian = FALSE)
+                control = list(maxit=300,trace=0), hessian = FALSE)
     
     #opt = optim(par.init, f2min, R.m = R.m, R.s = R.s, L.m=L.m, L.s = L.s, alpha.m=alpha.m, alpha.s=alpha.s, 
     #            outlier.m = outlier.m, outlier.s = outlier.s, model = model, debug = debug, zt = zt, norm.params=norm.params,
