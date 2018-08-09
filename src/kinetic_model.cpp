@@ -98,7 +98,6 @@ NumericVector compute_m_beta(NumericVector t,
     
     res_integrate = Numer::integrate(f, lower, upper, err_est, err_code);
     res_Gamma =  gamma * (upper + eps_gamma/w * sin(w * (upper - phase_gamma)));
-    //m(i) = 0.2 *  Min + Amp * pow(((1.0+cos(w*(t(i)-phase)))/2.0), beta);
     m[i] = splicing_k * exp(-res_Gamma) * res_integrate ;
     //m[i] = splicing.k*exp(-Gamma(t = Tstable+time, gamma = gamma, eps.gamma=eps.gamma, phase.gamma=phase.gamma)) *
     //integrate(f2integrate, lower = 0, upper = Tstable+time, par = c(gamma, eps.gamma, phase.gamma, Min, Amp, phase, beta))$value
